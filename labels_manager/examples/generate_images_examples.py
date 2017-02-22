@@ -6,15 +6,17 @@ import nibabel as nib
 import scipy.ndimage.filters as fil
 
 from definitions import root_dir
-from labels_managers.tools.aux_methods.utils import generate_o, generate_c
-from labels_managers.tools.detectors.segmentation import intensity_segmentation
+from labels_manager.tools.aux_methods.utils import generate_o, generate_c
+from labels_manager.tools.detectors.segmentation import intensity_segmentation
 
 
 def generate_figures():
 
+    print 'Generate figures for the examples, may take some seconds: '
+
     # create images examples folder:
 
-    examples_folder = jph(root_dir, 'examples', 'images_examples')
+    examples_folder = jph(root_dir, 'images_examples')
     os.system('mkdir -p ' + examples_folder)
 
     segmentation_levels = 7

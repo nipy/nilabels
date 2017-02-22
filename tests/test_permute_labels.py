@@ -1,6 +1,7 @@
 import numpy as np
+import sys
 
-from tools.labels.relabeller import permute_labels
+from labels_manager.tools.labels.relabeller import permute_labels
 
 
 def test_permute_labels_basic():
@@ -30,4 +31,3 @@ def test_permute_labels_basic_2():
     c = permute_labels(a, permutation=[[5, 7, 8, 3], [7, 8, 3, 5]])
     print
     print c
-

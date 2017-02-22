@@ -3,8 +3,7 @@ import copy
 import numpy as np
 import nibabel as nib
 
-from labels_managers.tools.aux_methods.utils import set_new_data
-from labels_managers.tools.aux_methods.permutations import is_valid_permutation
+from labels_manager.tools.aux_methods.permutations import is_valid_permutation
 
 
 def relabeller(in_data, list_old_labels, list_new_labels):

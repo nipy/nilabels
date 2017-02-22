@@ -2,8 +2,8 @@ import os
 import numpy as np
 
 import nibabel as nib
-from labels_managers.tools.aux_methods.utils import set_new_data
-from labels_managers.tools.labels.relabeller import relabeller_path
+from labels_manager.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.labels.relabeller import relabeller_path
 
 """
 Basic rotations of a 3d matrix.

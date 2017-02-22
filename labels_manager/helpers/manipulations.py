@@ -3,14 +3,14 @@ import numpy as np
 import nibabel as nib
 
 
-from labels_managers.tools.aux_methods.utils import set_new_data
-from labels_managers.tools.labels.relabeller import relabeller, permute_labels, erase_labels, assign_all_other_labels_the_same_value
-from labels_managers.tools.labels.splitter import split_labels_to_4d
-from labels_managers.tools.labels.merger import merge_labels_from_4d
-from labels_managers.tools.labels.selector import keep_only_one_label
-from labels_managers.tools.labels.symmetrizer import symmetrise_data, sym_labels
-from labels_managers.tools.labels.propagators import simple_propagator
-from labels_managers.tools.aux_methods.sanity_checks import arrange_path
+from labels_manager.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.labels.relabeller import relabeller, permute_labels, erase_labels, assign_all_other_labels_the_same_value
+from labels_manager.tools.labels.splitter import split_labels_to_4d
+from labels_manager.tools.labels.merger import merge_labels_from_4d
+from labels_manager.tools.labels.selector import keep_only_one_label
+from labels_manager.tools.labels.symmetrizer import symmetrise_data, sym_labels
+from labels_manager.tools.labels.propagators import simple_propagator
+from labels_manager.tools.aux_methods.sanity_checks import arrange_path
 
 
 class LabelsManagerManipulate(object):

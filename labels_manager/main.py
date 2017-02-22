@@ -1,8 +1,8 @@
 import os
 
-from labels_managers.helpers.manipulations import LabelsManagerManipulate
-from labels_managers.helpers.measures import LabelsManagerMeasure
-from labels_managers.helpers.detectors import LabelsManagerDetect
+from labels_manager.helpers.manipulations import LabelsManagerManipulate
+from labels_manager.helpers.measures import LabelsManagerMeasure
+from labels_manager.helpers.detectors import LabelsManagerDetect
 
 
 class LabelsManager(object):

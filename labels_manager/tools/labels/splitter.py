@@ -2,7 +2,7 @@ import os
 import numpy as np
 import nibabel as nib
 
-from labels_managers.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.aux_methods.utils import set_new_data
 
 
 def split_labels_to_4d(in_data, relabel_in_consecutive_numbers=True):
