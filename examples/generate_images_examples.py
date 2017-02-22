@@ -7,12 +7,12 @@ import scipy.ndimage.filters as fil
 
 from definitions import root_dir
 from labels_manager.tools.aux_methods.utils import generate_o, generate_c
-from labels_manager.tools.detectors.segmentation import intensity_segmentation
+from labels_manager.tools.detections.get_segmentation import intensity_segmentation
 
 
 def generate_figures():
 
-    print 'Generate figures for the examples, may take some seconds: '
+    print('Generate figures for the examples, may take some seconds: ')
 
     # create images examples folder:
 

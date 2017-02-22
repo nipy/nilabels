@@ -6,3 +6,4 @@ MANIFEST
 *.egg-info
 build
 images_examples
+images_output

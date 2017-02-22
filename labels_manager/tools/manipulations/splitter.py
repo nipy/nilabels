@@ -57,7 +57,7 @@ def split_labels_path(input_im_path, output_im_path, remove_gaps=True):
 
     im_labels = nib.load(input_im_path)
     data_labels = im_labels.get_data()
-    data_relabelled = split_labels(data_labels, remove_gaps=remove_gaps)
+    data_relabelled = split_labels_to_4d(data_labels, remove_gaps=remove_gaps)
 
     im_relabelled = set_new_data(im_labels, data_relabelled)
     nib.save(im_relabelled, output_im_path)

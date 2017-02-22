@@ -3,7 +3,7 @@ import numpy as np
 
 import nibabel as nib
 from labels_manager.tools.aux_methods.utils import set_new_data
-from labels_manager.tools.labels.relabeller import relabeller_path
+from labels_manager.tools.manipulations.relabeller import relabeller
 
 """
 Basic rotations of a 3d matrix.
@@ -216,12 +216,13 @@ def symmetrise_image_path(input_im_path, output_im_path,
     print('Symmetrised image from \n{0} \n saved in \n{1}'.format(input_im_path, output_im_path))
 
 
-def sym_labels(in_img_anatomy_path,
-               in_img_labels_path,
-               labels_input,
-               result_img_path,
-               results_folder,
-               labels_transformed=None,
+def sym_labels(pfi_anatomy,
+               pfi_segmentation,
+               pfo_results,
+               pfi_result_segmentation,
+               list_labels_input,
+               list_labels_transformed=None,
+               reuse_registration=False,
                coord='z'):
 
     # side A is the input, side B is the one where we want to symmetrise.
@@ -229,61 +230,76 @@ def sym_labels(in_img_anatomy_path,
     # --- Initialisation  --- #
 
     # check input:
-    if not os.path.isfile(in_img_anatomy_path):
-        raise IOError('input image file does not exist.')
-    if not os.path.isfile(in_img_labels_path):
-        raise IOError('input image file does not exist.')
+    if not os.path.isfile(pfi_anatomy):
+        raise IOError('input image file {} does not exist.'.format(pfi_anatomy))
+    if not os.path.isfile(pfi_segmentation):
+        raise IOError('input segmentation file {} does not exist.'.format(pfi_segmentation))
 
     # erase labels that are not in the list from image and descriptor
 
-    out_labels_side_A_path = os.path.join(results_folder, 'z_labels_side_A.nii.gz')
-    labels_im = nib.load(in_img_labels_path)
+    out_labels_side_A_path = os.path.join(pfo_results, 'z_labels_side_A.nii.gz')
+    labels_im = nib.load(pfi_segmentation)
     labels_data = labels_im.get_data()
-    labels_to_erase = list(set(labels_data.flat) - set(labels_input))
-    relabeller_path(in_img_labels_path, out_labels_side_A_path,
-                    list_old_labels=labels_to_erase,
-                    list_new_labels=[0, ] * len(labels_to_erase))
+    labels_to_erase = list(set(labels_data.flat) - set(list_labels_input))
+
+    # Relabel: from pfi_segmentation to out_labels_side_A_path
+    im_pfi_segmentation = nib.load(pfi_segmentation)
+
+    segmentation_data_relabelled = relabeller(im_pfi_segmentation.get_data(), list_old_labels=labels_to_erase,
+                                              list_new_labels=[0, ] * len(labels_to_erase))
+    nib_labels_side_A_path = set_new_data(im_pfi_segmentation, segmentation_data_relabelled)
+    nib.save(nib_labels_side_A_path, out_labels_side_A_path)
 
     # --- Create side B  --- #
 
     # flip anatomical image and register it over the non flipped
-    out_anatomical_flipped_path = os.path.join(results_folder, 'z_anatomical_flipped.nii.gz')
-    flip_data_path(in_img_anatomy_path, out_anatomical_flipped_path, axis=coord)
+    out_anatomical_flipped_path = os.path.join(pfo_results, 'z_anatomical_flipped.nii.gz')
+    flip_data_path(pfi_anatomy, out_anatomical_flipped_path, axis=coord)
 
     # flip the labels
-    out_labels_flipped_path = os.path.join(results_folder, 'z_labels_flipped.nii.gz')
+    out_labels_flipped_path = os.path.join(pfo_results, 'z_labels_flipped.nii.gz')
     flip_data_path(out_labels_side_A_path, out_labels_flipped_path, axis=coord)
 
     # register anatomical flipped over non flipped
-    out_anatomical_flipped_warped_path = os.path.join(results_folder, 'z_anatomical_flipped_warped.nii.gz')
-    out_affine_transf_path = os.path.join(results_folder, 'z_affine_transformation.txt')
-    cmd = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3}'.format(in_img_anatomy_path,
-                                                                  out_anatomical_flipped_path,
-                                                                  out_affine_transf_path,
-                                                                  out_anatomical_flipped_warped_path)
-    os.system(cmd)
+    out_anatomical_flipped_warped_path = os.path.join(pfo_results, 'z_anatomical_flipped_warped.nii.gz')
+    out_affine_transf_path = os.path.join(pfo_results, 'z_affine_transformation.txt')
 
-    # propagate the registration to the flipped labels
-    out_labels_side_B_path = os.path.join(results_folder, 'z_labels_side_B.nii.gz')
-    cmd = 'reg_resample -ref {0} -flo {1} -res {2} -trans {3} -inter {4}'.format(
-           out_labels_side_A_path,
-           out_labels_flipped_path,
-           out_labels_side_B_path,
-           out_affine_transf_path,
-           0)
+    if not reuse_registration:
+        cmd = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3}'.format(pfi_anatomy,
+                                                                      out_anatomical_flipped_path,
+                                                                      out_affine_transf_path,
+                                                                      out_anatomical_flipped_warped_path)
+        print('Registration started!\n')
+        os.system(cmd)
 
-    print('Resampling started!')
-    os.system(cmd)
+        # propagate the registration to the flipped labels
+        out_labels_side_B_path = os.path.join(pfo_results, 'z_labels_side_B.nii.gz')
+        cmd = 'reg_resample -ref {0} -flo {1} ' \
+          '-res {2} -trans {3} -inter {4}'.format(out_labels_side_A_path,
+                                                   out_labels_flipped_path,
+                                                   out_labels_side_B_path,
+                                                   out_affine_transf_path,
+                                                   0)
+
+        print('Resampling started!\n')
+        os.system(cmd)
+    else:
+        out_labels_side_B_path = os.path.join(pfo_results, 'z_labels_side_B.nii.gz')
 
     # update labels of the side B if necessarily
-    if labels_transformed is not None:
+    if list_labels_transformed is not None:
 
         print('relabelling step!')
 
-        assert len(labels_transformed) == len(labels_input)
-        relabeller_path(out_labels_side_B_path, out_labels_side_B_path,
-                        list_old_labels=labels_input,
-                        list_new_labels=labels_transformed)
+        assert len(list_labels_transformed) == len(list_labels_input)
+
+        # relabel from out_labels_side_B_path to out_labels_side_B_path
+        im_segmentation_side_B = nib.load(out_labels_side_B_path)
+
+        data_segmentation_side_B_new = relabeller(im_segmentation_side_B.get_data(), list_old_labels=list_labels_input,
+                                                list_new_labels=list_labels_transformed)
+        nib_segmentation_side_B_new = set_new_data(im_segmentation_side_B, data_segmentation_side_B_new)
+        nib.save(nib_segmentation_side_B_new, out_labels_side_B_path)
 
     # --- Merge side A and side B in a single volume according to a criteria --- #
     # out_labels_side_A_path,  out_labels_side_B_path --> result_path.nii.gz
@@ -296,10 +312,10 @@ def sym_labels(in_img_anatomy_path,
 
     symmetrised_data = np.zeros_like(data_side_A)
 
-    # vectorise later!
+    # vectorize later!
     dims = data_side_A.shape
 
-    print('Pointwise merging side A, side B started!')
+    print('Pointwise symmetrisation started!')
 
     for z in xrange(dims[0]):
         for x in xrange(dims[1]):
@@ -314,4 +330,4 @@ def sym_labels(in_img_anatomy_path,
                         symmetrised_data[z, x, y] = 255  # devil label!
 
     im_symmetrised = set_new_data(nib_side_A, symmetrised_data)
-    nib.save(im_symmetrised, result_img_path)
+    nib.save(im_symmetrised, pfi_result_segmentation)
