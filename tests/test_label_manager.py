@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from nose.tools import assert_equals, assert_raises, assert_almost_equals
 from numpy.testing import assert_array_equal, assert_almost_equal
-from labels_managers.tools.labels.relabeller import relabeller
 
 
 def test_relabeller_path_simple_input_simple_input(visual_assessment=False):

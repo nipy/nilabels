@@ -126,44 +126,6 @@ def compare_two_nifti(path_img_1, path_img_2):
     return compare_two_nib(im1, im2)
 
 
-def reproduce_slice_fourth_dimension(nib_image, num_slices=10):
-    # can be optimised...!
-
-    im_sh = nib_image.shape
-    if not (len(im_sh) == 2 or len(im_sh) == 3):
-        raise IOError('Methods can be used only for 2 or 3 dim images. No conflicts with existing multi, slices')
-    im_hd = nib_image.get_header()
-
-    new_data = np.zeros(list(im_sh) + [num_slices], dtype=im_hd['datatype'].dtype)
-    a_slice = copy.deepcopy(nib_image.get_data())
-
-    for d in xrange(num_slices):
-        new_data[..., d] = a_slice
-
-    im_output = set_new_data(nib_image, new_data)
-
-    output_im = set_new_data(nib_image, new_data)
-
-    return output_im
-
-
-def reproduce_slice_fourth_dimension_path(pfi_input_image, pfi_output_image, num_slices=10):
-    old_im = nib.load(pfi_input_image)
-    new_im = reproduce_slice_fourth_dimension(old_im, num_slices)
-    nib.save(new_im, pfi_output_image)
-    return 'copied!'
-
-
-'''
-tmp_path = '/Users/sebastiano/Documents/UCL/a_data/bunnies/pipelines/ex_vivo_DWI/zz_test'
-test_obj = os.path.join(tmp_path, 'ciccione_1305_on_1201_3D_mask_affine.nii.gz')
-test_obj_output = os.path.join(tmp_path, 'ciccione_1305_on_1201_3D_mask_affine_output.nii.gz')
-
-d = 12
-copy_and_paste_on_slice_path(test_obj, test_obj_output, d)
-'''
-
-
 def cut_dwi_image_from_first_slice_mask(input_dwi, input_mask):
 
     data_dwi  = input_dwi.get_data()
@@ -197,6 +159,27 @@ def eliminates_consecutive_duplicates(input_list):
     return output_list
 
 
+def threshold_a_matrix(in_matrix, dtype=np.bool):
+    out_matrix = np.zeros_like(in_matrix)
+    non_zero_places = in_matrix != 0
+    np.place(out_matrix, non_zero_places, 1)
+    return out_matrix.astype(dtype)
+
+
+# ---------- Distributions ---------------
+
+def triangular_density_function(x, a, mu, b):
+
+    if a <= x < mu:
+        return 2 * (x - a) / float((b - a) * (mu - a))
+    elif x == mu:
+        return 2 / float(b - a)
+    elif mu < x <= b:
+        return 2 * (b - x) / float((b - a) * (b - mu))
+    else:
+        return 0
+
+
 # ---------- O C generators experiments ---------------
 
 def generate_o(omega=(250, 250), radius=50,
@@ -225,7 +208,7 @@ def generate_c(omega=(250, 250), internal_radius=40, external_radius=60, opening
 
     def get_a_2d_c(omega, internal_radius, external_radius, opening_height, background_intensity, foreground_intensity, dtype):
 
-        m = background_intensity * np.zeros(omega[:2], dtype=dtype)
+        m = background_intensity * np.ones(omega[:2], dtype=dtype)
 
         c = [omega[j] / 2 for j in range(len(omega))]
         # create the crown
@@ -260,3 +243,17 @@ def generate_c(omega=(250, 250), internal_radius=40, external_radius=60, opening
             for z in xrange(margin, omega[2] - 2 * margin):
                 res[..., z] = c_2d
             return res
+
+
+# ---------- Ellipsoids experiments ---------------
+
+def generate_ellipsoid(omega, focus_1, focus_2, distance, background_intensity=0, foreground_intensity=100, dtype=np.uint8):
+    sky = background_intensity * np.ones(omega, dtype=dtype)
+    for xi in range(omega[0]):
+        for yi in range(omega[1]):
+            for zi in range(omega[2]):
+                if np.sqrt( (focus_1[0] - xi) ** 2 + (focus_1[1] - yi) ** 2 + (focus_1[2] - zi) ** 2 ) + \
+                    np.sqrt( (focus_2[0] - xi) ** 2 + (focus_2[1] - yi) ** 2 + (focus_2[2] - zi) ** 2 ) \
+                        <= distance:
+                    sky[xi, yi, zi] = foreground_intensity
+    return sky

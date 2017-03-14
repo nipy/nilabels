@@ -190,32 +190,6 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
     return out_data
 
 
-def symmetrise_image_path(input_im_path, output_im_path,
-                          axis='x', plane_intercept=10,
-                          side_to_copy='below', keep_in_data_dimensions=True):
-
-    # TODO erase when testing done.
-
-    if not os.path.isfile(input_im_path):
-        raise IOError('input image file does not exist.')
-    if not os.path.isfile(output_im_path):
-        raise IOError('input image file does not exist.')
-
-    im_labels = nib.load(input_im_path)
-    input_data = im_labels.get_data()
-
-    symmetrised_data = symmetrise_data(input_data,
-                                       axis=axis,
-                                       plane_intercept=plane_intercept,
-                                       side_to_copy=side_to_copy,
-                                       keep_in_data_dimensions=keep_in_data_dimensions)
-
-    im_relabelled = set_new_data(im_labels, symmetrised_data)
-    nib.save(im_relabelled, output_im_path)
-
-    print('Symmetrised image from \n{0} \n saved in \n{1}'.format(input_im_path, output_im_path))
-
-
 def sym_labels(pfi_anatomy,
                pfi_segmentation,
                pfo_results,
@@ -240,7 +214,7 @@ def sym_labels(pfi_anatomy,
     out_labels_side_A_path = os.path.join(pfo_results, 'z_labels_side_A.nii.gz')
     labels_im = nib.load(pfi_segmentation)
     labels_data = labels_im.get_data()
-    labels_to_erase = list(set(labels_data.flat) - set(list_labels_input))
+    labels_to_erase = list(set(labels_data.flat) - set(list_labels_input + [0]))
 
     # Relabel: from pfi_segmentation to out_labels_side_A_path
     im_pfi_segmentation = nib.load(pfi_segmentation)

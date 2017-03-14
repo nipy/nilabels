@@ -6,13 +6,12 @@ import nibabel as nib
 from labels_manager.tools.aux_methods.utils import set_new_data
 
 
-def merge_labels_from_4d(in_data):
+def merge_labels_from_4d(in_data, keep_original_values=True):
     """
-    Can be the inverse function of split label.
-    From labels splitted in the 4d dimension, it reconstruct the
-    original label volume from the masks in each time-point.
-    The label index corresponds to the number of the slice (starting from 1).
+    Can be the inverse function of split label with default parameters.
+    The labels are assuming to have no overlaps.
     :param in_data: 4d volume
+    :param keep_original_values: merge the labels with their values, otherwise it uses the values of the slice numbering (including zero label!).
     :return:
     """
     msg = 'Input array must be 4-dimensional.'
@@ -21,18 +20,12 @@ def merge_labels_from_4d(in_data):
     in_data_shape = in_data.shape
     out_data = np.zeros(in_data_shape[:3], dtype=in_data.dtype)
 
-    for i in range(in_data_shape[0]):
-        for j in range(in_data_shape[1]):
-            for k in range(in_data_shape[2]):
-
-                # position of element 1 in the row (i,j,k,:)
-                non_zero_label = list(np.where(np.in1d(in_data[i, j, k, :].ravel(), [3, 5]))[0])
-                if len(non_zero_label) > 1:
-                    print('More than one label at one voxel:' \
-                        'voxel = {0}, labels = {1}'.format([i, j, k], non_zero_label))
-
-                out_data[i, j, k] = non_zero_label[0]
-
+    for t in xrange(in_data.shape[3]):
+        slice_t = in_data[...,t]
+        if keep_original_values:
+            out_data = out_data + slice_t
+        else:
+            out_data = (t * slice_t.astype(np.bool)).astype(in_data.dtype)
     return out_data
 
 

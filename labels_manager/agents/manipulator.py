@@ -1,13 +1,12 @@
 import os
 import nibabel as nib
-
+import numpy as np
 
 from labels_manager.tools.aux_methods.utils import set_new_data
 from labels_manager.tools.manipulations.relabeller import relabeller, \
-        permute_labels, erase_labels, assign_all_other_labels_the_same_value
+        permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from labels_manager.tools.manipulations.splitter import split_labels_to_4d
 from labels_manager.tools.manipulations.merger import merge_labels_from_4d
-from labels_manager.tools.manipulations.selector import keep_only_one_label
 from labels_manager.tools.manipulations.symmetrizer import symmetrise_data, sym_labels
 from labels_manager.tools.manipulations.propagators import simple_propagator
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out,\
@@ -22,8 +21,7 @@ class LabelsManagerManipulate(object):
     one or more input manipulate them according to some rule and save the
     output in the output_data_folder or in the specified paths.
     """
-    # TODO add filename for labels descriptors and manipulations of labels
-    # descriptors
+    # TODO add filename for labels descriptors and manipulations of labels descriptors
 
     def __init__(self, input_data_folder=None, output_data_folder=None):
         self.pfo_in = input_data_folder
@@ -31,6 +29,9 @@ class LabelsManagerManipulate(object):
 
     def relabel(self, filename_in, filename_out=None, list_old_labels=(),
                 list_new_labels=()):
+        """
+        Masks of :func:`labels_manager.tools.manipulations.relabeller.relabeller` using filename
+        """
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in,
                                              self.pfo_out)
@@ -58,8 +59,7 @@ class LabelsManagerManipulate(object):
         print('Permuted labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def erase(self, filename_in, filename_out=None, labels_to_erase=(),
-        label_description_path=None):
+    def erase(self, filename_in, filename_out=None, labels_to_erase=()):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
@@ -73,7 +73,7 @@ class LabelsManagerManipulate(object):
         return pfi_out
 
     def assign_all_other_labels_the_same_value(self, filename_in, filename_out=None,
-        labels_to_keep=(), same_value_label=255, label_description_path=None):
+        labels_to_keep=(), same_value_label=255):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
@@ -87,18 +87,48 @@ class LabelsManagerManipulate(object):
         print('Reassigned labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def split_in_4d(self, filename_in, filename_out=None):
+    def keep_one_label(self, filename_in, filename_out=None, label_to_keep=1):
+
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
+
+        im_labels = nib.load(pfi_in)
+        data_labels = im_labels.get_data()
+        data_one_label = keep_only_one_label(data_labels, label_to_keep)
+
+        im_one_label = set_new_data(im_labels, data_one_label)
+        nib.save(im_one_label, pfi_out)
+        print('Label {0} kept from image {1} and saved in {2}.'.format(label_to_keep, pfi_in, pfi_out))
+        return pfi_out
+
+    def extend_slice_new_dimension(self, filename_in, filename_out=None, new_axis=3, num_slices=10):
+
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
+
+        im_slice = nib.load(pfi_in)
+        data_slice = im_slice.get_data()
+
+        data_extended = reproduce_slice_fourth_dimension(data_slice,
+                                num_slices=num_slices, new_axis=new_axis)
+
+        im_extended = set_new_data(im_slice, data_extended)
+        nib.save(im_extended, pfi_out)
+        print('Extended image of {0} saved in {1}.'.format(pfi_in, pfi_out))
+        return pfi_out
+
+    def split_in_4d(self, filename_in, filename_out=None, list_labels=None, keep_original_values=True):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
         im_labels_3d = nib.load(pfi_in)
         data_labels_3d = im_labels_3d.get_data()
         assert len(data_labels_3d.shape) == 3
-        data_split_in_4d = split_labels_to_4d(data_labels_3d)
+        if list_labels is None:
+            list_labels = list(np.sort(list(set(data_labels_3d.flat))))
+        data_split_in_4d = split_labels_to_4d(data_labels_3d, list_labels=list_labels, keep_original_values=keep_original_values)
 
         im_split_in_4d = set_new_data(im_labels_3d, data_split_in_4d)
         nib.save(im_split_in_4d, pfi_out)
-        print('Permuted labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
+        print('Split labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
     def merge_from_4d(self, filename_in, filename_out=None):
@@ -112,22 +142,7 @@ class LabelsManagerManipulate(object):
 
         im_merged_in_3d = set_new_data(im_labels_4d, data_merged_in_3d)
         nib.save(im_merged_in_3d, pfi_out)
-        print('Permuted labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
-        return pfi_out
-
-    def keep_one_label(self, filename_in, filename_out=None, labels_to_keep=1,
-        label_description_path=None):
-        # set all lables to a value (instead!)
-
-        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
-
-        im_labels = nib.load(pfi_in)
-        data_labels = im_labels.get_data()
-        data_one_label = keep_only_one_label(data_labels, labels_to_keep)
-
-        im_one_label = set_new_data(im_labels, data_one_label)
-        nib.save(im_one_label, pfi_out)
-        print('One label extracted from image {0} and saved in {1}.'.format(pfi_in, pfi_out))
+        print('Merged labels from 4d image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
     def symmetrise_axial(self, filename_in, filename_out=None, axis='x', plane_intercept=10,
@@ -145,7 +160,7 @@ class LabelsManagerManipulate(object):
 
         im_symmetrised = set_new_data(im_labels, data_symmetrised)
         nib.save(im_symmetrised, pfi_out)
-        print('Symmetrised image of {0} saved in {1}.'.format(pfi_in, pfi_out))
+        print('Symmetrised axis {0}, plane_intercept {1}, image of {2} saved in {3}.'.format(axis, plane_intercept, pfi_in, pfi_out))
         return pfi_out
 
     def symmetrise_with_registration(self,
@@ -179,38 +194,3 @@ class LabelsManagerManipulate(object):
                    list_labels_transformed=list_labels_transformed,
                    coord=coord,
                    reuse_registration=reuse_registration)
-
-    def registration_propagator(self,
-                                ref_in,
-                                flo_in,
-                                flo_mask_in,
-                                flo_on_ref_img_out,
-                                flo_on_ref_mask_out,
-                                flo_on_ref_trans_out):
-
-        ref_in               = connect_tail_head_path(self.pfo_in, ref_in)
-        flo_in               = connect_tail_head_path(self.pfo_in, flo_in)
-        flo_mask_in          = connect_tail_head_path(self.pfo_in, flo_mask_in)
-        flo_on_ref_img_out   = connect_tail_head_path(self.pfo_in, flo_on_ref_img_out)
-        flo_on_ref_mask_out  = connect_tail_head_path(self.pfo_in, flo_on_ref_mask_out)
-        flo_on_ref_trans_out = connect_tail_head_path(self.pfo_in, flo_on_ref_trans_out)
-
-        simple_propagator(ref_in, flo_in, flo_mask_in,
-                          flo_on_ref_img_out, flo_on_ref_mask_out, flo_on_ref_trans_out,
-                          settings_reg='', settings_interp=' -inter 0 ',
-                          verbose_on=True, safety_on=False)
-
-    def extend_slice_new_dimension(self, filename_in, filename_out=None, new_axis=3, num_slices=10):
-
-        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
-
-        im_slice = nib.load(pfi_in)
-        data_slice = im_slice.get_data()
-
-        data_extended = reproduce_slice_fourth_dimension(data_slice, num_slices=num_slices,
-                                                         repetition_axis=new_axis)
-
-        im_extended = set_new_data(im_slice, data_extended)
-        nib.save(im_extended, pfi_out)
-        print('Extended image of {0} saved in {1}.'.format(pfi_in, pfi_out))
-        return pfi_out

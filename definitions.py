@@ -28,11 +28,11 @@ definition_atlas = """ An atlas is the segmentation of the template, obtained av
 the series of segmentations corresponding to the series of images acquisition that generates the template.
 """
 
-definition_label = """ A segmentation assigns each region a label, and labels 
+definition_label = """ A segmentation assigns each region a label, and labels
 are represented as subset of voxel with the same positive integer value.
 """
 
 nomenclature_conventions = """ pfi_xxx = path to file xxx, \npfo_xxx = path to folder xxx,
-\nin_xxx = input data structure xxx, \nout_xxx = output data structure xxx,
-\n z_ : prefix to temporary files and folders
+\nin_xxx = input data structure xxx, \nout_xxx = output data structure xxx, \nz_ : prefix to temporary files and folders,
+\nfin_ : file name.
 """

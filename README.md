@@ -1,4 +1,5 @@
-# Label manager
+# Labels Manager (labels_manager)
+Python 2.7
 
 Quick manipulation of medical images segmentations.
 Main image format considered for images is nifti (.nii or .nii.gz).
@@ -8,10 +9,13 @@ Main image format considered for images is nifti (.nii or .nii.gz).
 What can you do with the package labels_manager:
 
 
+## Tests - Nose
+
+
 
 ## Instructions
-The code can be installed as a python package on a virtualenv (strongly recommended as it is recommended to avoid installing this package on system python interpreter).
-As usual I do not take responsibility for any damage this package may cause to everything of anyone.
+The tools and manager in the code can be installed as a python package on a virtualenv 
+(strongly recommended as it is recommended to avoid installing this package on system python interpreter).
 It is based on NiftyReg, NiftySeg, ITK-snap and some python (2.7) standard libraries
 
 + Install [NiftySeg](http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftySeg_install)
@@ -24,7 +28,7 @@ It is based on NiftyReg, NiftySeg, ITK-snap and some python (2.7) standard libra
 
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
-### Detailed instructions after installing NiftyReg, NiftySeg and requirement
+### To use as a package in a virtualenv.
 
 1) activate the virtualenvironment in the root folder of the repository.
 
