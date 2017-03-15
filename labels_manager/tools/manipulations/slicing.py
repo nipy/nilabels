@@ -1,4 +1,5 @@
 import numpy as np
+from labels_manager.tools.aux_methods.utils import set_new_data
 
 
 def reproduce_slice_fourth_dimension(in_data, num_slices=10, new_axis=3):
@@ -22,3 +23,8 @@ def cut_4d_volume_with_a_1_slice_mask(data_4d, data_mask):
 
     # image with header of the dwi and values under the mask for each slice:
     return data_masked_4d
+
+
+def grab_a_timepoint(input_4d_im, t=0):
+    assert t < input_4d_im.shape[3]
+    return set_new_data(input_4d_im, input_4d_im.get_data()[..., t])

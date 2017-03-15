@@ -16,8 +16,8 @@ if __name__ == '__main__':
     run_steps = {'Generate results folders' : False,
                  'Register and propagate'   : False,
                  'Create stack of images'   : False,
-                 'Fuse LNCC'                : True,
-                 'Fuse weighted'            : False,
+                 'Fuse LNCC'                : False,
+                 'Fuse weighted'            : True,
                  'Fuse seg_LabFusion'       : False,
                  'Fuse staple cmtk'         : False}
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         print cmd_mv
         os.system(cmd_mv)
 
-        # --- not really working!
+        #
 
     if run_steps['Fuse staple cmtk']:
 
@@ -148,4 +148,4 @@ if __name__ == '__main__':
                                                        jph(pfo_results_label_fusion, 'fusion_seg_ANTS_test1.nii.gz'))
         os.system(cmd)
 
-        # --- neither...!
+        #

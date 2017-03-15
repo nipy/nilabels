@@ -1,7 +1,4 @@
-import os
-import copy
 import numpy as np
-import nibabel as nib
 
 from labels_manager.tools.aux_methods.utils import set_new_data
 
@@ -25,22 +22,18 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
         if keep_original_values:
             out_data = out_data + slice_t
         else:
-            out_data = (t * slice_t.astype(np.bool)).astype(in_data.dtype)
+            out_data = out_data + ((t + 1) * slice_t.astype(np.bool)).astype(in_data.dtype)
     return out_data
 
 
-def merge_labels_from_4d_path(input_im_path, output_im_path):
-
-    # TODO erase after testing facade
-
-    if not os.path.isfile(input_im_path):
-        raise IOError('input image file does not exist.')
-    if not os.path.isfile(output_im_path):
-        raise IOError('input image file does not exist.')
-
-    im_labels = nib.load(input_im_path)
-    data_labels = im_labels.get_data()
-    data_relabelled = merge_labels_from_4d(data_labels)
-
-    im_relabelled = set_new_data(im_labels, data_relabelled)
-    nib.save(im_relabelled, output_im_path)
+def stack_images(list_images):
+    """
+    From a list of image of the same shape, the stack of these images in the new dimension.
+    :param list_images:
+    :return: stack image of the input list
+    """
+    msg = 'input images shapes are not all of the same dimension'
+    assert False not in [list_images[0].shape == im.shape for im in list_images[1:]], msg
+    new_data = np.stack([nib_image.get_data() for nib_image in list_images] , axis=len(list_images[0].shape))
+    stack_im = set_new_data(list_images[0], new_data)
+    return stack_im

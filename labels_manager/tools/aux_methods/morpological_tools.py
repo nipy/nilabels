@@ -45,9 +45,6 @@ def get_patch_values(point, target_image, radius=5, shape='circle', morfo_mask=N
         morfo_mask = get_morphological_mask(point, target_image.shape, radius=radius, shape=shape)
     coord = np.nonzero(morfo_mask.flatten())[0]
     return np.take(target_image.flatten(), coord)
-    # too slow for large number of coords: above solution is dirty but way way faster, thanks to flatnonzero!
-    # coords = np.nonzero(morfo_mask.flatten())[0]
-    # return [target_image.flatten()[k] for k in coords]
 
 
 def midpoint_circle_algorithm(center, radius):

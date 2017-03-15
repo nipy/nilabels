@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 
-from labels_manager.tools.aux_methods.permutations import is_valid_permutation
+from labels_manager.tools.aux_methods.utils import is_valid_permutation
 
 
 def relabeller(in_data, list_old_labels, list_new_labels):
@@ -51,6 +51,8 @@ def erase_labels(in_data, labels_to_erase):
     :param labels_to_erase: list or tuple of labels
     :return: all the labels in the list labels_to_erase will be assigned to zero.
     """
+    if isinstance(labels_to_erase, int):
+        labels_to_erase = [labels_to_erase, ]
     return relabeller(in_data, list_old_labels=labels_to_erase,
                       list_new_labels=[0, ] * len(labels_to_erase))
 
@@ -82,8 +84,8 @@ def keep_only_one_label(in_data, label_to_keep):
     list_labels = sorted(list(set(in_data.flat)))
 
     if label_to_keep not in list_labels:
-        print 'labels_to_keep {} in not delineated in the image'
-        return
+        print 'the label {} you want to keep is not present in the segmentation'.format(label_to_keep)
+        return in_data
 
     labels_not_to_keep = list(set(list_labels) - {label_to_keep})
     return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0,]*len(labels_not_to_keep))

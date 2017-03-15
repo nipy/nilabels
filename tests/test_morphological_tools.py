@@ -13,8 +13,9 @@ from labels_manager.tools.aux_methods.morpological_tools import get_shell_for_gi
     get_morphological_mask, get_patch_values
 
 
+
 def test_get_patch_values_simple():
-    # simple homemade mask:
+    # toy mask on a simple image:
     image = np.random.randint(0,10,(7,7))
     patch = np.zeros_like(image).astype(np.bool)
     patch[2,2] = True

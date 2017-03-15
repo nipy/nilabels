@@ -6,6 +6,7 @@ from collections import Counter
 from labels_manager.tools.aux_methods.morpological_tools import get_shell_for_given_radius, get_morphological_patch, \
     get_morphological_mask, get_patch_values
 from labels_manager.tools.aux_methods.utils import triangular_density_function
+from labels_manager.tools.measurements.distances import lncc_distance
 
 
 def weighting_for_LNCC(point, target_image, stack_warped, morphological_mask):
@@ -19,22 +20,12 @@ def weighting_for_LNCC(point, target_image, stack_warped, morphological_mask):
     :return:
     """
     num_timepoints = stack_warped.shape[3]
-
     patch_target = np.array(get_patch_values(point, target_image, morfo_mask=morphological_mask))
-
-
-
     ordered_measurements = []
 
     for t in range(num_timepoints):
         patch_t = np.array(get_patch_values(point, stack_warped[..., t], morfo_mask=morphological_mask))
-
-        den = float(np.linalg.norm(patch_t))
-        if den == 0: versor_t = np.zeros_like(patch_t)
-        else: versor_t = patch_t / den
-
-        ordered_measurements.append(versor_target.dot(versor_t))
-
+        ordered_measurements.append(lncc_distance(patch_target, patch_t))
     return np.array(ordered_measurements)
 
 
@@ -57,10 +48,10 @@ def weighting_for_whole_label_values(grayscale_value, covering_labels, intensiti
     return np.array(ans)
 
 
-def weighting_for_distance_from_certain_label(point, stack_weights, stack_segmentations):
+def weighting_for_distance_from_trusted_label(point, stack_weights, stack_segmentations):
     """
 
-    :param point:
+    :param point: coordinates of a point in the stack.
     :param stack_weights:
     :param stack_segmentations:
     :return:
@@ -76,7 +67,7 @@ def weighting_for_distance_from_certain_label(point, stack_weights, stack_segmen
         coord = get_shell_for_given_radius(r)
         for c in coord:
             if 1.0 in stack_weights[x + c[0], y + c[1], z + c[2], :]:
-                index_label_island = stack_weights[x + c[0], y + c[1], z + c[2], :].index(1.0)
+                index_label_island = list(stack_weights[x + c[0], y + c[1], z + c[2], :]).index(1.0)
                 label_island = stack_segmentations[x + c[0], y + c[1], z + c[2], index_label_island]
                 if label_island in list_candidates:
                     island_reached = True
@@ -93,8 +84,8 @@ def weighting_for_distance_from_certain_label(point, stack_weights, stack_segmen
 def get_values_below_label(image, segmentation, label):
     np.testing.assert_array_equal(image.shape, segmentation.shape)
     below_label_places = segmentation == label
-    image += 0.0000000000000001
-    return np.flatnonzero(below_label_places * image)
+    coord = np.nonzero(below_label_places.flatten())[0]
+    return np.take(image.flatten(), coord)
 
 
 def get_intensities_statistics_matrix(warped, segmentation, percentile=10):
@@ -199,7 +190,8 @@ def phase_2_majority_voting(target_image, stack_warped, stack_segmentations, sta
                     weight_bkg = weighting_for_whole_label_values(target_image[x, y, z],
                                                                       stack_segmentations[x, y, z, :],
                                                                       intensities_distrib_matrix)
-                    weight_dist = weighting_for_distance_from_certain_label([x, y, z], stack_weights,
+
+                    weight_dist = weighting_for_distance_from_trusted_label([x, y, z], stack_weights,
                                                                             stack_segmentations)
 
                     # Weighted sum of the values:
@@ -245,9 +237,9 @@ def weighted_sum_label_fusion(stack_seg, stack_warp, target, pfi_step_1_output=N
     # print 'phase 1 end'
     #
     # debug
-    stack_weights1 = np.zeros((100,100,100, 10))
+    stack_weights1 = np.ones((100,100,100, 10))
 
-    stack_weights1[30,30,30, 3] = 1.0
+    stack_weights1[30,30,30, :] = np.zeros(10)
 
     print 'starting phase 2'
     stack_weights2 = phase_2_majority_voting(target, stack_warp, stack_seg, stack_weights1)
