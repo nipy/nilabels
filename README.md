@@ -37,31 +37,39 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 ### To use as a package in a virtualenv.
 
-1) activate the virtualenvironment in the root folder of the repository.
+1) activate the virtualenvironment and go in the root folder of the repository.
 
-To install as a library (option 1):
-2a) python setup.py sdist
-2b) cd ../
-2c) pip install label_manager/dist/LabelsManager-XX.tar.gz
-where XX is the chosen version
-To install as a library (option 2):
-2a) python setup.py install
+2a) To install as a library (option 1):
 
-To install in [development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) (modality 1) 
-2a) python setup.py develop
+`python setup.py sdist`
+`cd ../`
+`pip install label_manager/dist/LabelsManager-XX.tar.gz`
+
+where XX is the chosen version.
+
+2b) To install as a library (option 2):
+
+`python setup.py install`
+
+2c) To install in [development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) (option 1) 
+
+`python setup.py develop`
+
 To install in development mode (option 2)
-2a) pip install -e .
+
+`pip install -e .`
 
 To verify that it works:
-3) python
-4) from labels_manager.main import LabelsManager as LM
-5) lm = LM('/some/folder/containing/nifti/images')
+
+`python`
+`from labels_manager.main import LabelsManager as LM`
+`lm = LM('/some/folder/containing/nifti/images')`
 
 To uninstall:
- pip uninstall LabelsManager
+ `pip uninstall LabelsManager`
  
 To delete the library in the virtualenv in case something really wrong happen and pip uninstall will not work:
-  sudo rm -rf /path_to_site_package_in_virtualenv/site-packages/LabelsManager*
+  `sudo rm -rf /path_to_site_package_in_virtualenv/site-packages/LabelsManager*`
  
 ## Tests - Nosetest
 To check that everything works run nosetests in the root directory of the project.
