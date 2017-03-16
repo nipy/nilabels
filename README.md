@@ -42,8 +42,10 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 2a) To install as a library (option 1):
 
 `python setup.py sdist`
+
 `cd ../`
-`pip install label_manager/dist/LabelsManager-XX.tar.gz`
+
+`pip install LabelManager/dist/LabelsManager-XX.tar.gz`
 
 where XX is the chosen version.
 
@@ -62,7 +64,9 @@ To install in development mode (option 2)
 To verify that it works:
 
 `python`
+
 `from labels_manager.main import LabelsManager as LM`
+
 `lm = LM('/some/folder/containing/nifti/images')`
 
 To uninstall:

@@ -1,6 +1,3 @@
-import os
-
-from labels_manager.tools.detections.get_segmentation import intensity_segmentation
 from definitions import definition_label
 
 
