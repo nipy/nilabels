@@ -8,19 +8,19 @@ import scipy.ndimage.filters as fil
 from definitions import root_dir
 from labels_manager.tools.aux_methods.utils import generate_o, generate_c
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
-from labels_manager.tools.aux_methods.utils import generate_ellipsoid, threshold_a_matrix
+from labels_manager.tools.aux_methods.utils import generate_ellipsoid, binarise_a_matrix
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
-    create = {'Examples folder'   : False,
-              'Punt e mes'        : False,
-              'C'                 : False,
-              'Planetaruim'       : False,
-              'Buckle ellipsoids' : False,
+    create = {'Examples folder'   : True,
+              'Punt e mes'        : True,
+              'C'                 : True,
+              'Planetaruim'       : True,
+              'Buckle ellipsoids' : True,
               'Ellipsoids family' : True
               }
 
-    print('\n.\n.\n\nGenerate figures for the examples, may take some seconds.\n.\n.')
+    print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
     examples_folder = jph(root_dir, 'images_examples')
 
     if create['Examples folder']:
@@ -116,7 +116,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         ellipsoid_left  = generate_ellipsoid(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left, foreground_intensity=foreground)
         ellipsoid_right = generate_ellipsoid(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right, foreground_intensity=foreground)
 
-        two_ellipsoids = foreground * threshold_a_matrix(ellipsoid_left + ellipsoid_right, dtype=np.float64)
+        two_ellipsoids = foreground * binarise_a_matrix(ellipsoid_left + ellipsoid_right, dtype=np.float64)
 
         two_ellipsoids = fil.gaussian_filter(two_ellipsoids, sigma=sigma_smoothing)
 

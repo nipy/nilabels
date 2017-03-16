@@ -1,0 +1,6 @@
+TODO:
+
+Implement descriptor manipulation itk-snap compatible.
+Integrate descriptor manipulation with the managers.
+Island detection.
+Sphynx documentation.

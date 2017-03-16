@@ -4,11 +4,12 @@ import numpy as np
 from labels_manager.tools.aux_methods.utils import is_valid_permutation
 
 
-def relabeller(in_data, list_old_labels, list_new_labels):
+def relabeller(in_data, list_old_labels, list_new_labels, verbose=True):
     """
     :param in_data: array corresponding to an image segmentation.
     :param list_old_labels: list or tuple of labels
     :param list_new_labels: list or tuple of labels of the same len as list_old_labels
+    :param verbose:
     :return: array where all the labels in list_new_labels are substituted with list_new_label in the same order.
     """
 
@@ -27,7 +28,8 @@ def relabeller(in_data, list_old_labels, list_new_labels):
         places = in_data == list_old_labels[k]
         if np.any(places):
             np.place(new_data, places, list_new_labels[k])
-            print('Label {0} substituted with label {1}'.format(list_old_labels[k], list_new_labels[k]))
+            if verbose:
+                print('Label {0} substituted with label {1}'.format(list_old_labels[k], list_new_labels[k]))
         else:
             print('Label {0} not present in the array'.format(list_old_labels[k]))
 
@@ -88,4 +90,4 @@ def keep_only_one_label(in_data, label_to_keep):
         return in_data
 
     labels_not_to_keep = list(set(list_labels) - {label_to_keep})
-    return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0,]*len(labels_not_to_keep))
+    return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0,]*len(labels_not_to_keep), verbose=False)

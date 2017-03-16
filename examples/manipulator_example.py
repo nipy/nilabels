@@ -8,14 +8,13 @@ from labels_manager.main import LabelsManager
 from definitions import root_dir
 from labels_manager.tools.aux_methods.utils import set_new_data
 import labels_manager.tools.manipulations.relabeller as rel
-import labels_manager.tools.manipulations.slicing as sl
 import labels_manager.tools.manipulations.splitter as sp
 
 
 if __name__ == '__main__':
 
     # Run generate_images_examples.py first
-
+    print('\nApprox 380MB required\n')
     # Create output folder:
     cmd = 'mkdir -p {}'.format(jph(root_dir, 'images_output'))
     os.system(cmd)
@@ -25,16 +24,16 @@ if __name__ == '__main__':
     print('Input folder: ' + lm._pfo_in)
     print('Output folder: ' + lm._pfo_out)
 
-    run_example = {'Relabel' : False,
-                   'Permute' : False,
-                   'Erase'   : False,
-                   'Assign all others a value': False,
-                   'Keep one label' : False,
-                   'Extend slice'   : False,
-                   'Split in 4d'    : False,
-                   'Split in 4d only some' : False,
-                   'Merge in 4d'    : False,
-                   'Axial symmetrisation' : False,
+    run_example = {'Relabel'                          : True,
+                   'Permute'                          : True,
+                   'Erase'                            : True,
+                   'Assign all others a value'        : True,
+                   'Keep one label'                   : True,
+                   'Extend slice'                     : True,
+                   'Split in 4d'                      : True,
+                   'Split in 4d only some'            : True,
+                   'Merge in 4d'                      : True,
+                   'Axial symmetrisation'             : True,
                    'Symmetrisation with registration' : True}
 
     open_figures = True
@@ -246,8 +245,8 @@ if __name__ == '__main__':
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
-        data_seg_new = sl.reproduce_slice_fourth_dimension(data_seg,
-                            new_axis=new_axis, num_slices=num_slices)
+        data_seg_new = np.stack([data_seg, ] * num_slices, axis=new_axis)
+
         # Results comparison:
         nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()

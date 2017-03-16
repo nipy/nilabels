@@ -9,6 +9,11 @@ def set_new_data(image, new_data):
     :param image: nibabel image
     :param new_data: numpy array
     :return: nibabel image
+    ----
+    Example:
+    To grab the third time-point of a nibabel image:
+    > input_4d_im = nib.load('from_somewhere.nii.gz')
+    > data_3d_third_slice = set_new_data(input_4d_im, input_4d_im.get_data()[..., 2])
     """
     # if nifty1
     if image.header['sizeof_hdr'] == 348:
@@ -24,34 +29,7 @@ def set_new_data(image, new_data):
     return new_image
 
 
-def label_selector(path_input_image, path_output_image, labels_to_keep, binarize=True):
-    """
-    Given an label of image and a list of labels to keep, a new image with only the labels to keep will be created.
-    New image can still have the original labels, or can binarize them.
-    :param path_input_image:
-    :param path_output_image:
-    :param labels to keep: list of labels
-    :param binarize: True if you want the output to be a binary images. Original labels are otherwise kept.
-    """
-    im = nib.load(path_input_image)
-    im_data = im.get_data()[:]
-    new_data = np.zeros_like(im_data)
-
-    for i in xrange(im_data.shape[0]):
-        for j in xrange(im_data.shape[1]):
-            for k in xrange(im_data.shape[2]):
-                if im_data[i, j, k] in labels_to_keep:
-                    if binarize:
-                        new_data[i, j, k] = 1
-                    else:
-                        new_data[i, j, k] = im_data[i, j, k]
-
-    new_im = set_new_data(im, new_data)
-    nib.save(new_im, path_output_image)
-    print('Output image saved in ' + str(path_output_image))
-
-
-def compare_two_nib(im1, im2, toll=1e-3):
+def compare_two_nib(im1, im2):
     """
     :param im1: one nibabel image
     :param im2: another nibabel image
@@ -61,9 +39,10 @@ def compare_two_nib(im1, im2, toll=1e-3):
 
     im1_name = 'First argument'
     im2_name = 'Second argument'
+    msg = ''
 
     hd1 = im1.header
-    hd2 = im1.header
+    hd2 = im2.header
 
     images_are_equals = True
 
@@ -71,44 +50,41 @@ def compare_two_nib(im1, im2, toll=1e-3):
     if not hd1['sizeof_hdr'] == hd2['sizeof_hdr']:
 
         if hd1['sizeof_hdr'] == 348:
-            msg = '{0} is nifty1\n{1} is nifty2.'.format(im1_name, im2_name)
+            msg += '{0} is nifti1\n{1} is nifti2.'.format(im1_name, im2_name)
         else:
-            msg = '{0} is nifty2\n{1} is nifty1.'.format(im1_name, im2_name)
-        print(msg)
+            msg += '{0} is nifti2\n{1} is nifti1.'.format(im1_name, im2_name)
 
         images_are_equals = False
 
     # Compare headers:
+    else:
+        for k in hd1.keys():
+            if k not in ['scl_slope', 'scl_inter']:
+                val1, val2 = hd1[k], hd2[k]
+                are_different = val1 != val2
+                if isinstance(val1, np.ndarray):
+                    are_different = are_different.any()
 
-    for k in hd1.keys():
-        if k not in ['scl_slope', 'scl_inter']:
-            val1, val2 = hd1[k], hd2[k]
-            are_different = val1 != val2
-            if isinstance(val1, np.ndarray):
-                are_different = are_different.any()
+                if are_different:
+                    images_are_equals = False
+                    msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name , hd1[k], im2_name, hd2[k])
 
-            if are_different:
+            elif not np.isnan(hd1[k]) and np.isnan(hd2[k]):
                 images_are_equals = False
-                print(k, hd1[k])
+                msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name, hd1[k], im2_name, hd2[k])
 
-        elif not np.isnan(hd1[k]) and np.isnan(hd2[k]):
-            images_are_equals = False
-            print(k, hd1[k])
-
-    '''
     # Compare values and type:
-
-    im1_data = im1.get_data()
-    im2_data = im2.get_data()
-
-    if not im1_data.dtype == im2_data.dtype:
+    if not im1.get_data_dtype() == im2.get_data_dtype():
+        msg += 'Dtype are different consistent {0} {1} - {2} {3} \n'.format(im1_name, im1.get_data_dtype(), im2_name, im2.get_data_dtype())
+        images_are_equals = False
+    if not np.array_equal(im1.get_data(), im2.get_data()):
+        msg += 'Data are different. \n'
+        images_are_equals = False
+    if not np.array_equal(im1.get_affine(), im2.get_affine()):
+        msg += 'Affine transformations are different. \n'
         images_are_equals = False
 
-    # Compare values
-    if np.max(im1_data - im2_data) > toll:
-        images_are_equals = False
-    '''
-
+    print(msg)
     return images_are_equals
 
 
@@ -125,31 +101,11 @@ def compare_two_nifti(path_img_1, path_img_2):
     return compare_two_nib(im1, im2)
 
 
-def cut_dwi_image_from_first_slice_mask(input_dwi, input_mask):
-
-    data_dwi  = input_dwi.get_data()
-    data_mask = input_mask.get_data()
-
-    data_masked_dw = np.zeros_like(data_dwi)
-
-    for t in xrange(input_dwi.shape[-1]):
-        data_masked_dw[..., t] = np.multiply(data_mask, data_dwi[..., t])
-
-    # image with header of the dwi and values under the mask for each slice:
-    return set_new_data(input_dwi, data_masked_dw)
-
-
-def cut_dwi_image_from_first_slice_mask_path(path_input_dwi, path_input_mask, path_output_masked_dwi):
-
-    im_dwi = nib.load(path_input_dwi)
-    im_mask = nib.load(path_input_mask)
-
-    im_masked = cut_dwi_image_from_first_slice_mask(im_dwi, im_mask)
-
-    nib.save(im_masked, path_output_masked_dwi)
-
-
 def eliminates_consecutive_duplicates(input_list):
+    """
+    :param input_list: a list
+    :return: the same list with no consecutive duplicates.
+    """
     output_list = [input_list[0],]
     for i in xrange(1, len(input_list)):
         if not input_list[i] == input_list[i-1]:
@@ -158,11 +114,31 @@ def eliminates_consecutive_duplicates(input_list):
     return output_list
 
 
-def threshold_a_matrix(in_matrix, dtype=np.bool):
+def binarise_a_matrix(in_matrix, dtype=np.bool):
+    """
+    All the values above zeros will be ones.
+    :param in_matrix: any matrix
+    :param dtype: the output matrix is forced to this data type (bool by default).
+    :return: The same matrix, where all the non-zero elements are equals to 1.
+    """
     out_matrix = np.zeros_like(in_matrix)
     non_zero_places = in_matrix != 0
     np.place(out_matrix, non_zero_places, 1)
     return out_matrix.astype(dtype)
+
+
+def get_values_below_label(image, segmentation, label):
+    """
+    Given an image (matrix) and a segmentation (another matrix), provides a list
+    :param image: np.array of an image
+    :param segmentation: np.array of the segmentation of the same image
+    :param label: a label in the segmentation
+    :return: np.array with all the values below the label.
+    """
+    np.testing.assert_array_equal(image.shape, segmentation.shape)
+    below_label_places = segmentation == label
+    coord = np.nonzero(below_label_places.flatten())[0]
+    return np.take(image.flatten(), coord)
 
 
 def is_valid_permutation(in_perm):

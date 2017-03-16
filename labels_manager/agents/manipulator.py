@@ -7,11 +7,11 @@ from labels_manager.tools.manipulations.relabeller import relabeller, \
         permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from labels_manager.tools.manipulations.splitter import split_labels_to_4d
 from labels_manager.tools.manipulations.merger import merge_labels_from_4d
+from labels_manager.tools.manipulations.cutter import cut_4d_volume_with_a_1_slice_mask_nib
 from labels_manager.tools.manipulations.symmetrizer import symmetrise_data, sym_labels
-from labels_manager.tools.manipulations.propagators import simple_propagator
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out,\
      connect_tail_head_path
-from labels_manager.tools.manipulations.slicing import reproduce_slice_fourth_dimension
+
 
 
 class LabelsManagerManipulate(object):
@@ -107,8 +107,7 @@ class LabelsManagerManipulate(object):
         im_slice = nib.load(pfi_in)
         data_slice = im_slice.get_data()
 
-        data_extended = reproduce_slice_fourth_dimension(data_slice,
-                                num_slices=num_slices, new_axis=new_axis)
+        data_extended = np.stack([data_slice, ] * num_slices, axis=new_axis)
 
         im_extended = set_new_data(im_slice, data_extended)
         nib.save(im_extended, pfi_out)
@@ -144,6 +143,18 @@ class LabelsManagerManipulate(object):
         nib.save(im_merged_in_3d, pfi_out)
         print('Merged labels from 4d image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
+
+    def cut_4d_volume_with_a_1_slice_mask(self, filename_in, filename_mask, filename_out=None):
+
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
+        pfi_mask = connect_tail_head_path(self.pfo_in, filename_mask)
+
+        im_dwi = nib.load(pfi_in)
+        im_mask = nib.load(pfi_mask)
+
+        im_masked = cut_4d_volume_with_a_1_slice_mask_nib(im_dwi, im_mask)
+
+        nib.save(im_masked, pfi_out)
 
     def symmetrise_axial(self, filename_in, filename_out=None, axis='x', plane_intercept=10,
         side_to_copy='below', keep_in_data_dimensions=True):

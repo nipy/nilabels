@@ -1,22 +1,18 @@
 import os
 
 
-def arrange_path(base_path, main_input):
-    return os.path.join(base_path, main_input)
-
-
 def connect_tail_head_path(tail, head):
     """
     It expects
       1) to find the path to folder in tail and filename in head.
-      2) to find the full path in the head.
+      2) to find the full path in the head (with tail as sub-path).
       3) to have tail with a base path and head to have an additional path + filename.
     :param tail:
     :param head:
     :return:
     """
 
-    if os.path.dirname(head) == tail:  # case 2
+    if head.startswith(tail):  # os.path.abspath(head).startswith(os.path.abspath(tail)):  # Case 2
         return head
     else:  # case 1, 3
         return os.path.join(tail, head)
@@ -24,11 +20,12 @@ def connect_tail_head_path(tail, head):
 
 def check_pfi_io(pfi_input, pfi_output):
     if not os.path.exists(pfi_input):
-        IOError('Input file {} does not exists.'.format(pfi_input))
+        raise IOError('Input file {} does not exists.'.format(pfi_input))
     if pfi_output is not None:
         if not os.path.exists(os.path.dirname(pfi_output)):
-            IOError('Output file {} is located in a non-existing folder.'.format(
+            raise IOError('Output file {} is located in a non-existing folder.'.format(
                     pfi_output))
+    return True
 
 
 def get_pfi_in_pfi_out(filename_in, filename_out, pfo_in, pfo_out):

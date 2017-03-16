@@ -5,31 +5,29 @@ import nibabel as nib
 from labels_manager.tools.aux_methods.utils import set_new_data
 from labels_manager.tools.manipulations.relabeller import relabeller
 
-"""
-Basic rotations of a 3d matrix.
-----------
-Example:
-
-cube = array([[[0, 1],
-               [2, 3]],
-
-              [[4, 5],
-               [6, 7]]])
-
-axis 0: perpendicular to the face [[0,1],[2,3]] (front-rear)
-axis 1: perpendicular to the face [[1,5],[3,7]] (lateral right-left)
-axis 2: perpendicular to the face [[0,1],[5,4]] (top-bottom)
-----------
-Note: the command m[:, ::-1, :].swapaxes(0, 1)[::-1, :, :].swapaxes(0, 2) rotates the cube m
-around the diagonal axis 0-7.
-----------
-Note: avoid reorienting the data if you can reorient the header instead.
-"""
-
 
 def basic_rot_ax(m, ax=0):
     """
+    Basic rotations of a 3d matrix. Ingredient of the method axial_rotations.
+    ----------
+    Example:
+
+    cube = array([[[0, 1],
+                   [2, 3]],
+
+                  [[4, 5],
+                   [6, 7]]])
+
+    axis 0: perpendicular to the face [[0,1],[2,3]] (front-rear)
+    axis 1: perpendicular to the face [[1,5],[3,7]] (lateral right-left)
+    axis 2: perpendicular to the face [[0,1],[5,4]] (top-bottom)
+    ----------
+    Note: the command m[:, ::-1, :].swapaxes(0, 1)[::-1, :, :].swapaxes(0, 2) rotates the cube m
+    around the diagonal axis 0-7.
+    ----------
+    Note: avoid reorienting the data if you can reorient the header instead.
     :param m: 3d matrix
+    :param ax: axis of rotation
     :return: rotate the cube around axis ax, perpendicular to the face [[0,1],[2,3]]
     """
 
@@ -83,19 +81,6 @@ def flip_data(in_data, axis='x'):
     return out_data
 
 
-def flip_data_path(input_im_path, output_im_path, axis='x'):
-
-    if not os.path.isfile(input_im_path):
-        raise IOError('input image file does not exist.')
-
-    im_labels = nib.load(input_im_path)
-    data_labels = im_labels.get_data()
-    data_flipped = flip_data(data_labels, axis=axis)
-
-    im_relabelled = set_new_data(im_labels, data_flipped)
-    nib.save(im_relabelled, output_im_path)
-
-
 def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below', keep_in_data_dimensions=True):
     """
     Symmetrise the input_array according to the axial plane
@@ -135,17 +120,11 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
             s_block_symmetric = s_block[:, ::-1, :]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=1)
 
-            if keep_in_data_dimensions:
-                pass
-
         if side_to_copy == 'above':
 
             s_block = in_data[:, plane_intercept:, :]
             s_block_symmetric = s_block[:, ::-1, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=1)
-
-            if keep_in_data_dimensions:
-                pass
 
     if axis == 'y':
 
@@ -155,17 +134,11 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
             s_block_symmetric = s_block[:, :, ::-1]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=2)
 
-            if keep_in_data_dimensions:
-                pass
-
         if side_to_copy == 'above':
 
             s_block = in_data[:, :, plane_intercept:]
             s_block_symmetric = s_block[:, :, ::-1]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=2)
-
-            if keep_in_data_dimensions:
-                pass
 
     if axis == 'z':
 
@@ -175,17 +148,14 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
             s_block_symmetric = s_block[::-1, :, :]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=0)
 
-            if keep_in_data_dimensions:
-                pass
-
         if side_to_copy == 'above':
 
             s_block = in_data[plane_intercept:, :, :]
             s_block_symmetric = s_block[::-1, :, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=0)
 
-            if keep_in_data_dimensions:
-                pass
+    if keep_in_data_dimensions:
+        out_data = out_data[:in_data.shape[0], :in_data.shape[1], :in_data.shape[2]]
 
     return out_data
 
@@ -198,9 +168,35 @@ def sym_labels(pfi_anatomy,
                list_labels_transformed=None,
                reuse_registration=False,
                coord='z'):
+    """
+    Symmetrise a segmentation with registration: it uses NiftyReg.
+    The old side is symmetrised in the new side, with new relabelling.
+    :param pfi_anatomy: Path to FIle anatomical image
+    :param pfi_segmentation: Path to FIle segmentation of the anatomical image
+    :param pfo_results: Path to FOlder where intermediate results are stored
+    :param pfi_result_segmentation: Path to FIle symmetrised segmentation
+    :param list_labels_input: labels that will be taken into account in the symmetrisation from the old side.
+    :param list_labels_transformed: corresponding labels in the same order. If None, labels of the new side
+    will be kept with the same numbering in the new side.
+    :param reuse_registration: if a registration is already present in the pfo_results, and you only need to change the
+    labels value, it will spare you some time when set to True.
+    :param coord: coordinate of the registration: in RAS, 'z' will symmetrise Left on Right.
+    :return: symmetrised segmentation.
+    """
+
+    def flip_data_path(input_im_path, output_im_path, axis='x'):
+        # wrap flip data, having path for inputs and outputs.
+        if not os.path.isfile(input_im_path):
+            raise IOError('input image file does not exist.')
+
+        im_labels = nib.load(input_im_path)
+        data_labels = im_labels.get_data()
+        data_flipped = flip_data(data_labels, axis=axis)
+
+        im_relabelled = set_new_data(im_labels, data_flipped)
+        nib.save(im_relabelled, output_im_path)
 
     # side A is the input, side B is the one where we want to symmetrise.
-
     # --- Initialisation  --- #
 
     # check input:
@@ -286,7 +282,7 @@ def sym_labels(pfi_anatomy,
 
     symmetrised_data = np.zeros_like(data_side_A)
 
-    # vectorize later!
+    # To manage the intersections of labels between old and new side. Vectorize later...
     dims = data_side_A.shape
 
     print('Pointwise symmetrisation started!')

@@ -4,9 +4,9 @@ from scipy import ndimage
 
 def get_morphological_patch(dimension, shape):
     """
-    :param dimension: dimension of the image.
+    :param dimension: dimension of the image (NOT the shape).
     :param shape: circle or square.
-    :return:
+    :return: morphological patch as ndimage
     """
     if shape == 'circle':
         morpho_patch = ndimage.generate_binary_structure(dimension, 1)
@@ -47,18 +47,24 @@ def get_patch_values(point, target_image, radius=5, shape='circle', morfo_mask=N
     return np.take(target_image.flatten(), coord)
 
 
-def midpoint_circle_algorithm(center, radius):
+def midpoint_circle_algorithm(center=(0, 0, 0), radius=4):
     x, y, z = center
     # TODO generalise the midpoint circle algorithm and use it for get_shell_for_given_radius
     pass
 
 
-def get_shell_for_given_radius(radius):
-    # NOTE: 3d only for the moment - radius must be integer
+def get_shell_for_given_radius(radius, d=3):
     circle = []
-    for xi in xrange(-radius, radius + 1):
-        for yi in xrange(-radius, radius + 1):
-            for zi in xrange(-radius, radius + 1):
-                if (radius - 1) ** 2 < xi ** 2 + yi ** 2 + zi ** 2 <= radius ** 2:
-                    circle.append([xi, yi, zi])
+    if d == 3:
+        for xi in xrange(-radius, radius + 1):
+            for yi in xrange(-radius, radius + 1):
+                for zi in xrange(-radius, radius + 1):
+                    if (radius - 1) ** 2 < xi ** 2 + yi ** 2 + zi ** 2 <= radius ** 2:
+                        circle.append((xi, yi, zi))
+    if d == 2:
+        for xi in xrange(-radius, radius + 1):
+            for yi in xrange(-radius, radius + 1):
+                if (radius - 1) ** 2 < xi ** 2 + yi ** 2 <= radius ** 2:
+                    circle.append((xi, yi))
+
     return circle

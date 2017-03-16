@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def centroid(im, labels, affine=np.eye(4)):
+def centroid(im, labels, affine=np.eye(3)):
     """
 
     :param im:
@@ -16,11 +16,10 @@ def centroid(im, labels, affine=np.eye(4)):
             for k in xrange(im.shape[2]):
                 if im[i, j, k] in labels:
                     label_index = labels.index(im[i, j, k])
-                    centers_of_mass[label_index] += np.array([i, j, k])
+                    centers_of_mass[label_index] = centers_of_mass[label_index] +  np.array([i, j, k]).astype(np.uint64)
                     num_voxel_per_label[label_index] += 1
-
     for n_index, n in enumerate(num_voxel_per_label):
-        centers_of_mass[n_index] = (1 / n) * affine.dot(centers_of_mass[n_index].astype(np.float64))
+        centers_of_mass[n_index] = (1 / float(n)) * affine.dot(centers_of_mass[n_index].astype(np.float64))
 
     return centers_of_mass
 

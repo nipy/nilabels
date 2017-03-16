@@ -46,14 +46,16 @@ descriptor_standard_header = \
 
 
 def generate_example(num_labels=5, ):
+    # TODO and to move in exmaples
     pass
 
 
 def permute_idx(in_descriptor, in_permutation):
-
+    # TODO
     pass
 
 
 def standardise_colour_convention_left_right(in_descriptor, out_descriptor):
+    # TODO
     pass
 
