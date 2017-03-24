@@ -1,7 +1,7 @@
-# Labels Manager (labels_manager)
+# Labels Manager
 Python 2.7
 
-A set of tools to automatise simple and tedious manipulations of medical images segmentations in nifti format (.nii or .nii.gz).
+A set of tools to automatise simple manipulations of medical images segmentations in nifti format and to compute simple measurements on them.
 
 ## What can you do with label manager
 
