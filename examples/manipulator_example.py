@@ -1,15 +1,14 @@
 import os
 from os.path import join as jph
 
-import numpy as np
 import nibabel as nib
+import numpy as np
 
-from labels_manager.main import LabelsManager
-from definitions import root_dir
-from labels_manager.tools.aux_methods.utils import set_new_data
 import labels_manager.tools.manipulations.relabeller as rel
 import labels_manager.tools.manipulations.splitter as sp
-
+from labels_manager.definitions import root_dir
+from labels_manager.main import LabelsManager
+from labels_manager.tools.aux_methods.utils import set_new_data
 
 if __name__ == '__main__':
 

@@ -1,14 +1,15 @@
 import os
 from os.path import join as jph
 
-import numpy as np
 import nibabel as nib
+import numpy as np
 import scipy.ndimage.filters as fil
 
-from definitions import root_dir
+from labels_manager.definitions import root_dir
+from labels_manager.tools.aux_methods.utils import generate_ellipsoid, binarise_a_matrix
 from labels_manager.tools.aux_methods.utils import generate_o, generate_c
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
-from labels_manager.tools.aux_methods.utils import generate_ellipsoid, binarise_a_matrix
+
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 

@@ -1,7 +1,7 @@
 # Labels Manager (labels_manager)
 Python 2.7
 
-An essential package for simple and generic manipulations of medical images segmentations in nifti format (.nii or .nii.gz).
+A set of tools to automatise simple and tedious manipulations of medical images segmentations in nifti format (.nii or .nii.gz).
 
 ## What can you do with label manager
 
@@ -31,7 +31,7 @@ It is based on NiftyReg, NiftySeg, ITK-snap and some python (2.7) standard libra
 
 + Install python requirements in requirements.txt with
 
-    pip install -r requirements.txt
+    `pip install -r requirements.txt`
 
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
@@ -39,7 +39,7 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 1) activate the virtualenvironment and go in the root folder of the repository.
 
-2a) To install as a library (option 1):
++ To install as a library (option 1):
 
 `python setup.py sdist`
 
@@ -49,34 +49,63 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 where XX is the chosen version.
 
-2b) To install as a library (option 2):
++ To install as a library (option 2):
 
 `python setup.py install`
 
-2c) To install in [development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) (option 1) 
++ To install in [development mode](http://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode) (option 1) 
 
 `python setup.py develop`
 
-To install in development mode (option 2)
++ To install in development mode (option 2)
 
 `pip install -e .`
 
-To verify that it works:
++ To verify that it works:
 
 `python`
 
 `from labels_manager.main import LabelsManager as LM`
 
-`lm = LM('/some/folder/containing/nifti/images')`
+`lm = LM('/some/folder')`
 
 To uninstall:
+
  `pip uninstall LabelsManager`
  
-To delete the library in the virtualenv in case something really wrong happen and pip uninstall will not work:
-  `sudo rm -rf /path_to_site_package_in_virtualenv/site-packages/LabelsManager*`
+To delete the library in the virtualenv in case something really wrong happen and pip uninstall will not work correctly:
+  
+  `sudo rm -rf /path_to_site_packages_in_virtualenv/site-packages/LabelsManager*`
  
 ## Tests - Nosetest
-To check that everything works run nosetests in the root directory of the project.
+
+To check that everything works run `nosetests` in the root directory of the project.
+
+## Design pattern
+
+Command design pattern: 
+
+Tools package stored under labels_manager.tools are designed to manipulate segmentations as numpy.arrays and are tested individually in the test folder.
+To make them work directly with nifty images, the class LabelsManager is implemented, with a facade design pattern. 
+Under labels_manager/main.py, the class LabelsManager calls the methods stored in the tools package, and it is extended in a has-a relationship with Command design pattern and class composition paradigm 
+through the "agents" classes under label_manager.agents. 
+
+An instances of the class LabelsManager access the nifty images through their paths, and apply to their data each of the specified tools. 
+ 
+For example to apply the tool `relabel` under `tools.manipulations.relabel` to the input files `file{1..10}.nii.gz` in the folder `input_folder`
+and save the relabelled segmentations in the `output_folder` you can:
+
+```python
+lm = LabelsManager(input_folder, output_folder)
+
+for i in range(1, 11):
+    input_file_name = 'file{}.nii.gz'.format(i)
+    output_file_name = 'file{}.nii.gz'.format(i)
+    lm.manipulate.relabel(input_file_name, output_file_name,
+                          [1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+```
+
+
   
 ## Working examples
 To see some toy examples of what can be done with LabelsManager, go to LabelsManager/examples and run simple_relabelling_examples.py after running
