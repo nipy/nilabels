@@ -2,12 +2,14 @@ import numpy as np
 import nibabel as nib
 
 
-def set_new_data(image, new_data):
+def set_new_data(image, new_data, new_dtype=None, remove_nan=False):
     """
     From a nibabel image and a numpy array it creates a new image with
     the same header of the image and the new_data as its data.
     :param image: nibabel image
     :param new_data: numpy array
+    :param new_dtype: preferred output data type. Default is the type of the new_data
+    :param remove_nan: remove nan in case there is some in the new_data.
     :return: nibabel image
     ----
     Example:
@@ -15,6 +17,9 @@ def set_new_data(image, new_data):
     > input_4d_im = nib.load('from_somewhere.nii.gz')
     > data_3d_third_slice = set_new_data(input_4d_im, input_4d_im.get_data()[..., 2])
     """
+    if remove_nan:
+        new_data = np.nan_to_num(new_data)
+
     # if nifty1
     if image.header['sizeof_hdr'] == 348:
         new_image = nib.Nifti1Image(new_data, image.affine, header=image.header)
@@ -23,8 +28,12 @@ def set_new_data(image, new_data):
         new_image = nib.Nifti2Image(new_data, image.affine, header=image.header)
     else:
         raise IOError('input_image_problem')
+
     # update data type:
-    new_image.set_data_dtype(new_data.dtype)
+    if new_dtype is None:
+        new_image.set_data_dtype(new_data.dtype)
+    else:
+        new_image.set_data_dtype(new_dtype)
 
     return new_image
 

@@ -39,7 +39,7 @@ class LabelsManagerFuse(object):
         stack_seg = np.stack(list_stack_seg, axis=3)
         del list_stack_seg
         im_4d_seg = set_new_data(nib.load(list_pfi_segmentations[0]), stack_seg)
-        pfi_4d_seg = connect_tail_head_path(self.pfo_out, 'z_4d_seg.nii.gz')
+        pfi_4d_seg = connect_tail_head_path(self.pfo_out, 'res_4d_seg.nii.gz')
         nib.save(im_4d_seg, pfi_4d_seg)
 
         # save 4d warped if available
@@ -52,7 +52,7 @@ class LabelsManagerFuse(object):
             stack_warp = np.stack(list_stack_warp, axis=3)
             del list_stack_warp
             im_4d_warp = set_new_data(nib.load(list_pfi_warped[0]), stack_warp)
-            pfi_4d_warp = connect_tail_head_path(self.pfo_out, 'z_4d_warp.nii.gz')
+            pfi_4d_warp = connect_tail_head_path(self.pfo_out, 'res_4d_warp.nii.gz')
             nib.save(im_4d_warp, pfi_4d_warp)
 
         if not prepare_data_only:
