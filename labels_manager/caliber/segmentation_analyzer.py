@@ -95,7 +95,7 @@ class SegmentationAnalyzer(object):
 
         return vol, voxels, vol_over_tot, vol_over_icv
 
-    def get_average_below_labels(self, selected_labels, verbose=1):
+    def get_average_below_labels(self, selected_labels, verbose=0):
         """
         :param selected_labels:  can be an integer, or a list.
          If it is a list, it can contain sublists.
@@ -125,9 +125,9 @@ class SegmentationAnalyzer(object):
                 for label_k_j in label_k:
                     all_places += self._segmentation.get_data() == label_k_j
 
-            masked_scalar_data = all_places.astype(np.float64) * self._scalar_im.astype(np.float64)
+            masked_scalar_data = all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)
             # remove zero elements from the array:
-            non_zero_masked_scalar_data = (masked_scalar_data > 0.00000000001) * masked_scalar_data
+            non_zero_masked_scalar_data = [ j for j in masked_scalar_data.flatten() if j > 0.00000000001]
 
             mean_voxel = np.mean(non_zero_masked_scalar_data)
 
