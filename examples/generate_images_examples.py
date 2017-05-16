@@ -13,13 +13,14 @@ from labels_manager.tools.detections.get_segmentation import intensity_segmentat
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
-    create = {'Examples folder'   : False,
-              'Punt e mes'        : False,
-              'C'                 : False,
-              'Planetaruim'       : False,
-              'Buckle ellipsoids' : False,
-              'Ellipsoids family' : False,
-              'Cubes in the sky'  : True
+    create = {'Examples folder'   : True,
+              'Punt e mes'        : True,
+              'C'                 : True,
+              'Planetaruim'       : True,
+              'Buckle ellipsoids' : True,
+              'Ellipsoids family' : True,
+              'Cubes in the sky'  : True,
+              'Sandwich'          : True
               }
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
@@ -230,6 +231,18 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         nib.save(im1, filename=jph(examples_folder, 'cubes_in_space_bin.nii.gz'))
         nib.save(im2, filename=jph(examples_folder, 'cubes_in_space.nii.gz'))
+
+    if create['Sandwich']:
+
+        omega = [9, 9, 10]
+        sandwich = np.zeros(omega)
+
+        sandwich[:, :2, :]  = 2 * np.ones([9, 2, 10])
+        sandwich[:, 2:5, :] = 3 * np.ones([9, 3, 10])
+        sandwich[:, 5:, :]  = 4 * np.ones([9, 4, 10])
+        im_sandwich = nib.Nifti1Image(sandwich, affine=np.diag([0.1, 0.2, 0.3, 1]))
+
+        nib.save(im_sandwich, filename=jph(examples_folder, 'sandwich.nii.gz'))
 
 if __name__ == '__main__':
     generate_figures()

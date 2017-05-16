@@ -22,6 +22,7 @@ class SegmentationAnalyzer(object):
 
         self._segmentation = None
         self._scalar_im = None
+        self._one_voxel_volume = None
 
         self.update()
 
@@ -30,21 +31,28 @@ class SegmentationAnalyzer(object):
         self._segmentation =  nib.load(self.pfi_segmentation)
         self._scalar_im = nib.load(self.pfi_scalar_im)
 
-        np.testing.assert_array_equal(self._scalar_im.get_affine(), self._segmentation.get_affine())
+        if not np.array_equal(self._scalar_im.get_affine(), self._segmentation.get_affine()):
+            raise IOError
+        if not np.array_equal(self._scalar_im.shape, self._segmentation.shape):
+            raise IOError
+        # NOTE: images must be in standard form using fslreorient2std of FSL - GIGO.
+        if np.count_nonzero(self._scalar_im.get_affine() - np.diag(np.diagonal(self._scalar_im.get_affine()))):
+            raise IOError
+
+        self._one_voxel_volume = np.round(np.abs(np.prod(np.diag(self._segmentation.get_affine()))), decimals=6)
 
     def get_total_volume(self):
 
         num_voxels = np.count_nonzero(self._segmentation.get_data())
 
         if self.return_mm3:
-            mm_3 = num_voxels * np.abs(np.prod(np.diag(self._segmentation.get_affine())))
+            mm_3 = num_voxels * self._one_voxel_volume
             return mm_3
         else:
             return num_voxels
 
     def get_volumes_per_label(self, selected_labels, verbose=0):
         """
-        NOTE: images must be in standard form using fslreorient2std of FSL - GIGO.
         :param selected_labels: can be an integer, or a list.
          If it is a list, it can contain sublists.
          If labels are in the sublist, volumes will be computed for all the labels in the list.
@@ -76,7 +84,10 @@ class SegmentationAnalyzer(object):
 
             voxels[index_label_k] = np.count_nonzero(places)
 
-        vol = np.abs(np.prod(np.diag(self._segmentation.get_affine()))) * voxels.astype(np.float64)
+        if self.return_mm3:
+               vol = self._one_voxel_volume * voxels.astype(np.float64)
+        else:
+            vol = voxels.astype(np.float64)[:]
 
         # get volumes over total volume:
         vol_over_tot = vol / float(tot_brain_volume)
@@ -111,8 +122,6 @@ class SegmentationAnalyzer(object):
         else:
             raise IOError('Input labels must be a list or an int.')
 
-        assert self._scalar_im.shape == self._segmentation.get_data().shape
-
         # Get volumes per regions:
         values = np.zeros(len(selected_labels), dtype=np.float64)
 
@@ -127,16 +136,20 @@ class SegmentationAnalyzer(object):
 
             masked_scalar_data = all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)
             # remove zero elements from the array:
-            non_zero_masked_scalar_data = [ j for j in masked_scalar_data.flatten() if j > 0.00000000001]
+            non_zero_masked_scalar_data = [j for j in masked_scalar_data.flatten() if j > 1e-6]
 
-            mean_voxel = np.mean(non_zero_masked_scalar_data)
+            if not non_zero_masked_scalar_data:  # if not non_zero_masked_scalar_data == []
+                non_zero_masked_scalar_data = 0
 
-            if self.return_mm3:
-                values[index_label_k] = ( 1 / np.abs(np.prod(np.diag(self._segmentation.get_affine()))) ) * mean_voxel
-            else:
-                values[index_label_k] = mean_voxel
+            values[index_label_k] = np.mean(non_zero_masked_scalar_data)
+
+            # mean_voxel = np.mean(non_zero_masked_scalar_data)
+            # if self.return_mm3:
+            #     values[index_label_k] = ( 1 / self._one_voxel_volume ) * mean_voxel
+            # else:
+            #     values[index_label_k] = mean_voxel
 
             if verbose:
-                print('Mean below the labels {0} : {1}'.format(selected_labels[index_label_k], values[index_label_k]))
+                print('Mean below the labels for the given image {0} : {1}'.format(selected_labels[index_label_k], values[index_label_k]))
 
         return values
