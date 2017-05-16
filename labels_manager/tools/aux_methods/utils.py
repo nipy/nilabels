@@ -209,7 +209,8 @@ def generate_o(omega=(250, 250), radius=50,
 def generate_c(omega=(250, 250), internal_radius=40, external_radius=60, opening_height=50,
                background_intensity=0, foreground_intensity=20, dtype=np.uint8, margin=None):
 
-    def get_a_2d_c(omega, internal_radius, external_radius, opening_height, background_intensity, foreground_intensity, dtype):
+    def get_a_2d_c(omega, internal_radius, external_radius, opening_height, background_intensity,
+                   foreground_intensity, dtype):
 
         m = background_intensity * np.ones(omega[:2], dtype=dtype)
 
@@ -250,7 +251,8 @@ def generate_c(omega=(250, 250), internal_radius=40, external_radius=60, opening
 
 # ---------- Ellipsoids experiments ---------------
 
-def generate_ellipsoid(omega, focus_1, focus_2, distance, background_intensity=0, foreground_intensity=100, dtype=np.uint8):
+def generate_ellipsoid(omega, focus_1, focus_2, distance, background_intensity=0, foreground_intensity=100,
+                       dtype=np.uint8):
     sky = background_intensity * np.ones(omega, dtype=dtype)
     for xi in range(omega[0]):
         for yi in range(omega[1]):
@@ -259,4 +261,17 @@ def generate_ellipsoid(omega, focus_1, focus_2, distance, background_intensity=0
                     np.sqrt( (focus_2[0] - xi) ** 2 + (focus_2[1] - yi) ** 2 + (focus_2[2] - zi) ** 2 ) \
                         <= distance:
                     sky[xi, yi, zi] = foreground_intensity
+    return sky
+
+# ---------- Cubes experiments ---------------
+
+
+def generate_cube(omega, center, side_length, background_intensity=0, foreground_intensity=100, dtype=np.uint8):
+    sky = background_intensity * np.ones(omega, dtype=dtype)
+    half_side_length = int(np.ceil(side_length / 2))
+
+    for lx in range(-half_side_length, half_side_length + 1):
+        for ly in range(-half_side_length, half_side_length + 1):
+            for lz in range(-half_side_length, half_side_length + 1):
+                sky[center[0] + lx, center[1] + ly, center[2] + lz] = foreground_intensity
     return sky

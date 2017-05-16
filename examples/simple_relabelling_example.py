@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from labels_manager.definitions import root_dir
+from definitions import root_dir
 from labels_manager.main import LabelsManager
 
 if __name__ == '__main__':
