@@ -12,7 +12,7 @@ from labels_manager.tools.aux_methods.utils import set_new_data
 
 if __name__ == '__main__':
 
-    # Run generate_images_examples.py first
+    print('Run generate_images_examples.py before this, please.')
     print('\nApprox 380MB required\n')
     # Create output folder:
     cmd = 'mkdir -p {}'.format(jph(root_dir, 'images_output'))

@@ -1,5 +1,8 @@
 import numpy as np
 
+from labels_manager.tools.manipulations.relabeller import keep_only_one_label
+from labels_manager.tools.aux_methods.utils import binarise_a_matrix
+
 
 def lncc_distance(values_patch1, values_patch2):
     """

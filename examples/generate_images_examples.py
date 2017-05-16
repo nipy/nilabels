@@ -13,13 +13,13 @@ from labels_manager.tools.detections.get_segmentation import intensity_segmentat
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
-    create = {'Examples folder'   : True,
-              'Punt e mes'        : True,
-              'C'                 : True,
-              'Planetaruim'       : True,
-              'Buckle ellipsoids' : True,
-              'Ellipsoids family' : True,
-              'Cube in the sky'   : True
+    create = {'Examples folder'   : False,
+              'Punt e mes'        : False,
+              'C'                 : False,
+              'Planetaruim'       : False,
+              'Buckle ellipsoids' : False,
+              'Ellipsoids family' : False,
+              'Cubes in the sky'  : True
               }
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
@@ -208,21 +208,28 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
                                                     str_pfi_ellipsoids)
         os.system(cmd)
 
-    if create['Cube in the sky']:
+    if create['Cubes in the sky']:
 
         omega = [80, 80, 80]
-        cube_a = [[10, 60, 55], 10, 1]
-        cube_b = [[50, 55, 42], 16, 2]
-        cube_c = [[25, 20, 20], 20, 3]
-        cube_d = [[55, 16, 9], 10, 4]
+        cube_a = [[10, 60, 55], 11, 1]
+        cube_b = [[50, 55, 42], 17, 2]
+        cube_c = [[25, 20, 20], 19, 3]
+        cube_d = [[55, 16, 9], 9, 4]
 
-        sky = generate_cube(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=cube_a[2]) + \
-              generate_cube(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=cube_b[2]) + \
-              generate_cube(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=cube_c[2]) + \
-              generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=cube_d[2])
-        im = nib.Nifti1Image(sky, affine=np.eye(4))
+        sky1 = generate_cube(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=1) + \
+               generate_cube(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=1) + \
+               generate_cube(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=1) + \
+               generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=1)
+        im1 = nib.Nifti1Image(sky1, affine=np.eye(4))
 
-        nib.save(im, filename=jph(examples_folder, 'cubes_in_space.nii.gz'))
+        sky2 = generate_cube(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=cube_a[2]) + \
+               generate_cube(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=cube_b[2]) + \
+               generate_cube(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=cube_c[2]) + \
+               generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=cube_d[2])
+        im2 = nib.Nifti1Image(sky2, affine=np.eye(4))
+
+        nib.save(im1, filename=jph(examples_folder, 'cubes_in_space_bin.nii.gz'))
+        nib.save(im2, filename=jph(examples_folder, 'cubes_in_space.nii.gz'))
 
 if __name__ == '__main__':
     generate_figures()
