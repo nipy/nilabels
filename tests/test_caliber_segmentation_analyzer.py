@@ -163,6 +163,13 @@ def test_modulating_affine_sandwich_volume_below_label():
     expected_av1 = 0
     assert_almost_equal(av1, expected_av1, places=6)
 
-    vol2 = sa.get_average_below_labels([2])[0]
-    expected_vol2 = 2.0  # 2.0 in each voxel: the mean over the voxels is still 2.0
-    assert_almost_equal(vol2, expected_vol2, places=6)
+    av2 = sa.get_average_below_labels([2])[0]
+    expected_av2 = 2.0  # 2.0 in each voxel: the mean over the voxels is still 2.0
+    assert_almost_equal(av2, expected_av2, places=6)
+
+    av2_3_2and3 = sa.get_average_below_labels([2, 3, [2, 3]])
+    np.testing.assert_array_equal(av2_3_2and3, [2.0 * 2 * 9 * 10 / (2 * 9 * 10) ,
+                                                3.0 * 3 * 9 * 10 / (3 * 9 * 10) ,
+                                                (2.0 * 2 * 9 * 10 + 3.0 * 3 * 9 * 10) /  ((2 + 3) * 9 * 10) ])
+
+test_modulating_affine_sandwich_volume_below_label()
