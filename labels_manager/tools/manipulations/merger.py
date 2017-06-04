@@ -12,7 +12,7 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
     :return:
     """
     msg = 'Input array must be 4-dimensional.'
-    assert len(in_data.shape) == 4, msg
+    assert in_data.ndim == 4, msg
 
     in_data_shape = in_data.shape
     out_data = np.zeros(in_data_shape[:3], dtype=in_data.dtype)

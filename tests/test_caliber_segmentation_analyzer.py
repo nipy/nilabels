@@ -3,7 +3,7 @@ import numpy as np
 from os.path import join as jph
 from nose.tools import assert_raises, assert_almost_equal
 
-from definitions import root_dir
+from defs import root_dir
 from labels_manager.caliber.segmentation_analyzer import SegmentationAnalyzer as SA
 
 

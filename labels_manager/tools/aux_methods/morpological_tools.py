@@ -21,7 +21,7 @@ def get_morphological_patch(dimension, shape):
 def get_morphological_mask(point, omega, radius=5, shape='circle', morpho_patch=None):
 
     if morpho_patch is None:
-        d = len(omega.shape)
+        d = omega.ndim
         morpho_patch = get_morphological_patch(d, shape=shape)
 
     mask = np.zeros(omega, dtype=np.bool)

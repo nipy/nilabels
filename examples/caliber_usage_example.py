@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from definitions import root_dir
+from defs import root_dir
 from labels_manager.caliber.segmentation_analyzer import SegmentationAnalyzer as SA
 
 

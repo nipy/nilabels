@@ -49,7 +49,7 @@ def axial_rotations(m, rot=1, ax=2):
     :return: m rotate rot times around axis ax, according to convention.
     """
 
-    if len(m.shape) is not 3:
+    if m.ndim is not 3:
         assert IOError
 
     rot %= 4
@@ -66,7 +66,7 @@ def axial_rotations(m, rot=1, ax=2):
 def flip_data(in_data, axis='x'):
 
     msg = 'Input array must be 3-dimensional.'
-    assert len(in_data.shape) == 3, msg
+    assert in_data.ndim == 3, msg
 
     msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
     assert axis in ['x', 'y', 'z'], msg
@@ -98,7 +98,7 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
     # Sanity check:
 
     msg = 'Input array must be 3-dimensional.'
-    assert len(in_data.shape) == 3, msg
+    assert in_data.ndim == 3, msg
 
     msg = 'side_to_copy must be one of the two {}.'.format(['below', 'above'])
     assert side_to_copy in ['below', 'above'], msg

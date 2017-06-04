@@ -14,7 +14,7 @@ def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
     :return:
     """
     msg = 'Input array must be 3-dimensional.'
-    assert len(in_data.shape) == 3, msg
+    assert in_data.ndim == 3, msg
 
     out_data = np.zeros(list(in_data.shape) + [len(list_labels)], dtype=in_data.dtype)
 

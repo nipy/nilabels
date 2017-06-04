@@ -1,4 +1,4 @@
-from definitions import definition_label
+from defs import definition_label
 
 
 class LabelsManagerDetect(object):

@@ -6,7 +6,7 @@ import numpy as np
 
 import labels_manager.tools.manipulations.relabeller as rel
 import labels_manager.tools.manipulations.splitter as sp
-from definitions import root_dir
+from defs import root_dir
 from labels_manager.main import LabelsManager
 from labels_manager.tools.aux_methods.utils import set_new_data
 

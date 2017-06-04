@@ -19,6 +19,7 @@ class SegmentationAnalyzer(object):
         self.return_mm3 = return_mm3
         self.pfi_scalar_im = pfi_scalar_im
         self.icv_factor = icv_factor
+        self.labels_to_exclude = None
 
         self._segmentation = None
         self._scalar_im = None
@@ -35,15 +36,21 @@ class SegmentationAnalyzer(object):
             raise IOError
         if not np.array_equal(self._scalar_im.shape, self._segmentation.shape):
             raise IOError
-        # NOTE: images must be in standard form using fslreorient2std of FSL - GIGO.
-        if np.count_nonzero(self._scalar_im.get_affine() - np.diag(np.diagonal(self._scalar_im.get_affine()))):
-            raise IOError
 
         self._one_voxel_volume = np.round(np.abs(np.prod(np.diag(self._segmentation.get_affine()))), decimals=6)
 
     def get_total_volume(self):
 
-        num_voxels = np.count_nonzero(self._segmentation.get_data())
+        if self.labels_to_exclude is not None:
+
+            seg = np.copy(self._segmentation.get_data())
+            for index_label_k, label_k in enumerate(self.labels_to_exclude):
+                places = self._segmentation.get_data() != label_k
+                seg =  seg * places.astype(np.int)
+
+            num_voxels = np.count_nonzero(seg)
+        else:
+            num_voxels = np.count_nonzero(self._segmentation.get_data())
 
         if self.return_mm3:
             mm_3 = num_voxels * self._one_voxel_volume
@@ -134,12 +141,14 @@ class SegmentationAnalyzer(object):
                 for label_k_j in label_k:
                     all_places += self._segmentation.get_data() == label_k_j
 
-            masked_scalar_data = all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)
+            masked_scalar_data = (all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)).flatten()
             # remove zero elements from the array:
-            non_zero_masked_scalar_data = [j for j in masked_scalar_data.flatten() if j > 1e-6]
+            # non_zero_masked_scalar_data = [j for j in masked_scalar_data if j > 1e-6]
 
-            if not non_zero_masked_scalar_data:  # if not non_zero_masked_scalar_data == []
-                non_zero_masked_scalar_data = 0
+            non_zero_masked_scalar_data = masked_scalar_data[np.where(masked_scalar_data > 1e-6)]  # 1e-6
+
+            if non_zero_masked_scalar_data.size == 0:  # if not non_zero_masked_scalar_data is an empty array.
+                non_zero_masked_scalar_data = 0.
 
             values[index_label_k] = np.mean(non_zero_masked_scalar_data)
 
@@ -151,5 +160,6 @@ class SegmentationAnalyzer(object):
 
             if verbose:
                 print('Mean below the labels for the given image {0} : {1}'.format(selected_labels[index_label_k], values[index_label_k]))
-
+                if isinstance(non_zero_masked_scalar_data, np.ndarray):
+                    print 'non zero masked scalar data : ' + str(len(non_zero_masked_scalar_data))
         return values
