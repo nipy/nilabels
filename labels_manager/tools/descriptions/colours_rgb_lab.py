@@ -123,3 +123,7 @@ def color_distance(v1, v2, in_color_space='rgb'):
 
     return np.linalg.norm(
            np.array(color_space_map[in_color_space](v1)) - np.array(color_space_map[in_color_space](v2)))
+
+
+def get_random_rgb():
+    return list(np.random.choice(range(256), 3))

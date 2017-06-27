@@ -46,7 +46,7 @@ def centroid(im, labels, affine=np.eye(3)):
     return centers_of_mass
 
 
-def box_sides(in_segmentation, label_to_box=1, affine=np.eye(4), dtype_output=np.float64):
+def box_sides(in_segmentation, label_to_box=1):
     """
     We assume the component with label equals to label_to_box is connected
     :return:
