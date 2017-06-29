@@ -5,8 +5,8 @@ dist
 MANIFEST
 *.egg-info
 build
-images_examples
-images_output
+data_examples
+data_output
 fusing_labels
 *.pyc
 todo_list.txt

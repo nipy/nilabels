@@ -12,14 +12,14 @@ from labels_manager.tools.aux_methods.utils import set_new_data
 
 if __name__ == '__main__':
 
-    print('Run generate_images_examples.py before this, please.')
+    print('Run generate_data_examples.py before this, please.')
     print('\nApprox 380MB required\n')
     # Create output folder:
-    cmd = 'mkdir -p {}'.format(jph(root_dir, 'images_output'))
+    cmd = 'mkdir -p {}'.format(jph(root_dir, 'data_output'))
     os.system(cmd)
 
     # Instantiate a manager from the class LabelsManager
-    lm = LabelsManager(jph(root_dir, 'images_examples'), jph(root_dir, 'images_output'))
+    lm = LabelsManager(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
     print('Input folder: ' + lm._pfo_in)
     print('Output folder: ' + lm._pfo_out)
 
@@ -55,27 +55,27 @@ if __name__ == '__main__':
                               list_old_labels, list_new_labels)
 
         # Without the managers: loading the data and applying the relabeller
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = rel.relabeller(data_seg, list_old_labels, list_new_labels)
 
         im_relabelled = set_new_data(im_seg, data_seg_new)
 
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -93,25 +93,25 @@ if __name__ == '__main__':
         lm.manipulate.permute(fin_punt_seg_original, fin_punt_seg_new, perm)
 
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = rel.permute_labels(data_seg, perm)
 
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -129,25 +129,25 @@ if __name__ == '__main__':
         lm.manipulate.erase(fin_punt_seg_original, fin_punt_seg_new, labels_to_erase=labels_to_erase)
 
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = rel.erase_labels(data_seg, labels_to_erase)
 
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -167,26 +167,26 @@ if __name__ == '__main__':
                fin_punt_seg_new, labels_to_keep=labels_to_keep, same_value_label=new_value)
 
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = rel.assign_all_other_labels_the_same_value(data_seg,
                 labels_to_keep=labels_to_keep, same_value_label=new_value)
 
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -202,24 +202,24 @@ if __name__ == '__main__':
         lm.manipulate.keep_one_label(fin_punt_seg_original, fin_punt_seg_new,
                                      label_to_keep=label_to_keep)
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = rel.keep_only_one_label(data_seg, label_to_keep=label_to_keep)
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', 'punt.nii.gz'),
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_examples', 'punt.nii.gz'),
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -242,25 +242,25 @@ if __name__ == '__main__':
         lm.manipulate.extend_slice_new_dimension(fin_punt_seg_original, fin_punt_seg_new,
                                                  new_axis=new_axis, num_slices=num_slices)
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = np.stack([data_seg, ] * num_slices, axis=new_axis)
 
         # Results comparison:
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before:
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_examples', fin_punt_original),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))
+                   jph(root_dir, 'data_examples', fin_punt_original),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))
             os.system(cmd)
             # figure after - (*) the segmentation can be loaded in itksnap in only one slice.
             cmd = 'itksnap -g {0} -s {1}'.format(
-                   jph(root_dir, 'images_output', fin_punt_new),
-                   jph(root_dir, 'images_examples', fin_punt_seg_original))  # (*)
+                   jph(root_dir, 'data_output', fin_punt_new),
+                   jph(root_dir, 'data_examples', fin_punt_seg_original))  # (*)
             os.system(cmd)
 
     """
@@ -274,19 +274,19 @@ if __name__ == '__main__':
         # using the manager
         lm.manipulate.split_in_4d(fin_seg_original, fin_seg_new)
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_seg_original))
         data_seg = im_seg.get_data()
         list_labels = list(np.sort(list(set(data_seg.flat))))
         data_seg_new = sp.split_labels_to_4d(data_seg, list_labels)
         # results comparison
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure before and after:
             cmd = 'itksnap -g {0}; itksnap -g {1};'.format(
-                   jph(root_dir, 'images_examples', fin_seg_original), jph(root_dir, 'images_output', fin_seg_new))
+                   jph(root_dir, 'data_examples', fin_seg_original), jph(root_dir, 'data_output', fin_seg_new))
             os.system(cmd)
 
     """
@@ -303,18 +303,18 @@ if __name__ == '__main__':
         lm.manipulate.split_in_4d(fin_punt_seg_original, fin_punt_seg_new, list_labels=list_labels,
                                   keep_original_values=False)
         # without the manager:
-        im_seg = nib.load(jph(root_dir, 'images_examples', fin_punt_seg_original))
+        im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
         data_seg = im_seg.get_data()
         data_seg_new = sp.split_labels_to_4d(data_seg, list_labels, keep_original_values=False)
         # results comparison
-        nib_seg_new = nib.load(jph(root_dir, 'images_output', fin_punt_seg_new))
+        nib_seg_new = nib.load(jph(root_dir, 'data_output', fin_punt_seg_new))
         nib_seg_new_data = nib_seg_new.get_data()
         np.testing.assert_array_equal(data_seg_new, nib_seg_new_data)
 
         if open_figures:
             # figure after:
             cmd = 'itksnap -g {0}'.format(
-                   jph(root_dir, 'images_output', fin_punt_seg_new))
+                   jph(root_dir, 'data_output', fin_punt_seg_new))
             os.system(cmd)
 
     """
@@ -329,12 +329,12 @@ if __name__ == '__main__':
         # split:
         lm.manipulate.split_in_4d(fin_seg_original, fin_seg_splitted)
         # merge
-        lm.set_input_data_folder(jph(root_dir, 'images_output'))
+        lm.set_input_data_folder(jph(root_dir, 'data_output'))
 
         lm.manipulate.merge_from_4d(fin_seg_splitted, fin_seg_merged)
         # check you got back the same:
-        pfi_seg_before = jph(root_dir, 'images_examples', fin_seg_original)
-        pfi_seg_after = jph(root_dir, 'images_output', fin_seg_merged)
+        pfi_seg_before = jph(root_dir, 'data_examples', fin_seg_original)
+        pfi_seg_after = jph(root_dir, 'data_output', fin_seg_merged)
         im_before = nib.load(pfi_seg_before)
         im_after  = nib.load(pfi_seg_after)
         np.testing.assert_array_equal(im_before.get_data(), im_after.get_data())
@@ -351,7 +351,7 @@ if __name__ == '__main__':
                                        side_to_copy='above', keep_in_data_dimensions=True)
 
         if open_figures:
-            cmd = 'itksnap -g {0}'.format(jph(root_dir, 'images_output', fin_transformed))
+            cmd = 'itksnap -g {0}'.format(jph(root_dir, 'data_output', fin_transformed))
             os.system(cmd)
 
     """
@@ -364,11 +364,11 @@ if __name__ == '__main__':
         # transform mes in a punt
         lm.manipulate.symmetrise_with_registration(fin_anatomy, fin_seg,
                                                    list_labels_input=[1, 2, 3, 4, 5, 6],
-                                                   results_folder_path=jph(root_dir, 'images_output'),
-                                                   result_img_path=jph(root_dir, 'images_output','ellipsoid_seg_SYM.nii.gz'),
+                                                   results_folder_path=jph(root_dir, 'data_output'),
+                                                   result_img_path=jph(root_dir, 'data_output','ellipsoid_seg_SYM.nii.gz'),
                                                    list_labels_transformed=[7, 8, 9, 10, 11, 12])
 
         if open_figures:
-            cmd = 'itksnap -g {0} -s {1}'.format(jph(root_dir, 'images_examples', fin_anatomy),
-                                                 jph(root_dir, 'images_output','ellipsoid_seg_SYM.nii.gz'))
+            cmd = 'itksnap -g {0} -s {1}'.format(jph(root_dir, 'data_examples', fin_anatomy),
+                                                 jph(root_dir, 'data_output','ellipsoid_seg_SYM.nii.gz'))
             os.system(cmd)

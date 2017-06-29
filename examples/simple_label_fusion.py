@@ -10,9 +10,9 @@ if __name__ == '__main__':
                  'Register and propagate': False,
                  'Fuse seg_LabFusion': True}
 
-    pfo_input_dataset = jph(root_dir, 'images_examples', 'ellipsoids_family')
-    pfo_results_propagation = jph(root_dir, 'images_output', 'results_propagation')
-    pfo_results_label_fusion = jph(root_dir, 'images_output', 'results_label_fusion')
+    pfo_input_dataset = jph(root_dir, 'data_examples', 'ellipsoids_family')
+    pfo_results_propagation = jph(root_dir, 'data_output', 'results_propagation')
+    pfo_results_label_fusion = jph(root_dir, 'data_output', 'results_label_fusion')
 
     if run_steps['Generate results folders']:
         cmd0 = 'mkdir -p {0}'.format(pfo_results_propagation)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     if run_steps['Fuse seg_LabFusion']:
 
         # instantiate a label manager:
-        lm = LabelsManager(jph(root_dir, 'images_examples', 'ellipsoids_family'), jph(root_dir, 'images_output'))
+        lm = LabelsManager(jph(root_dir, 'data_examples', 'ellipsoids_family'), jph(root_dir, 'data_output'))
 
         # With majority voting
         options_seg = '-MV'

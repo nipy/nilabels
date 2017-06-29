@@ -24,7 +24,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
               }
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
-    examples_folder = jph(root_dir, 'images_examples')
+    examples_folder = jph(root_dir, 'data_examples')
 
     if create['Examples folder']:
 

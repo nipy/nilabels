@@ -1,5 +1,10 @@
 import numpy as np
 import nibabel as nib
+import collections
+
+from labels_manager.tools.descriptions.colours_rgb_lab import get_random_rgb
+from labels_manager.tools.descriptions.manipulate_descriptors import descriptor_standard_header
+
 
 
 def set_new_data(image, new_data, new_dtype=None, remove_nan=False):
@@ -275,3 +280,37 @@ def generate_cube(omega, center, side_length, background_intensity=0, foreground
             for lz in range(-half_side_length, half_side_length + 1):
                 sky[center[0] + lx, center[1] + ly, center[2] + lz] = foreground_intensity
     return sky
+
+
+# ---------- Label descriptors experiments ---------------
+
+
+def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None):
+    """
+    For testing purposes, it creates a dummy label descriptor.
+    :param pfi_output: where to save the eventual label descriptor
+    :param list_labels: list of labels range, default 0:5
+    :param list_roi_names: names of the regions of interests. If None, default names are assigned.
+    :return: label descriptor as a dictionary.
+    """
+    d = collections.OrderedDict()
+    d.update({'type': 'Label descriptor parsed'})
+    num_labels = len(list_labels)
+    colors = [get_random_rgb() for _ in range(num_labels)]
+    visibility = [(1, 1, 1)] * num_labels
+    if list_roi_names is None:
+        list_roi_names = ["label {}".format(j) for j in list_labels]
+    else:
+        assert len(list_labels) == len(list_roi_names)
+    for j in range(num_labels):
+        up_d = {str(j): [colors[j], visibility[j], list_roi_names[j]]}
+        d.update(up_d)
+    f = open(pfi_output, 'w+')
+    f.write(descriptor_standard_header)
+    for j in d.keys():
+        if j.isdigit():
+            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(j,
+                d[j][0][0], d[j][0][1], d[j][0][2], d[j][1][0], d[j][1][1], d[j][1][2], d[j][2])
+            f.write(line)
+    f.close()
+    return d

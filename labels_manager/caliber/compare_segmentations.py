@@ -17,8 +17,7 @@ import os
 from os.path import join as jph
 import pandas as pd
 
-from labels_manager.tools.descriptions.manipulate_descriptors import parse_label_descriptor_to_dict, \
-    generate_sample_label_descriptor
+from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
 
 
 
@@ -74,8 +73,8 @@ def get_precision(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files, 
     return np.abs(np.linalg.det(t))
 
 
-def get_errors_data_frame(pfi_segm1, pfi_segm2, pfo_intermediate_files, pfi_output_table=None,
-                          pfi_label_descriptor=None, erase_intermediate=False):
+def get_errors_data_frame(pfi_segm1, pfi_segm2, pfo_intermediate_files, pfi_label_descriptor,
+                          pfi_output_table=None, erase_intermediate=False, tag=0):
 
     im1 = nib.load(pfi_segm1)
     im2 = nib.load(pfi_segm2)
@@ -84,8 +83,13 @@ def get_errors_data_frame(pfi_segm1, pfi_segm2, pfo_intermediate_files, pfi_outp
     list_labels_2 = sorted(list(set(im2.get_data().flat)))
     assert list_labels_1 == list_labels_2
 
-    if pfi_label_descriptor is not None:
-        lab_descriptor_dict = parse_label_descriptor_to_dict(pfi_label_descriptor)
-    else:
-        lab_descriptor_dict = generate_sample_label_descriptor(list_labels_1)
-    # TODO
+    ldm = LabelsDescriptorManager(pfi_label_descriptor)
+    multi_label = ldm.get_multi_label_dict()
+
+    # create data-frame to fill:
+    regions = multi_label.keys()
+    s_dice  = pd.Series(np.zeros(len(regions)), index=regions)
+    s_dispe = pd.Series(np.zeros(len(regions)), index=regions)
+    s_prec  = pd.Series(np.zeros(len(regions)), index=regions)
+
+    # split images in binarised segmentations components.

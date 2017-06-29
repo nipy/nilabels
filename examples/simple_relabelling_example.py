@@ -7,11 +7,11 @@ from labels_manager.main import LabelsManager
 if __name__ == '__main__':
 
     # generate output folder for examples:
-    cmd = 'mkdir -p {}'.format(jph(root_dir, 'images_output'))
+    cmd = 'mkdir -p {}'.format(jph(root_dir, 'data_output'))
     os.system(cmd)
 
     # instantiate a label manager:
-    lm = LabelsManager(jph(root_dir, 'images_examples'), jph(root_dir, 'images_output'))
+    lm = LabelsManager(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
 
     # data:
     fin_punt_seg_original = 'mes_seg.nii.gz'
@@ -26,11 +26,11 @@ if __name__ == '__main__':
 
     # figure before:
     cmd = 'itksnap -g {0} -s {1}'.format(
-        jph(root_dir, 'images_examples', 'mes.nii.gz'),
-        jph(root_dir, 'images_examples', fin_punt_seg_original))
+        jph(root_dir, 'data_examples', 'mes.nii.gz'),
+        jph(root_dir, 'data_examples', fin_punt_seg_original))
     os.system(cmd)
     # figure after
     cmd = 'itksnap -g {0} -s {1}'.format(
-        jph(root_dir, 'images_examples', 'mes.nii.gz'),
-        jph(root_dir, 'images_output', fin_punt_seg_new))
+        jph(root_dir, 'data_examples', 'mes.nii.gz'),
+        jph(root_dir, 'data_output', fin_punt_seg_new))
     os.system(cmd)

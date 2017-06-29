@@ -7,7 +7,7 @@ from labels_manager.caliber.segmentation_analyzer import SegmentationAnalyzer as
 
 if __name__ == '__main__':
 
-    examples_folder = jph(root_dir, 'images_examples')
+    examples_folder = jph(root_dir, 'data_examples')
 
     pfi_im = jph(examples_folder, 'cubes_in_space.nii.gz')
     pfi_im_bin = jph(examples_folder, 'cubes_in_space_bin.nii.gz')
