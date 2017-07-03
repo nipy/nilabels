@@ -9,6 +9,6 @@ generate_dummy_label_descriptor
 
 
 if __file__ == '__main__':
-    ldm = LabelDescriptorManager()
+    ldm = LabelsDescriptorManager()
 
 
