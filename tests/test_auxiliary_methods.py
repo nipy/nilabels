@@ -92,8 +92,8 @@ def test_get_pfi_in_pfi_out():
 
 
 ''' Test aux_methods.utils.py '''
-from labels_manager.tools.aux_methods.utils import set_new_data, compare_two_nib, \
-    eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
+from labels_manager.tools.aux_methods.utils import set_new_data, compare_two_nib, binarise_a_matrix
+    # eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
 
 
 def test_set_new_data_simple_modifications():
@@ -139,11 +139,11 @@ def test_compare_two_nib_different_affine():
     assert_equals(compare_two_nib(im_0, im_1), False)
 
 
-def test_eliminates_consecutive_duplicates():
-
-    l_in = [0,0,0,1,1,2,3,4,5,5,5,6,7,8,9]
-    l_out = range(10)
-    assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
+# def test_eliminates_consecutive_duplicates():
+#
+#     l_in = [0,0,0,1,1,2,3,4,5,5,5,6,7,8,9]
+#     l_out = range(10)
+#     assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
 
 
 def test_binarise_a_matrix():
@@ -153,14 +153,14 @@ def test_binarise_a_matrix():
     assert_array_equal(expected_out_data, binarise_a_matrix(in_data, dtype=np.int))
 
 
-def test_get_values_below_label():
-
-    image = np.array(range(8 * 8)).reshape(8, 8)
-    mask = np.zeros_like(image)
-    mask[2, 2] = 1
-    mask[2, 3] = 1
-    mask[3, 2] = 1
-    mask[3, 3] = 1
-    vals = get_values_below_label(image, mask, 1)
-    assert_array_equal([image[2, 2], image[2, 3], image[3, 2], image[3, 3]], vals)
+# def test_get_values_below_label():
+#
+#     image = np.array(range(8 * 8)).reshape(8, 8)
+#     mask = np.zeros_like(image)
+#     mask[2, 2] = 1
+#     mask[2, 3] = 1
+#     mask[3, 2] = 1
+#     mask[3, 3] = 1
+#     vals = get_values_below_label(image, mask, 1)
+#     assert_array_equal([image[2, 2], image[2, 3], image[3, 2], image[3, 3]], vals)
 

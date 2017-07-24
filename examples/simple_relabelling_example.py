@@ -4,6 +4,7 @@ from os.path import join as jph
 from defs import root_dir
 from labels_manager.main import LabelsManager
 
+
 if __name__ == '__main__':
 
     # generate output folder for examples:

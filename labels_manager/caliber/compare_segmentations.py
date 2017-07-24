@@ -11,7 +11,6 @@ To have it in displacement coordinate system (Lagrangian coordinate system) for 
 subtract them the identity with python (not with - disp in niftyReg, otherwise it will be exponentiated again).
 """
 import numpy as np
-import scipy
 import nibabel as nib
 import os
 from os.path import join as jph
@@ -46,18 +45,16 @@ def get_dispersion(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files,
                                                                              pfi_warp_aff,
                                                                              pfi_transf_aff)
     os.system(cmd1)
-    pfi_warp_nrig = jph(pfo_intermediate_files, 'dispersion_aff_warped_interp0_' + str(tag) +'.nii.gz')
-    pfi_svf = jph(pfo_intermediate_files, 'dispersion_aff_transf_interp0' + str(tag) +'.nii.gz')
-    cmd2 = 'reg_f3d -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -vel'.format(pfi_binary_image1,
-                                                                               pfi_warp_aff,
-                                                                               pfi_warp_nrig,
-                                                                               pfi_svf)
-    os.system(cmd2)
-    # get the dense SVF - tests to be made
-    # cmd3 = 'reg_transform -disp {0} {1}'.format(pfi_svf, )
-    svf = nib.load(pfi_svf)
-    norms = scipy.linalg.norm(svf.get_data(), axis=4)
-    return np.median(norms.flatten())
+    # pfi_warp_nrig = jph(pfo_intermediate_files, 'dispersion_aff_warped_interp0_' + str(tag) +'.nii.gz')
+    # pfi_svf = jph(pfo_intermediate_files, 'dispersion_aff_transf_interp0' + str(tag) +'.nii.gz')
+    # cmd2 = 'reg_f3d -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -vel'.format(pfi_binary_image1,
+    #                                                                            pfi_warp_aff,
+    #                                                                            pfi_warp_nrig,
+    #                                                                            pfi_svf)
+    # os.system(cmd2)
+    # svf = nib.load(pfi_svf)
+    # norms = scipy.linalg.norm(svf.get_data(), axis=4)
+    return get_dice_score(pfi_binary_image1, pfi_warp_aff)
 
 
 def get_precision(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files, tag=0):

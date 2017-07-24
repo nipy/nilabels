@@ -13,7 +13,7 @@ class SegmentationAnalyzer(object):
 
         for p in [pfi_segmentation, pfi_scalar_im]:
             if not os.path.exists(p):
-                IOError('Input data path {} does not exist.')
+                raise IOError('Input data path {} does not exist.'.format(p))
 
         self.pfi_segmentation = pfi_segmentation
         self.return_mm3 = return_mm3
@@ -32,10 +32,8 @@ class SegmentationAnalyzer(object):
         self._segmentation =  nib.load(self.pfi_segmentation)
         self._scalar_im = nib.load(self.pfi_scalar_im)
 
-        if not np.array_equal(self._scalar_im.get_affine(), self._segmentation.get_affine()):
-            raise IOError
-        if not np.array_equal(self._scalar_im.shape, self._segmentation.shape):
-            raise IOError
+        np.testing.assert_array_almost_equal(self._scalar_im.get_affine(), self._segmentation.get_affine())
+        np.testing.assert_array_almost_equal(self._scalar_im.shape, self._segmentation.shape)
 
         self._one_voxel_volume = np.round(np.abs(np.prod(np.diag(self._segmentation.get_affine()))), decimals=6)
 
