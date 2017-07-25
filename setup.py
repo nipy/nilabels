@@ -8,6 +8,6 @@ setup(name='LabelsManager',
       description='Manage the labels of the segmentations of nifti images.',
       author='sebastiano ferraris',
       author_email='sebastiano.ferraris@gmail.com',
-      # url='',
+      url='https://github.com/SebastianoF/LabelsManager',
       packages=find_packages(),
      )

@@ -1,4 +1,6 @@
 import os
+import time
+import subprocess
 
 
 def connect_tail_head_path(tail, head):
@@ -47,3 +49,24 @@ def get_pfi_in_pfi_out(filename_in, filename_out, pfo_in, pfo_out):
 
     check_pfi_io(pfi_in, pfi_out)
     return pfi_in, pfi_out
+
+
+def check_path(pfi, interval=1, timeout=100):
+    if os.path.exists(pfi):
+        if pfi.endswith('.nii.gz'):
+            mustend = time.time() + timeout
+            while time.time() < mustend:
+                try:
+                    subprocess.check_output('gunzip -t {}'.format(pfi), shell=True)
+                except subprocess.CalledProcessError:
+                    print "Caught CalledProcessError"
+                else:
+                    return True
+                time.sleep(interval)
+            msg = 'File {0} corrupted after 100 tests. \n'.format(pfi)
+            raise IOError(msg)
+        else:
+            return True
+    else:
+        msg = '{} does not exist!'.format(pfi)
+        raise IOError(msg)
