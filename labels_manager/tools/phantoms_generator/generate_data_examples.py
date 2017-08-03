@@ -14,14 +14,14 @@ from labels_manager.tools.detections.get_segmentation import intensity_segmentat
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
-    create = {'Examples folder'   : True,
-              'Punt e mes'        : True,
-              'C'                 : True,
-              'Planetaruim'       : True,
-              'Buckle ellipsoids' : True,
+    create = {'Examples folder'   : False,
+              'Punt e mes'        : False,
+              'C'                 : False,
+              'Planetaruim'       : False,
+              'Buckle ellipsoids' : False,
               'Ellipsoids family' : True,
-              'Cubes in the sky'  : True,
-              'Sandwich'          : True
+              'Cubes in the sky'  : False,
+              'Sandwich'          : False
               }
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')

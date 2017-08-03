@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     for p in [pfi_im, pfi_im_bin, examples_folder]:
         if not os.path.exists(p):
-            raise IOError('Run generate_images_examples.py to create the images examples before this, please.')
+            raise IOError('Run lm.tools.benchmarking.generate_images_examples.py to create the images examples before this, please.')
 
     # instantiate the SegmentationAnalyzer from caliber: scalar is the binary.
     sa = SA(pfi_segmentation=pfi_im, pfi_scalar_im=pfi_im_bin)
