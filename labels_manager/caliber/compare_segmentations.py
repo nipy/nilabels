@@ -37,7 +37,7 @@ def get_dice_score(pfi_binary_image1, pfi_binary_image2):
     return 2 * card_im1_intersect_im2  / float(card_im1 + card_im2)
 
 
-def get_dispersion(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files, tag=0):
+def get_dispersion(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files, tag=''):
     pfi_warp_aff = jph(pfo_intermediate_files, 'dispersion_aff_warped_interp0_' + str(tag) +'.nii.gz')
     pfi_transf_aff = jph(pfo_intermediate_files, 'dispersion_aff_transf_interp0_' + str(tag) +'.txt')
     cmd1 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0'.format(pfi_binary_image1,
@@ -70,8 +70,12 @@ def get_precision(pfi_binary_image1, pfi_binary_image2, pfo_intermediate_files, 
     return np.abs(np.linalg.det(t))**(-1)
 
 
+def get_hausdoroff_distance(pfi_segm1, pfi_segm2, pfo_intermediate_files):
+    pass
+
+
 def get_errors_data_frame(pfi_segm1, pfi_segm2, pfo_intermediate_files, pfi_label_descriptor,
-                          pfi_output_table=None, erase_intermediate=False, tag=0):
+                          pfi_output_table=None, erase_intermediate=False, tag=''):
 
     """
     Images in intermediate files are saved as

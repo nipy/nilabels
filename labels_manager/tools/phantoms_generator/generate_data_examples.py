@@ -6,10 +6,10 @@ import numpy as np
 import scipy.ndimage.filters as fil
 
 from defs import root_dir
-from labels_manager.tools.aux_methods.phantoms_generator import generate_ellipsoid, generate_o, generate_c, \
-    generate_cube
 from labels_manager.tools.aux_methods.utils import binarise_a_matrix
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
+from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_ellipsoid, generate_o, generate_c, \
+    generate_cube
 
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
@@ -97,7 +97,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
             for x in xrange(center[0] - radius - 1, center[0] + radius + 1):
                 for y in xrange(center[1] - radius - 1, center[1] + radius + 1):
                     for z in xrange(center[2] - radius - 1, center[2] + radius + 1):
-                        if (center[0] - x) ** 2 + (center[1] - y) ** 2 + (center[2] - z) ** 2 <= radius:
+                        if (center[0] - x) ** 2 + (center[1] - y) ** 2 + (center[2] - z) ** 2 <= radius ** 2:
                             sky[x, y, z] = intensity
 
         planetarium = fil.gaussian_filter(sky, np.min(radii)-np.std(radii))

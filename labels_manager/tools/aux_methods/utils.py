@@ -206,10 +206,10 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 def adjust_affine_header(pfi_input, pfi_output, theta, trasl):
 
     # transformations parameters
-    rot_x = np.array([[1,            0,           0,     trasl[0]],
-                     [0,  np.cos(theta),  -np.sin(theta),     trasl[1]],
+    rot_x = np.array([[1,            0,           0,      trasl[0]],
+                     [0,  np.cos(theta),  -np.sin(theta), trasl[1]],
                      [0,  np.sin(theta), np.cos(theta),   trasl[2]],
-                     [0,             0,          0,      1]])
+                     [0,             0,          0,       1]])
 
     # Load input image:
     im_input = nib.load(pfi_input)
@@ -237,6 +237,21 @@ def adjust_affine_header(pfi_input, pfi_output, theta, trasl):
 
     # save output image
     nib.save(new_image, pfi_output)
+
+
+def adjust_nifti_translation(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True):
+    """
+    Change q_form or s_form or both translational part.
+    :param pfi_nifti_input: path to file of the input image
+    :param new_traslation: 3dim array, affine coordinates, will be the future translational part of the affine.
+    :param pfi_nifti_output: path to file of the image with the modifed translation. Try not to be destructive, unless you do not really want.
+    :param q_form: [True] affect q_form
+    :param s_form: [True] affect s_form
+    :return: None. It creates a new image in pfi_nifti_output with defined translational part.
+    """
+    pass
+
+
 
 # ---------- Distributions ---------------
 

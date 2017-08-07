@@ -27,7 +27,7 @@ def centroid(im, labels, affine=np.eye(3)):
     """
 
     :param im:
-    :param labels: list of labels, even with a single element!
+    :param labels: list of labels, e.g. [3] or [2, 3, 45]
     :param affine: transformation matrix, from matrix space to real world coordinates. Identity by default
     :return: centroid of the labels of an image, in the order of the labels
     """
@@ -46,6 +46,10 @@ def centroid(im, labels, affine=np.eye(3)):
     return centers_of_mass
 
 
+def center_of_gravity_whole_segmentation(im):
+    pass
+
+
 def box_sides(in_segmentation, label_to_box=1):
     """
     We assume the component with label equals to label_to_box is connected
@@ -56,3 +60,7 @@ def box_sides(in_segmentation, label_to_box=1):
     for d in range(len(one_label_data.shape)):
         ans.append(np.sum(binarise_a_matrix(np.sum(one_label_data, axis=d), dtype=np.int)))
     return ans
+
+
+def hausdoroff_distance():
+    pass
