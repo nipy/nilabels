@@ -239,7 +239,7 @@ def adjust_affine_header(pfi_input, pfi_output, theta, trasl):
     nib.save(new_image, pfi_output)
 
 
-def adjust_nifti_translation(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True):
+def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True):
     """
     Change q_form or s_form or both translational part.
     :param pfi_nifti_input: path to file of the input image
@@ -251,6 +251,56 @@ def adjust_nifti_translation(pfi_nifti_input, new_traslation, pfi_nifti_output, 
     """
     pass
 
+
+def reproduce_slice_fourth_dimension(nib_image, num_slices=10, repetition_axis=3):
+
+    im_sh = nib_image.shape
+    if not (len(im_sh) == 2 or len(im_sh) == 3):
+        raise IOError('Methods can be used only for 2 or 3 dim images. No conflicts with existing multi, slices')
+
+    new_data = np.stack([nib_image.get_data(), ] * num_slices, axis=repetition_axis)
+    output_im = set_new_data(nib_image, new_data)
+
+    return output_im
+
+
+def reproduce_slice_fourth_dimension_path(pfi_input_image, pfi_output_image, num_slices=10, repetition_axis=3):
+    old_im = nib.load(pfi_input_image)
+    new_im = reproduce_slice_fourth_dimension(old_im, num_slices=num_slices, repetition_axis=repetition_axis)
+    nib.save(new_im, pfi_output_image)
+    print 'New image created and saved in {0}'.format(pfi_output_image)
+
+
+
+def apply_a_mask_path(pfi_input, pfi_mask, pfi_output):
+    """
+    Adaptative - if the mask is 3D and the image is 4D, will create a temporary mask,
+    generate the stack of masks, and apply the stacks to the image.
+    :param pfi_input: path to file 3d x T image
+    :param pfi_mask: 3d mask same dimension as the 3d of the pfi_input
+    :param pfi_output: apply the mask to each time point T in the fourth dimension if any.
+    :return: None, save the output in pfi_output.
+    """
+    im_input = nib.load(pfi_input)
+    im_mask = nib.load(pfi_mask)
+
+    assert len(im_mask.shape) == 3
+
+    if not im_mask.shape == im_input.shape[:3]:
+        msg = 'Mask {0} and image {1} does not have compatible dimension: {2} and {3}'.format(
+            pfi_input, pfi_mask, im_input, im_mask.shape)
+        raise IOError(msg)
+
+    if len(im_input.shape) == 3:
+        new_data = im_input.get_data() * im_mask.get_data().astype(np.bool)
+    else:
+        new_data = np.zeros_like(im_input.get_data())
+        for t in range(im_input.shape[3]):
+            new_data[..., t] = im_input.get_data()[..., t] * im_mask.get_data().astype(np.bool)
+
+    new_im = set_new_data(image=im_input, new_data=new_data)
+
+    nib.save(new_im, filename=pfi_output)
 
 
 # ---------- Distributions ---------------
