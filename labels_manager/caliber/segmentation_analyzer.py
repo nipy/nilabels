@@ -139,10 +139,8 @@ class SegmentationAnalyzer(object):
                 for label_k_j in label_k:
                     all_places += self._segmentation.get_data() == label_k_j
 
-            masked_scalar_data = (all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)).flatten()
+            masked_scalar_data = np.nan_to_num((all_places.astype(np.float64) * self._scalar_im.get_data().astype(np.float64)).flatten())
             # remove zero elements from the array:
-            # non_zero_masked_scalar_data = [j for j in masked_scalar_data if j > 1e-6]
-
             non_zero_masked_scalar_data = masked_scalar_data[np.where(masked_scalar_data > 1e-6)]  # 1e-6
 
             if non_zero_masked_scalar_data.size == 0:  # if not non_zero_masked_scalar_data is an empty array.

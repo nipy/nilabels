@@ -13,7 +13,6 @@ from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out,\
      connect_tail_head_path
 
 
-
 class LabelsManagerManipulate(object):
     """
     Facade of the methods in tools, for work with paths to images rather than

@@ -203,7 +203,7 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
         subprocess.call(cmd, shell=True)
 
 
-def adjust_affine_header(pfi_input, pfi_output, theta, trasl):
+def adjust_affine_header(pfi_input, pfi_output, theta, trasl=np.array([0, 0, 0])):
 
     # transformations parameters
     rot_x = np.array([[1,            0,           0,      trasl[0]],
@@ -239,7 +239,8 @@ def adjust_affine_header(pfi_input, pfi_output, theta, trasl):
     nib.save(new_image, pfi_output)
 
 
-def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True):
+def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True,
+                                  verbose=1):
     """
     Change q_form or s_form or both translational part.
     :param pfi_nifti_input: path to file of the input image
@@ -249,7 +250,48 @@ def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_out
     :param s_form: [True] affect s_form
     :return: None. It creates a new image in pfi_nifti_output with defined translational part.
     """
-    pass
+    im_input = nib.load(pfi_nifti_input)
+
+    # generate new affine transformation (from bicommissural to histological)
+    aff = im_input.affine
+    # create output image on the input
+    if im_input.header['sizeof_hdr'] == 348:
+        new_image = nib.Nifti1Image(im_input.get_data(), aff, header=im_input.header)
+    # if nifty2
+    elif im_input.header['sizeof_hdr'] == 540:
+        new_image = nib.Nifti2Image(im_input.get_data(), aff, header=im_input.header)
+    else:
+        raise IOError
+
+    new_transf = np.copy(aff)
+    if len(new_traslation) == 4 and new_traslation[-1] == 1:
+        new_transf[:, 3] = new_traslation
+    elif len(new_traslation) == 3:
+        new_transf[:3, 3] = new_traslation
+    else:
+        raise IOError
+
+    if q_form:
+        new_image.set_qform(new_transf)
+
+    if s_form:
+        new_image.set_sform(new_transf)
+
+    new_image.update_header()
+
+    if verbose > 0:
+        # print intermediate results
+        print('Affine input image:')
+        print(im_input.get_affine())
+        print('Affine after update:')
+        print(new_image.get_affine())
+        print('Q-form after update:')
+        print(new_image.get_qform())
+        print('S-form after update:')
+        print(new_image.get_sform())
+
+    # save output image
+    nib.save(new_image, pfi_nifti_output)
 
 
 def reproduce_slice_fourth_dimension(nib_image, num_slices=10, repetition_axis=3):

@@ -22,7 +22,6 @@ def lncc_distance(values_patch1, values_patch2):
     return patches[0].dot(patches[1])
 
 
-
 def centroid(im, labels, affine=np.eye(3)):
     """
 
