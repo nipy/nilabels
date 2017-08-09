@@ -294,6 +294,12 @@ def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_out
     nib.save(new_image, pfi_nifti_output)
 
 
+def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output):
+    im_input = nib.load(pfi_nifti_input)
+    new_im = set_new_data(im_input, im_input.get_data().dtype(new_dtype), new_dtype=new_dtype, remove_nan=True)
+    nib.save(new_im, pfi_nifti_output)
+
+
 def reproduce_slice_fourth_dimension(nib_image, num_slices=10, repetition_axis=3):
 
     im_sh = nib_image.shape

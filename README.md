@@ -111,3 +111,18 @@ for i in range(1, 11):
 To see some toy examples of what can be done with LabelsManager, go to LabelsManager/examples and run simple_relabelling_examples.py after running
 run generate_images_examples.py and after selecting the example you want to run in the module itself. Explore other examples as manipulator_example.py.
 
+
+## Work in progress code - Warning
+
+This code is a constant work in progress. 
+
+How it should work: evey method in the `tools` is as direct as possible and works for nibabel images or
+for numpy arrays or for some other type of data, and tested independently.
+To apply the methods in the tools to nifti images by their paths, you can access
+them via the agents: they provide a facade to the tools method, sharing 
+the same path management, that is in itself a tool.
+
+Being a work in progress, there can be methods in `tools` acting directly on paths (ending in `_path`), and
+not yet integrated in the agents, and not yet tested. This has to be considered as a temporary method
+that will be soon integrated in the existing agents or in some new agents created ad hoc 
+(evey method ending in `_path` has to be seen as a todo and as something that will be soon replaced).
