@@ -14,19 +14,21 @@ def set_new_data(image, new_data, new_dtype=None, remove_nan=True):
     :param remove_nan:
     :return: nibabel image
     """
+    hd = image.header
     if remove_nan:
         new_data = np.nan_to_num(new_data)
 
     # update data type:
     if new_dtype is not None:
-        new_data.astype(new_dtype)
+        new_data = new_data.astype(new_dtype)
+        image.set_data_dtype(new_dtype)
 
     # if nifty1
-    if image.header['sizeof_hdr'] == 348:
-        new_image = nib.Nifti1Image(new_data, image.affine, header=image.header)
+    if hd['sizeof_hdr'] == 348:
+        new_image = nib.Nifti1Image(new_data, image.affine, header=hd)
     # if nifty2
-    elif image.header['sizeof_hdr'] == 540:
-        new_image = nib.Nifti2Image(new_data, image.affine, header=image.header)
+    elif hd['sizeof_hdr'] == 540:
+        new_image = nib.Nifti2Image(new_data, image.affine, header=hd)
     else:
         raise IOError('Input image header problem')
 
@@ -294,9 +296,15 @@ def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_out
     nib.save(new_image, pfi_nifti_output)
 
 
-def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output):
+def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output, update_description=None):
     im_input = nib.load(pfi_nifti_input)
-    new_im = set_new_data(im_input, im_input.get_data().dtype(new_dtype), new_dtype=new_dtype, remove_nan=True)
+    if update_description is not None:
+        if not isinstance(update_description, str):
+            raise IOError('update_description must be a string')
+        hd = im_input.header
+        hd['descrip'] = update_description
+        im_input.update_header()
+    new_im = set_new_data(im_input, im_input.get_data().astype(new_dtype), new_dtype=new_dtype, remove_nan=True)
     nib.save(new_im, pfi_nifti_output)
 
 

@@ -22,26 +22,22 @@ def lncc_distance(values_patch1, values_patch2):
     return patches[0].dot(patches[1])
 
 
-def centroid(im, labels, affine=np.eye(3)):
+def centroid(im, labels, real_space_coordinates=True):
     """
 
     :param im:
     :param labels: list of labels, e.g. [3] or [2, 3, 45]
-    :param affine: transformation matrix, from matrix space to real world coordinates. Identity by default
+    :param real_space_coordinates: if true the answer is in mm if false in voxel indexes.
     :return: centroid of the labels of an image, in the order of the labels
     """
-    centers_of_mass = [np.array([0, 0, 0]).astype(np.uint64), ] * len(labels)
-    num_voxel_per_label = [0, ]*len(labels)
-    for i in xrange(im.shape[0]):
-        for j in xrange(im.shape[1]):
-            for k in xrange(im.shape[2]):
-                if im[i, j, k] in labels:
-                    label_index = labels.index(im[i, j, k])
-                    centers_of_mass[label_index] = centers_of_mass[label_index] +  np.array([i, j, k]).astype(np.uint64)
-                    num_voxel_per_label[label_index] += 1
-    for n_index, n in enumerate(num_voxel_per_label):
-        centers_of_mass[n_index] = (1 / float(n)) * affine.dot(centers_of_mass[n_index].astype(np.float64))
-
+    centers_of_mass = [np.array([0, 0, 0]) ] * len(labels)
+    for l_id, l in enumerate(labels):
+        coordinates_l = np.where(im.get_data() == l)  # returns [X_vector, Y_vector, Z_vector]
+        centers_of_mass[l_id] = (1 / float(len(coordinates_l[0]))) * np.array([np.sum(k) for k in coordinates_l])
+    if real_space_coordinates:
+        centers_of_mass = [im.affine[:3, :3].dot(cm.astype(np.float64)) for cm in centers_of_mass]
+    else:
+        centers_of_mass = [np.round(cm).astype(np.uint64) for cm in centers_of_mass]
     return centers_of_mass
 
 
