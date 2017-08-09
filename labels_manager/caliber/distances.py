@@ -41,10 +41,6 @@ def centroid(im, labels, real_space_coordinates=True):
     return centers_of_mass
 
 
-def center_of_gravity_whole_segmentation(im):
-    pass
-
-
 def box_sides(in_segmentation, label_to_box=1):
     """
     We assume the component with label equals to label_to_box is connected

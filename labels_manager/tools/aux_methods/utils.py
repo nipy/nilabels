@@ -296,7 +296,7 @@ def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_out
     nib.save(new_image, pfi_nifti_output)
 
 
-def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output, update_description=None):
+def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output, update_description=None, verbose=1):
     im_input = nib.load(pfi_nifti_input)
     if update_description is not None:
         if not isinstance(update_description, str):
@@ -305,6 +305,9 @@ def adjust_nifti_image_type_path(pfi_nifti_input, new_dtype, pfi_nifti_output, u
         hd['descrip'] = update_description
         im_input.update_header()
     new_im = set_new_data(im_input, im_input.get_data().astype(new_dtype), new_dtype=new_dtype, remove_nan=True)
+    if verbose > 0:
+        print('Data type before {}'.format(im_input.get_data_dtype()))
+        print('Data type after {}'.format(new_im.get_data_dtype()))
     nib.save(new_im, pfi_nifti_output)
 
 
