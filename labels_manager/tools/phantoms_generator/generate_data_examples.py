@@ -5,8 +5,8 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
-from defs import root_dir
 from labels_manager.tools.aux_methods.utils import binarise_a_matrix
+from labels_manager.tools.defs import root_dir
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
 from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_ellipsoid, generate_o, generate_c, \
     generate_cube

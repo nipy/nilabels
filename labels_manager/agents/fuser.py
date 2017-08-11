@@ -15,7 +15,9 @@ class LabelsManagerFuse(object):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
 
-    def seg_LabFusion(self, pfi_target, pfi_result, list_pfi_segmentations, list_pfi_warped=None, options='-MV', prepare_data_only=False):
+    def seg_LabFusion(self, pfi_target, pfi_result, list_pfi_segmentations, list_pfi_warped=None, options='-MV',
+                      prepare_data_only=False, seg_output_name='res_4d_seg', warp_output_name='res_4d_warp',
+                      output_tag=''):
         """
         Takes into account the
         :param pfi_target: path to file to the target of the segmentation
@@ -25,6 +27,9 @@ class LabelsManagerFuse(object):
         :param options: simple option of NiftySeg, can be -MV -SBA or -STAPLE
         :param prepare_data_only: Return the paths to the stack images, and does not call seg_LabFusion.
              This can be set as True when some more sophistication on the methods is required.
+        :param seg_output_name:
+        :param warp_output_name:
+        :param output_tag: additional tag output.
         :return: if prepare_data_only is True it returns the path to files prepared to be used externally in nifty seg,
                 in the following order
                     [pfi_target, pfi_result, pfi_4d_seg, pfi_4d_warp]
@@ -39,7 +44,7 @@ class LabelsManagerFuse(object):
         stack_seg = np.stack(list_stack_seg, axis=3)
         del list_stack_seg
         im_4d_seg = set_new_data(nib.load(list_pfi_segmentations[0]), stack_seg)
-        pfi_4d_seg = connect_tail_head_path(self.pfo_out, 'res_4d_seg.nii.gz')
+        pfi_4d_seg = connect_tail_head_path(self.pfo_out, '{0}_{1}.nii.gz'.format(seg_output_name, output_tag))
         nib.save(im_4d_seg, pfi_4d_seg)
 
         # save 4d warped if available
@@ -52,7 +57,7 @@ class LabelsManagerFuse(object):
             stack_warp = np.stack(list_stack_warp, axis=3)
             del list_stack_warp
             im_4d_warp = set_new_data(nib.load(list_pfi_warped[0]), stack_warp)
-            pfi_4d_warp = connect_tail_head_path(self.pfo_out, 'res_4d_warp.nii.gz')
+            pfi_4d_warp = connect_tail_head_path(self.pfo_out, '{0}_{1}.nii.gz'.format(warp_output_name, output_tag))
             nib.save(im_4d_warp, pfi_4d_warp)
 
         if not prepare_data_only:

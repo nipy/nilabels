@@ -5,7 +5,7 @@ import numpy as np
 from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
-from defs import root_dir
+from labels_manager.tools.defs import root_dir
 
 ''' Test aux_methods.morphological.py'''
 from labels_manager.tools.aux_methods.morpological_tools import get_morphological_patch, get_patch_values, \

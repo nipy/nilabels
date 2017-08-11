@@ -4,8 +4,8 @@ from os.path import join as jph
 import numpy as np
 from nose.tools import assert_raises, assert_almost_equal
 
-from defs import root_dir
 from labels_manager.tools.caliber import SegmentationAnalyzer as SA
+from labels_manager.tools.defs import root_dir
 
 # global paths variable:
 

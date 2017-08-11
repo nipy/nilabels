@@ -3,12 +3,12 @@ from os.path import join as jph
 
 import nibabel as nib
 import numpy as np
-from nose.tools import assert_equals, assert_raises
-from numpy.testing import assert_array_equal, assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal
 
-from defs import root_dir
-from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
 from labels_manager.tools.aux_methods.utils import adjust_nifti_translation_path
+from labels_manager.tools.defs import root_dir
+from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
+
 
 def test_adjust_nifti_translation_path_F_F():
     pfi_input = jph(root_dir, 'data_examples', 'acee.nii.gz')

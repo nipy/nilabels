@@ -1,15 +1,14 @@
 import numpy as np
-from tabulate import tabulate
+import pandas as pa
 
 from labels_manager.tools.aux_methods.utils import one_voxel_volume
 
 
-def get_total_volume(im_segm, labels_to_exclude=None, return_mm3=True):
+def get_total_volume(im_segm, labels_to_exclude=None):
     """
 
     :param im_segm:
     :param labels_to_exclude:
-    :param return_mm3:
     :return:
     """
     seg = np.copy(im_segm.get_data())
@@ -20,33 +19,19 @@ def get_total_volume(im_segm, labels_to_exclude=None, return_mm3=True):
         num_voxels = np.count_nonzero(seg)
     else:
         num_voxels = np.count_nonzero(im_segm.get_data())
-
-    if return_mm3:
-        mm_3 = num_voxels * one_voxel_volume(im_segm)
-        return mm_3
-    else:
-        return num_voxels
+    vol_mm3 = num_voxels * one_voxel_volume(im_segm)
+    return num_voxels, vol_mm3
 
 
-def get_volumes_per_label(im_segm, labels='all', tot_volume_prior=None, verbose=0, return_mm3=True):
+def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
     """
-
     :param im_segm:
-    :param labels: Labels can be as well a list of lists. In this case the volume is measured together (Left + right)
+    :param labels:
+    :param labels_names: index of labels in the final dataframes.
     :param tot_volume_prior:
     :param verbose:
-    :param return_mm3:
     :return:
     """
-    if isinstance(labels, int):
-        labels = [labels, ]
-    elif isinstance(labels, list):
-        pass
-    elif labels == 'all':
-        labels = list(np.sort(list(set(im_segm.flat))))
-    else:
-        raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all'.")
-
     # Get volumes per regions:
     num_voxels = np.zeros(len(labels), dtype=np.uint64)
 
@@ -61,28 +46,32 @@ def get_volumes_per_label(im_segm, labels='all', tot_volume_prior=None, verbose=
 
         num_voxels[index_label_k] = np.count_nonzero(places)
 
-    if return_mm3:
-        volume = one_voxel_volume(im_segm) * num_voxels.astype(np.float64)
-    else:
-        volume = num_voxels.astype(np.float64)[:]
+    volume = one_voxel_volume(im_segm) * num_voxels.astype(np.float64)
 
     # Get tot volume
     if tot_volume_prior is None:
-        tot_volume_prior = get_total_volume(im_segm)
+        tot_volume_prior = get_total_volume(im_segm)[0]
 
     # get volumes over total volume:
     vol_over_tot = volume / float(tot_volume_prior)
 
-    # show a table at console:
-    if verbose:
-        headers = ['labels', 'Vol', 'Vol/totVol']
-        table = [[r, v, v_t] for r, v, v_t in zip(labels, volume, vol_over_tot)]
-        print(tabulate(table, headers=headers))
+    # pandas series:
+    se_num_voxel    = pa.Series(num_voxels,   index=labels_names)
+    se_volume       = pa.Series(volume,       index=labels_names)
+    se_vol_over_tot = pa.Series(vol_over_tot, index=labels_names)
+    # final data frame
+    data_frame = pa.DataFrame({'Num voxels'   : se_num_voxel,
+                               'Volumes'      : se_volume,
+                               'Vol over Tot' : se_vol_over_tot}, columns=['Num voxels', 'Volumes', 'Vol over Tot'])
 
-    return num_voxels, volume, vol_over_tot
+    if verbose > 0:
+        # show the data-frame at console:
+        print(data_frame)
+
+    return data_frame
 
 
-def get_average_below_labels(im_segm, im_anatomical, labels='all', verbose=0):
+def get_average_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
     """
     can be an integer, or a list.
      If it is a list, it can contain sublists.
@@ -91,17 +80,10 @@ def get_average_below_labels(im_segm, im_anatomical, labels='all', verbose=0):
     :param im_anatomical:
     :param im_segm:
     :param labels:
+    :param labels_names:
     :param verbose:
     :return:
     """
-    if isinstance(labels, int):
-        labels = [labels, ]
-    elif isinstance(labels, list):
-        pass
-    elif labels == 'all':
-        labels = list(np.sort(list(set(im_segm.flat))))
-    else:
-        raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all'.")
 
     # Get volumes per regions:
     values = np.zeros(len(labels), dtype=np.float64)
@@ -125,15 +107,19 @@ def get_average_below_labels(im_segm, im_anatomical, labels='all', verbose=0):
 
         values[index_label_k] = np.mean(non_zero_masked_scalar_data)
 
-        # mean_voxel = np.mean(non_zero_masked_scalar_data)
-        # if self.return_mm3:
-        #     values[index_label_k] = ( 1 / self._one_voxel_volume ) * mean_voxel
-        # else:
-        #     values[index_label_k] = mean_voxel
-
         if verbose:
             print('Mean below the labels for the given image {0} : {1}'.format(labels[index_label_k],
                                                                                values[index_label_k]))
             if isinstance(non_zero_masked_scalar_data, np.ndarray):
                 print 'non zero masked scalar data : ' + str(len(non_zero_masked_scalar_data))
-    return values
+
+    # pandas series:
+    se_values = pa.Series(values, index=labels_names)
+
+    # final data frame
+    data_frame = pa.DataFrame({'Average below label': se_values})
+
+    if verbose > 0:
+        print(data_frame)
+
+    return data_frame
