@@ -1,11 +1,11 @@
 import os
-import numpy as np
 from os.path import join as jph
+
+import numpy as np
 from nose.tools import assert_raises, assert_almost_equal
 
 from defs import root_dir
-from labels_manager.caliber.segmentation_analyzer import SegmentationAnalyzer as SA
-
+from labels_manager.tools.caliber import SegmentationAnalyzer as SA
 
 # global paths variable:
 

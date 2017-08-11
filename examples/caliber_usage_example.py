@@ -2,8 +2,7 @@ import os
 from os.path import join as jph
 
 from defs import root_dir
-from labels_manager.caliber.segmentation_analyzer import SegmentationAnalyzer as SA
-
+from labels_manager.tools.caliber import SegmentationAnalyzer as SA
 
 if __name__ == '__main__':
 

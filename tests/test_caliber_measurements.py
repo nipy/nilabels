@@ -3,7 +3,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 ''' Test measurements.distances.py'''
-from labels_manager.caliber.distances import lncc_distance
+from labels_manager.tools.caliber import lncc_distance
 
 
 def test_simple_patches_values_lncc():
@@ -30,7 +30,7 @@ def test_simple_patches_values_lncc():
 
 
 ''' Test measurements.linear.py'''
-from labels_manager.caliber.distances import box_sides
+from labels_manager.tools.caliber import box_sides
 
 
 def test_box_sides():
@@ -52,7 +52,7 @@ def test_box_sides():
 
 
 ''' Test measurements.linear.py'''
-from labels_manager.caliber.distances import centroid
+from labels_manager.tools.caliber import centroid
 
 
 def test_simple_centroid():
