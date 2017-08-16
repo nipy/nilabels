@@ -1,11 +1,11 @@
 import os
 import nibabel as nib
-import numpy as np
 import pandas as pa
 
+from labels_manager.tools.aux_methods.utils_nib import labels_query
 from labels_manager.tools.aux_methods.sanity_checks import connect_tail_head_path
 from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels
-from labels_manager.tools.caliber.distances import dice_score, dispersion, precision
+from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, centroid
 from labels_manager.tools.defs import definition_label
 
 
@@ -30,26 +30,14 @@ class LabelsManagerMeasure(object):
         :param labels: list of labels, multi-labels (as sublists, e.g. left right will be considered one label)
         :param anatomy_filename: filename of the anatomical image A. (A,S) forms a chart.
         :param tot_volume_prior: as an intra-cranial volume factor.
+        :param where_to_save:
         :return:
         """
         pfi_segm = connect_tail_head_path(self.pfo_in, segmentation_filename)
         assert os.path.exists(pfi_segm)
         im_segm = nib.load(pfi_segm)
 
-        if isinstance(labels, int):
-            labels_list = [labels, ]
-            labels_names = [str(labels)]
-        elif isinstance(labels, list):
-            labels_list = labels
-            labels_names = [str(l) for l in labels]
-        elif labels == 'all':
-            labels_list = list(np.sort(list(set(im_segm.flat))))
-            labels_names = [str(l) for l in labels]
-        elif labels == 'tot':
-            labels_list = [list(np.sort(list(set(im_segm.flat))))]
-            labels_names = labels
-        else:
-            raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all'.")
+        labels_list, labels_names = labels_query(im_segm, labels)
 
         df_volumes_per_label = get_volumes_per_label(im_segm, labels=labels_list, labels_names=labels_names,
                                                      tot_volume_prior=tot_volume_prior, verbose=self.verbose)
@@ -87,20 +75,11 @@ class LabelsManagerMeasure(object):
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
 
-        if isinstance(labels, int):
-            labels_list = [labels, ]
-            labels_names = [str(labels)]
-        elif isinstance(labels, list):
-            labels_list = labels
-            labels_names = [str(l) for l in labels]
-        elif labels == 'all' or labels is None:
-            labels_list1 = list(set(im_segm1.flat))
-            labels_list2 = list(set(im_segm2.flat))
-            labels_list = list(set(labels_list1) & set(labels_list2))
-            labels_list.sort()
-            labels_names = [str(l) for l in labels]
-        else:
-            raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or None.")
+        labels_list1, labels_names1 = labels_query(im_segm1, labels)
+        labels_list2, labels_names2 = labels_query(im_segm1, labels)
+
+        labels_list  = list(set(labels_list1) & set(labels_list2))
+        labels_names = list(set(labels_names1) & set(labels_names2))
 
         dict_distances_per_label = {}
 

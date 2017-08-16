@@ -2,7 +2,7 @@ import os
 import nibabel as nib
 import numpy as np
 
-from labels_manager.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.manipulations.relabeller import relabeller, \
         permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from labels_manager.tools.manipulations.splitter import split_labels_to_4d

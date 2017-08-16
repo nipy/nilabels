@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 
-from labels_manager.tools.aux_methods.utils import is_valid_permutation
+from labels_manager.tools.aux_methods.sanity_checks import is_valid_permutation
 
 
 def relabeller(in_data, list_old_labels, list_new_labels, verbose=True):

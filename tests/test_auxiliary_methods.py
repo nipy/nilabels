@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from labels_manager.tools.defs import root_dir
 
 ''' Test aux_methods.morphological.py'''
-from labels_manager.tools.aux_methods.morpological_tools import get_morphological_patch, get_patch_values, \
+from labels_manager.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
     midpoint_circle_algorithm, get_shell_for_given_radius
 
 
@@ -92,8 +92,9 @@ def test_get_pfi_in_pfi_out():
 
 
 ''' Test aux_methods.utils.py '''
-from labels_manager.tools.aux_methods.utils import set_new_data, compare_two_nib, binarise_a_matrix
-    # eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
+from labels_manager.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
+from labels_manager.tools.aux_methods.utils import binarise_a_matrix
+# eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
 
 
 def test_set_new_data_simple_modifications():

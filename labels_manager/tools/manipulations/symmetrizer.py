@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 import nibabel as nib
-from labels_manager.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.manipulations.relabeller import relabeller
 
 

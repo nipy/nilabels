@@ -1,6 +1,6 @@
 import numpy as np
 
-from labels_manager.tools.aux_methods.utils import set_new_data
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 
 def merge_labels_from_4d(in_data, keep_original_values=True):
