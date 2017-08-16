@@ -3,10 +3,10 @@ import os
 import nibabel as nib
 import numpy as np
 
-from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_tail_head_path
+from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
-from labels_manager.tools.manipulations_colors.relabeller import relabeller
-from labels_manager.tools.manipulations_shapes.spatial_adjuster import flip_data, symmetrise_data
+from labels_manager.tools.colors_manipulations.relabeller import relabeller
+from labels_manager.tools.shapes_manipulations.spatial import flip_data, symmetrise_data
 
 
 class LabelsManagerSymmetrize(object):
@@ -66,8 +66,8 @@ class LabelsManagerSymmetrize(object):
         :return: symmetrised segmentation.
         """
 
-        pfi_in_anatomy = connect_tail_head_path(self.pfo_in, filename_anatomy)
-        pfi_in_segmentation = connect_tail_head_path(self.pfo_in, filename_segmentation)
+        pfi_in_anatomy = connect_path_tail_head(self.pfo_in, filename_anatomy)
+        pfi_in_segmentation = connect_path_tail_head(self.pfo_in, filename_segmentation)
 
         if results_folder_path is None:
             if self.pfo_out is not None:
@@ -77,7 +77,7 @@ class LabelsManagerSymmetrize(object):
         else:
             results_folder_path = os.path.dirname(pfi_in_segmentation)
 
-        pfi_out_segmentation = connect_tail_head_path(results_folder_path, result_img_path)
+        pfi_out_segmentation = connect_path_tail_head(results_folder_path, result_img_path)
 
         def flip_data_path(input_im_path, output_im_path, axis='x'):
             # wrap flip data, having path for inputs and outputs.

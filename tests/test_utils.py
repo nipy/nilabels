@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 
 from labels_manager.tools.defs import root_dir
-from labels_manager.tools.manipulations_shapes.spatial_adjuster import adjust_nifti_translation_path
+from labels_manager.tools.shapes_manipulations.spatial import adjust_nifti_translation_path
 from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
 
 

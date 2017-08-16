@@ -3,7 +3,7 @@ import pandas as pa
 import os
 import nibabel as nib
 
-from labels_manager.tools.manipulations_colors.relabeller import keep_only_one_label
+from labels_manager.tools.colors_manipulations.relabeller import keep_only_one_label
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.aux_methods.utils import print_and_run
 

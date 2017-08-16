@@ -3,7 +3,7 @@ import time
 import subprocess
 
 
-def connect_tail_head_path(tail, head):
+def connect_path_tail_head(tail, head):
     """
     It expects
       1) to find the path to folder in tail and filename in head.
@@ -32,26 +32,27 @@ def check_pfi_io(pfi_input, pfi_output):
 
 def get_pfi_in_pfi_out(filename_in, filename_out, pfo_in, pfo_out):
     """
+    Core method of every facade
     :param filename_in:
     :param filename_out:
     :param pfo_in:
     :param pfo_out:
     :return:
     """
-    pfi_in = connect_tail_head_path(pfo_in, filename_in)    
+    pfi_in = connect_path_tail_head(pfo_in, filename_in)
     if filename_out is None:
         pfi_out = pfi_in
     else:
         if pfo_out is None:
-            pfi_out = connect_tail_head_path(pfo_in, filename_out)
+            pfi_out = connect_path_tail_head(pfo_in, filename_out)
         else:
-            pfi_out = connect_tail_head_path(pfo_out, filename_out)
+            pfi_out = connect_path_tail_head(pfo_out, filename_out)
 
     check_pfi_io(pfi_in, pfi_out)
     return pfi_in, pfi_out
 
 
-def check_path(pfi, interval=1, timeout=100):
+def check_path_valid(pfi, interval=1, timeout=100):
     if os.path.exists(pfi):
         if pfi.endswith('.nii.gz'):
             mustend = time.time() + timeout

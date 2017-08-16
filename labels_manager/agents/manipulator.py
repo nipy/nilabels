@@ -2,13 +2,13 @@ import nibabel as nib
 import numpy as np
 
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, \
-    connect_tail_head_path
+    connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
-from labels_manager.tools.manipulations_colors.cutter import cut_4d_volume_with_a_1_slice_mask_nib
-from labels_manager.tools.manipulations_colors.relabeller import relabeller, \
+from labels_manager.tools.colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask_nib
+from labels_manager.tools.colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
-from labels_manager.tools.manipulations_shapes.merger import merge_labels_from_4d
-from labels_manager.tools.manipulations_shapes.splitter import split_labels_to_4d
+from labels_manager.tools.shapes_manipulations.merger import merge_labels_from_4d
+from labels_manager.tools.shapes_manipulations.splitter import split_labels_to_4d
 
 
 class LabelsManagerManipulate(object):
@@ -144,7 +144,7 @@ class LabelsManagerManipulate(object):
     def cut_4d_volume_with_a_1_slice_mask(self, filename_in, filename_mask, filename_out=None):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
-        pfi_mask = connect_tail_head_path(self.pfo_in, filename_mask)
+        pfi_mask = connect_path_tail_head(self.pfo_in, filename_mask)
 
         im_dwi = nib.load(pfi_in)
         im_mask = nib.load(pfi_mask)

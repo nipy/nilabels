@@ -1,6 +1,6 @@
 import os
 
-from labels_manager.tools.aux_methods.sanity_checks import connect_tail_head_path
+from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head
 
 
 class LabelsManagerPropagate(object):
@@ -24,12 +24,12 @@ class LabelsManagerPropagate(object):
                           settings_reg='',
                           settings_interp=' -inter 0 '):
 
-        ref_in               = connect_tail_head_path(self.pfo_in, ref_in)
-        flo_in               = connect_tail_head_path(self.pfo_in, flo_in)
-        flo_mask_in          = connect_tail_head_path(self.pfo_in, flo_mask_in)
-        flo_on_ref_img_out   = connect_tail_head_path(self.pfo_in, flo_on_ref_img_out)
-        flo_on_ref_mask_out  = connect_tail_head_path(self.pfo_in, flo_on_ref_mask_out)
-        flo_on_ref_trans_out = connect_tail_head_path(self.pfo_in, flo_on_ref_trans_out)
+        ref_in               = connect_path_tail_head(self.pfo_in, ref_in)
+        flo_in               = connect_path_tail_head(self.pfo_in, flo_in)
+        flo_mask_in          = connect_path_tail_head(self.pfo_in, flo_mask_in)
+        flo_on_ref_img_out   = connect_path_tail_head(self.pfo_in, flo_on_ref_img_out)
+        flo_on_ref_mask_out  = connect_path_tail_head(self.pfo_in, flo_on_ref_mask_out)
+        flo_on_ref_trans_out = connect_path_tail_head(self.pfo_in, flo_on_ref_trans_out)
 
         last_two = lambda l: '/'.join(l.split('/')[-2:])
 

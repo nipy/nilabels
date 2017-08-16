@@ -47,10 +47,10 @@ def get_patch_values(point, target_image, radius=5, shape='circle', morfo_mask=N
     return np.take(target_image.flatten(), coord)
 
 
-def midpoint_circle_algorithm(center=(0, 0, 0), radius=4):
-    x, y, z = center
-    # TODO generalise the midpoint circle algorithm and use it for get_shell_for_given_radius
-    pass
+# def midpoint_circle_algorithm(center=(0, 0, 0), radius=4):
+#     x, y, z = center
+#     # TODO generalise the midpoint circle algorithm and use it for get_shell_for_given_radius
+#     pass
 
 
 def get_shell_for_given_radius(radius, d=3):

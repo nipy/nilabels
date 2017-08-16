@@ -3,7 +3,7 @@ import nibabel as nib
 import pandas as pa
 
 from labels_manager.tools.aux_methods.utils_nib import labels_query
-from labels_manager.tools.aux_methods.sanity_checks import connect_tail_head_path
+from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head
 from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels
 from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, centroid
 from labels_manager.tools.defs import definition_label
@@ -33,7 +33,7 @@ class LabelsManagerMeasure(object):
         :param where_to_save:
         :return:
         """
-        pfi_segm = connect_tail_head_path(self.pfo_in, segmentation_filename)
+        pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
         assert os.path.exists(pfi_segm)
         im_segm = nib.load(pfi_segm)
 
@@ -42,7 +42,7 @@ class LabelsManagerMeasure(object):
         df_volumes_per_label = get_volumes_per_label(im_segm, labels=labels_list, labels_names=labels_names,
                                                      tot_volume_prior=tot_volume_prior, verbose=self.verbose)
         if anatomy_filename is not None:
-            pfi_anatomy = connect_tail_head_path(self.pfo_in, anatomy_filename)
+            pfi_anatomy = connect_path_tail_head(self.pfo_in, anatomy_filename)
             assert os.path.exists(pfi_anatomy)
             im_anatomy = nib.load(pfi_anatomy)
             df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels, labels_names=labels_names,
@@ -54,7 +54,7 @@ class LabelsManagerMeasure(object):
             print(df_volumes_per_label)
 
         if where_to_save is not None:
-            pfi_output_table = connect_tail_head_path(self.pfo_out, where_to_save)
+            pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
             assert os.path.exists(pfi_output_table)
             df_volumes_per_label.to_pickle(pfi_output_table)
         return df_volumes_per_label
@@ -63,12 +63,12 @@ class LabelsManagerMeasure(object):
              metrics=('dice score', 'dispersion', 'precision'),
              where_to_save=None, intermediate_files_folder_name=None):
 
-        pfi_segm1 = connect_tail_head_path(self.pfo_in, segm_1_filename)
-        pfi_segm2 = connect_tail_head_path(self.pfo_in, segm_1_filename)
+        pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
+        pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_1_filename)
         if intermediate_files_folder_name is None:
-            pfo_intermediate_file = connect_tail_head_path(self.pfo_out, 'z_precision_files')
+            pfo_intermediate_file = connect_path_tail_head(self.pfo_out, 'z_precision_files')
         else:
-            pfo_intermediate_file = connect_tail_head_path(self.pfo_out, intermediate_files_folder_name)
+            pfo_intermediate_file = connect_path_tail_head(self.pfo_out, intermediate_files_folder_name)
 
         assert os.path.exists(pfi_segm1)
         assert os.path.exists(pfi_segm2)
@@ -103,7 +103,7 @@ class LabelsManagerMeasure(object):
             print(df_distances_per_label)
 
         if where_to_save is not None:
-            pfi_output_table = connect_tail_head_path(self.pfo_out, where_to_save)
+            pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
             assert os.path.exists(pfi_output_table)
             df_distances_per_label.to_pickle(pfi_output_table)
 

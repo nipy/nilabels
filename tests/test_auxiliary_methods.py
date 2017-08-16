@@ -52,17 +52,17 @@ def test_get_shell_for_given_radius():
 
 
 ''' Test aux_methods.sanity_checks.py - NOTE - this is the core of the manager design '''
-from labels_manager.tools.aux_methods.sanity_checks import connect_tail_head_path, check_pfi_io, get_pfi_in_pfi_out
+from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head, check_pfi_io, get_pfi_in_pfi_out
 
 
 def test_connect_tail_head_path():
 
     # Case 1:
-    assert_equals(connect_tail_head_path('as/df/gh', 'lm.txt'), 'as/df/gh/lm.txt')
+    assert_equals(connect_path_tail_head('as/df/gh', 'lm.txt'), 'as/df/gh/lm.txt')
     # Case 2:
-    assert_equals(connect_tail_head_path('as/df/gh', 'as/df/gh/lm/nb.txt'), 'as/df/gh/lm/nb.txt')
+    assert_equals(connect_path_tail_head('as/df/gh', 'as/df/gh/lm/nb.txt'), 'as/df/gh/lm/nb.txt')
     # Case 3:
-    assert_equals(connect_tail_head_path('as/df/gh', 'lm/nb.txt'), 'as/df/gh/lm/nb.txt')
+    assert_equals(connect_path_tail_head('as/df/gh', 'lm/nb.txt'), 'as/df/gh/lm/nb.txt')
 
 
 def test_check_pfi_io():

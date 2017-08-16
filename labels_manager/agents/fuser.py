@@ -2,7 +2,7 @@ import os
 import numpy as np
 import nibabel as nib
 
-from labels_manager.tools.aux_methods.sanity_checks import connect_tail_head_path
+from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 
@@ -35,29 +35,29 @@ class LabelsManagerFuse(object):
                     [pfi_target, pfi_result, pfi_4d_seg, pfi_4d_warp]
 
         """
-        pfi_target = connect_tail_head_path(self.pfo_in, pfi_target)
-        pfi_result = connect_tail_head_path(self.pfo_out, pfi_result)
+        pfi_target = connect_path_tail_head(self.pfo_in, pfi_target)
+        pfi_result = connect_path_tail_head(self.pfo_out, pfi_result)
         # save 4d segmentations in stack_seg
-        list_pfi_segmentations = [connect_tail_head_path(self.pfo_in, j) for j in list_pfi_segmentations]
+        list_pfi_segmentations = [connect_path_tail_head(self.pfo_in, j) for j in list_pfi_segmentations]
         #
         list_stack_seg = [nib.load(pfi).get_data() for pfi in list_pfi_segmentations]
         stack_seg = np.stack(list_stack_seg, axis=3)
         del list_stack_seg
         im_4d_seg = set_new_data(nib.load(list_pfi_segmentations[0]), stack_seg)
-        pfi_4d_seg = connect_tail_head_path(self.pfo_out, '{0}_{1}.nii.gz'.format(seg_output_name, output_tag))
+        pfi_4d_seg = connect_path_tail_head(self.pfo_out, '{0}_{1}.nii.gz'.format(seg_output_name, output_tag))
         nib.save(im_4d_seg, pfi_4d_seg)
 
         # save 4d warped if available
         if list_pfi_warped is None:
             pfi_4d_warp = None
         else:
-            list_pfi_warped = [connect_tail_head_path(self.pfo_in, j) for j in list_pfi_warped]
+            list_pfi_warped = [connect_path_tail_head(self.pfo_in, j) for j in list_pfi_warped]
             #
             list_stack_warp = [nib.load(pfi).get_data() for pfi in list_pfi_warped]
             stack_warp = np.stack(list_stack_warp, axis=3)
             del list_stack_warp
             im_4d_warp = set_new_data(nib.load(list_pfi_warped[0]), stack_warp)
-            pfi_4d_warp = connect_tail_head_path(self.pfo_out, '{0}_{1}.nii.gz'.format(warp_output_name, output_tag))
+            pfi_4d_warp = connect_path_tail_head(self.pfo_out, '{0}_{1}.nii.gz'.format(warp_output_name, output_tag))
             nib.save(im_4d_warp, pfi_4d_warp)
 
         if not prepare_data_only:
