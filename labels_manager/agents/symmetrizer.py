@@ -21,7 +21,6 @@ class LabelsManagerSymmetrize(object):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
 
-
     def symmetrise_axial(self, filename_in, filename_out=None, axis='x', plane_intercept=10,
         side_to_copy='below', keep_in_data_dimensions=True):
 

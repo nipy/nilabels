@@ -43,7 +43,7 @@ class LabelsManagerManipulate(object):
         print('Relabelled image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def permute(self, filename_in, filename_out=None, permutation=()):
+    def permute_labels(self, filename_in, filename_out=None, permutation=()):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
@@ -56,7 +56,7 @@ class LabelsManagerManipulate(object):
         print('Permuted labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def erase(self, filename_in, filename_out=None, labels_to_erase=()):
+    def erase_labels(self, filename_in, filename_out=None, labels_to_erase=()):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 

@@ -90,7 +90,7 @@ if __name__ == '__main__':
         perm = [[1, 2, 3], [3, 1, 2]]
 
         # Using the manager:
-        lm.manipulate.permute(fin_punt_seg_original, fin_punt_seg_new, perm)
+        lm.manipulate.permute_labels(fin_punt_seg_original, fin_punt_seg_new, perm)
 
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         labels_to_erase = [4, 5, 6]
 
         # using the manager:
-        lm.manipulate.erase(fin_punt_seg_original, fin_punt_seg_new, labels_to_erase=labels_to_erase)
+        lm.manipulate.erase_labels(fin_punt_seg_original, fin_punt_seg_new, labels_to_erase=labels_to_erase)
 
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
