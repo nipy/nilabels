@@ -52,7 +52,7 @@ def get_pfi_in_pfi_out(filename_in, filename_out, pfo_in, pfo_out):
     return pfi_in, pfi_out
 
 
-def check_path_valid(pfi, interval=1, timeout=100):
+def check_path_validity(pfi, interval=1, timeout=100):
     if os.path.exists(pfi):
         if pfi.endswith('.nii.gz'):
             mustend = time.time() + timeout
