@@ -1,9 +1,15 @@
-# Labels Manager
+# LabelsManager
 Python 2.7
 
-A set of tools to automatise simple manipulations of medical images segmentations in nifti format and to compute simple measurements on them.
+LabelsManager is a set of tools to automatise simple manipulations and measurements of medical images and images 
+segmentations in nifti format.
 
-## What can you do with label manager
+Each tool provided can be 
+* Accessed directly as nibabel objects, numpy arrays and other Python objects.
+* Accessed indirectly trough the facades as paths to the corresponding files.
+
+
+## What can you do with LabelsManager
 
 What can you do with the package labels_manager: access all the functions stored in tools, programmed to work with numpy array, using the facade manager that works with paths to nifti images. 
 Tools consists of simple manipulations of labels, mainly based on [NiftySeg](http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftySeg_install) and [NiftyReg](http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg_install).
@@ -15,7 +21,8 @@ Examples of tools are divided in:
 * Splitter: opposite direction as merger.
 * Relabeller: change the values of the labels according to given permutation or labels lists.
 * Symmetriser: symmetrise a segmentation from one side to the anatomical image to the other, by flipping or with rigid or affine registration to compensate for asymmetries.
-* Measurements: compute distances between patches (generated with morphological tools). Compute the centroid of each label of a segmentation, compute linear measurements.
+* Measurements: compute distances between patches (generated with morphological tools).
+ Compute the centroid of each label of a segmentation, compute linear measurements, compute volumetric measurements.
 
 The dev branch is devoted to prototyping algorithms and for benchmarking respect to the state of the art segmentation algorithms (NiftySeg).
 It currently contains some early developments of label fusion algorithms.
