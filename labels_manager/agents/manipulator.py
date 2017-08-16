@@ -1,4 +1,3 @@
-import os
 import nibabel as nib
 import numpy as np
 
@@ -8,7 +7,6 @@ from labels_manager.tools.manipulations.relabeller import relabeller, \
 from labels_manager.tools.manipulations.splitter import split_labels_to_4d
 from labels_manager.tools.manipulations.merger import merge_labels_from_4d
 from labels_manager.tools.manipulations.cutter import cut_4d_volume_with_a_1_slice_mask_nib
-from labels_manager.tools.manipulations.symmetrizer import symmetrise_data, sym_labels
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out,\
      connect_tail_head_path
 
@@ -154,53 +152,3 @@ class LabelsManagerManipulate(object):
         im_masked = cut_4d_volume_with_a_1_slice_mask_nib(im_dwi, im_mask)
 
         nib.save(im_masked, pfi_out)
-
-    def symmetrise_axial(self, filename_in, filename_out=None, axis='x', plane_intercept=10,
-        side_to_copy='below', keep_in_data_dimensions=True):
-
-        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
-
-        im_labels = nib.load(pfi_in)
-        data_labels = im_labels.get_data()
-        data_symmetrised = symmetrise_data(data_labels,
-                                           axis=axis,
-                                           plane_intercept=plane_intercept,
-                                           side_to_copy=side_to_copy,
-                                           keep_in_data_dimensions=keep_in_data_dimensions)
-
-        im_symmetrised = set_new_data(im_labels, data_symmetrised)
-        nib.save(im_symmetrised, pfi_out)
-        print('Symmetrised axis {0}, plane_intercept {1}, image of {2} saved in {3}.'.format(axis, plane_intercept, pfi_in, pfi_out))
-        return pfi_out
-
-    def symmetrise_with_registration(self,
-                                     filename_anatomy,
-                                     filename_segmentation,
-                                     list_labels_input,
-                                     result_img_path,
-                                     results_folder_path=None,
-                                     list_labels_transformed=None,
-                                     coord='z',
-                                     reuse_registration=False):
-
-        pfi_in_anatomy = connect_tail_head_path(self.pfo_in, filename_anatomy)
-        pfi_in_segmentation = connect_tail_head_path(self.pfo_in, filename_segmentation)
-
-        if results_folder_path is None:
-            if self.pfo_out is not None:
-                results_folder_path = self.pfo_out
-            else:
-                results_folder_path = self.pfo_in
-        else:
-            results_folder_path = os.path.dirname(pfi_in_segmentation)
-
-        pfi_out_segmentation = connect_tail_head_path(results_folder_path, result_img_path)
-
-        sym_labels(pfi_in_anatomy,
-                   pfi_in_segmentation,
-                   results_folder_path,
-                   pfi_out_segmentation,
-                   list_labels_input,
-                   list_labels_transformed=list_labels_transformed,
-                   coord=coord,
-                   reuse_registration=reuse_registration)

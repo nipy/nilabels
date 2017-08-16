@@ -5,12 +5,13 @@ import nibabel as nib
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
-from labels_manager.tools.aux_methods.utils import adjust_nifti_translation_path
+from labels_manager.tools.manipulations.spatial_adjuster import adjust_nifti_translation_path
 from labels_manager.tools.defs import root_dir
 from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
 
 
 def test_adjust_nifti_translation_path_F_F():
+    # TODO expose in facade
     pfi_input = jph(root_dir, 'data_examples', 'acee.nii.gz')
     if not os.path.exists(pfi_input):
         generate_figures()

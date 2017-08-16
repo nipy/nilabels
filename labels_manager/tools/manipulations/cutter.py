@@ -34,6 +34,7 @@ def cut_4d_volume_with_a_1_slice_mask_nib(input_4d_nib, input_mask_nib):
 
 
 def apply_a_mask_path(pfi_input, pfi_mask, pfi_output):
+    # TODO expose in facade
     """
     Adaptative - if the mask is 3D and the image is 4D, will create a temporary mask,
     generate the stack of masks, and apply the stacks to the image.
