@@ -4,8 +4,8 @@ from os.path import join as jph
 import nibabel as nib
 import numpy as np
 
-import labels_manager.tools.manipulations.relabeller as rel
-import labels_manager.tools.manipulations.splitter as sp
+import labels_manager.tools.manipulations_colors.relabeller as rel
+import labels_manager.tools.manipulations_shapes.splitter as sp
 from labels_manager.main import LabelsManager
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.defs import root_dir

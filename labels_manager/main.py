@@ -4,6 +4,7 @@ from labels_manager.agents.manipulator import LabelsManagerManipulate
 from labels_manager.agents.measurer import LabelsManagerMeasure
 from labels_manager.agents.fuser import LabelsManagerFuse
 from labels_manager.agents.propagator import LabelsManagerPropagate
+from labels_manager.agents.symmetrizer import LabelsManagerSymmetrize
 
 
 class LabelsManager(object):
@@ -38,3 +39,4 @@ class LabelsManager(object):
         self.measure    = LabelsManagerMeasure(self._pfo_in, self._pfo_out)
         self.fuse       = LabelsManagerFuse(self._pfo_in, self._pfo_out)
         self.propagate  = LabelsManagerPropagate(self._pfo_in, self._pfo_out)
+        self.symmetrize = LabelsManagerSymmetrize(self._pfo_in, self._pfo_out)

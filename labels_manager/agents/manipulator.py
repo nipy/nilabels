@@ -1,14 +1,14 @@
 import nibabel as nib
 import numpy as np
 
+from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, \
+    connect_tail_head_path
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
-from labels_manager.tools.manipulations.relabeller import relabeller, \
-        permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
-from labels_manager.tools.manipulations.splitter import split_labels_to_4d
-from labels_manager.tools.manipulations.merger import merge_labels_from_4d
-from labels_manager.tools.manipulations.cutter import cut_4d_volume_with_a_1_slice_mask_nib
-from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out,\
-     connect_tail_head_path
+from labels_manager.tools.manipulations_colors.cutter import cut_4d_volume_with_a_1_slice_mask_nib
+from labels_manager.tools.manipulations_colors.relabeller import relabeller, \
+    permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
+from labels_manager.tools.manipulations_shapes.merger import merge_labels_from_4d
+from labels_manager.tools.manipulations_shapes.splitter import split_labels_to_4d
 
 
 class LabelsManagerManipulate(object):
