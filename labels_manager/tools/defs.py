@@ -1,7 +1,7 @@
 import os
 
 
-root_dir = os.path.abspath(os.path.dirname(__file__))
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 info = {
         "name": "Label Manager",

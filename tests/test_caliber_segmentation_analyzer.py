@@ -4,8 +4,13 @@ from os.path import join as jph
 import numpy as np
 from nose.tools import assert_raises, assert_almost_equal
 
-from labels_manager.tools.caliber import SegmentationAnalyzer as SA
 from labels_manager.tools.defs import root_dir
+
+# Framework where to test the new SegmentationAnalyzer.
+
+
+'''
+
 
 # global paths variable:
 
@@ -173,3 +178,5 @@ def test_modulating_affine_sandwich_volume_below_label():
                                                 (2.0 * 2 * 9 * 10 + 3.0 * 3 * 9 * 10) /  ((2 + 3) * 9 * 10) ])
 
 test_modulating_affine_sandwich_volume_below_label()
+
+'''

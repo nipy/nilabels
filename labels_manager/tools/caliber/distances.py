@@ -134,18 +134,18 @@ def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_na
 
 # TODO below --------
 
-def box_sides():
-    # """
-    # im_segmentation, labels_to_box, labels_to_box_names
-    # Box surrounding the label in the list labels_to_box.
-    # A box is an (ordered!) couple of 3d points.
-    # :param im_segmentation:
-    # :param labels_to_box:
-    # :param labels_to_box_names:
-    # :return:
-    # """
-    # one_label_data = keep_only_one_label(im_segmentation, label_to_keep=label_to_box)
-    # ans = []
+def box_sides(im_segmentation, labels_to_box):
+    """
+    im_segmentation, labels_to_box, labels_to_box_names
+    Box surrounding the label in the list labels_to_box.
+    A box is an (ordered!) couple of 3d points.
+    :param im_segmentation:
+    :param labels_to_box:
+    :param labels_to_box_names:
+    :return:
+    """
+    one_label_data = keep_only_one_label(im_segmentation, label_to_keep=labels_to_box)
+    ans = []
     # for d in range(len(one_label_data.shape)):
     #     ans.append(np.sum(binarise_a_matrix(np.sum(one_label_data, axis=d), dtype=np.int)))
     # return ans
