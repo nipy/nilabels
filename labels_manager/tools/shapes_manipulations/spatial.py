@@ -74,9 +74,9 @@ def modify_affine_transformation(im_input, theta, translation=np.array([0, 0, 0]
     return new_image
 
 
-def apply_orientation_matrix():
+def apply_orientation_matrix(im, affine_left, pfi_b_vects=None):
     # TODO
-    pass
+    return 0
 
 
 def apply_orientation_matrix_to_image_path(pfi_nifti_image, affine_transformation_left,
@@ -292,7 +292,6 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
 
 # def adjust_nifti_translation_path(pfi_nifti_input, new_traslation, pfi_nifti_output, q_form=True, s_form=True,
 #                                   verbose=1):
-#     # TODO expose in facade
 #     """
 #     Change q_form or s_form or both translational part and rotational part.
 #     :param pfi_nifti_input: path to file of the input image
