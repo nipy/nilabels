@@ -114,7 +114,7 @@ def test_split_labels_to_4d():
 
 
 ''' From manipulations.symmetriser.py '''
-from labels_manager.tools.manipulations.symmetrizer import basic_rot_ax, axial_rotations, flip_data, symmetrise_data
+from labels_manager.tools.manipulations.spatial_adjuster import basic_rot_ax, axial_rotations, flip_data, symmetrise_data
 
 
 def test_basic_rotation_ax_simple_and_visual():

@@ -4,6 +4,7 @@ import nibabel as nib
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.aux_methods.utils import print_and_run
 
+
 def divide_by_median_below_labels_path(pfi_input, pfi_segmentation, pfi_output, thr_zeros=True):
     # TODO expose in facade
     im_input = nib.load(pfi_input)
