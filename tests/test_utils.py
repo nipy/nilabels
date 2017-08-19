@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 
 from labels_manager.tools.defs import root_dir
-from labels_manager.tools.shapes_manipulations.spatial import adjust_nifti_translation_path
+from labels_manager.tools.image_shape_manipulations.spatial import modify_affine_transformation
 from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
 
 
@@ -24,7 +24,7 @@ def test_adjust_nifti_translation_path_F_F():
     initial_qform = im_a_cee.get_qform()
     initial_sform = im_a_cee.get_sform()
 
-    adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=False, s_form=False)
+    # adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=False, s_form=False)
 
     im_a_cee_new = nib.load(pfi_output)
     final_affine = im_a_cee_new.affine
@@ -49,7 +49,8 @@ def test_adjust_nifti_translation_path_F_T():
     initial_qform = im_a_cee.get_qform()
     initial_sform = im_a_cee.get_sform()
 
-    adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=False, s_form=True)
+    # adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=False, s_form=True)
+    # modify_affine_transformation()
 
     im_a_cee_new = nib.load(pfi_output)
     final_affine = im_a_cee_new.affine
@@ -88,7 +89,7 @@ def test_adjust_nifti_translation_path_T_F():
     initial_qform = im_a_cee.get_qform()
     initial_sform = im_a_cee.get_sform()
 
-    adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=True, s_form=False)
+    # adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=True, s_form=False)
 
     im_a_cee_new = nib.load(pfi_output)
     final_affine = im_a_cee_new.affine
@@ -127,7 +128,7 @@ def test_adjust_nifti_translation_path_T_T():
     initial_qform = im_a_cee.get_qform()
     initial_sform = im_a_cee.get_sform()
 
-    adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=True, s_form=True)
+    # adjust_nifti_translation_path(pfi_input, translation, pfi_output, q_form=True, s_form=True)
 
     im_a_cee_new = nib.load(pfi_output)
     final_affine = im_a_cee_new.affine

@@ -3,9 +3,9 @@ import os
 import nibabel as nib
 import numpy as np
 
-from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out
-from labels_manager.tools.shapes_manipulations.spatial import modify_image_type, \
-    modify_affine_transformation, apply_orientation_matrix
+from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_path_tail_head
+from labels_manager.tools.image_shape_manipulations.spatial import modify_image_type, \
+    modify_affine_transformation
 
 class LabelsManagerHeaderController(object):
     """
@@ -27,19 +27,28 @@ class LabelsManagerHeaderController(object):
         new_im = modify_image_type(im, new_dtype=new_dtype, update_description=update_description, verbose=verbose)
         nib.save(new_im, pfi_out)
 
-    def modify_affine(self, filename_in, filename_out, new_dtype, theta, translation=np.array([0, 0, 0])):
+    def modify_affine(self, filename_in, filename_aff, filename_out, q_form=True, s_form=True,
+                      multiplication_side='left'):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
+        if filename_aff.endswith('.txt'):
+            aff = np.loadtxt(connect_path_tail_head(self.pfo_in, filename_aff))
+        else:
+            aff = np.load(connect_path_tail_head(self.pfo_in, filename_aff))
+
         im = nib.load(pfi_in)
-        new_im = modify_affine_transformation(im, theta=theta, translation=translation)
+        new_im = modify_affine_transformation(im, aff, q_form=q_form, s_form=s_form,
+                                              multiplication_side=multiplication_side)
         nib.save(new_im, pfi_out)
 
-    def multiply_affine_by_affine(self, filename_in, filename_out):
-        # TODO
+    def small_spatial_rotation(self, filename_in, filename_out, angle, ):
+
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
+        # TODO: create the small rotation and then apply to the matrix
+
         im = nib.load(pfi_in)
-        new_im = apply_orientation_matrix()
-        nib.save(new_im, pfi_out)
+        # new_im = apply_orientation_matrix()
+        # nib.save(new_im, pfi_out)
 

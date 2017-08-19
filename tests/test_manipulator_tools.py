@@ -4,7 +4,7 @@ from nose.tools import assert_raises
 from numpy.testing import assert_array_equal
 
 ''' From manipulations.merger.py'''
-from labels_manager.tools.shapes_manipulations.merger import stack_images, merge_labels_from_4d
+from labels_manager.tools.image_shape_manipulations.merger import stack_images, merge_labels_from_4d
 
 
 def test_merge_labels_from_4d_fake_input():
@@ -51,7 +51,7 @@ def test_stack_images_cascade():
 
 
 ''' From  manipulations.relabeller.py'''
-from labels_manager.tools.colors_manipulations.relabeller import relabeller, permute_labels, erase_labels, \
+from labels_manager.tools.image_colors_manipulations.relabeller import relabeller, permute_labels, erase_labels, \
     assign_all_other_labels_the_same_value, keep_only_one_label
 
 
@@ -99,7 +99,7 @@ def test_keep_only_one_label_label_not_present():
 
 
 ''' From manipulations.splitter.py '''
-from labels_manager.tools.shapes_manipulations.splitter import split_labels_to_4d
+from labels_manager.tools.image_shape_manipulations.splitter import split_labels_to_4d
 
 
 def test_split_labels_to_4d():
@@ -112,7 +112,7 @@ def test_split_labels_to_4d():
 
 
 ''' From manipulations.symmetriser.py '''
-from labels_manager.tools.shapes_manipulations.spatial import basic_rot_ax, axial_rotations, flip_data, symmetrise_data
+from labels_manager.tools.aux_methods.utils_rotations import basic_rot_ax, axial_rotations, flip_data, symmetrise_data
 
 
 def test_basic_rotation_ax_simple_and_visual():
@@ -266,7 +266,7 @@ def test_symmetrise_data_():
 
 
 ''' From manipulations.cutter.py '''
-from labels_manager.tools.colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask
+from labels_manager.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask
 
 
 def test_cut_4d_volume_with_a_1_slice_mask():
