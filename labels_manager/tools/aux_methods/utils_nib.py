@@ -207,7 +207,7 @@ def replace_translational_part(im_input, new_translation, q_form=True, s_form=Tr
 # ---------- Labels processors ---------------
 
 
-def labels_query(im_segmentation, labels):
+def labels_query(im_segmentation, labels, exclude_zero=True):
 
     if isinstance(labels, int):
         labels_list = [labels, ]
@@ -223,4 +223,7 @@ def labels_query(im_segmentation, labels):
         labels_names = labels
     else:
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all'.")
+    if exclude_zero:
+        labels_list = np.sort(list(set() - {0}))
+        labels_names = np.sort(list(set() - {'0'}))
     return labels_list, labels_names
