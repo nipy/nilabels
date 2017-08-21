@@ -17,11 +17,11 @@ class LabelsManagerMeasure(object):
     and return some feature of the segmentations {}.
     """.format(definition_label)
 
-    def __init__(self, input_data_folder=None, output_data_folder=None):
+    def __init__(self, input_data_folder=None, output_data_folder=None, return_mm3=True, verbose=1):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
-        self.return_mm3 = True
-        self.verbose = 0
+        self.return_mm3 = return_mm3
+        self.verbose = verbose
 
     def volume(self, segmentation_filename, labels=None, anatomy_filename=None, tot_volume_prior=None,
                where_to_save=None):

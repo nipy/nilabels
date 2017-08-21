@@ -203,7 +203,13 @@ def replace_translational_part(im_input, new_translation, q_form=True, s_form=Tr
     return im_out
 
 
+def change_header_parameter(pfi_input, pfi_output, parameter_key='datatype',
+                                   new_value_for_something=np.array(512, dtype=np.int16)):
 
+    im_input = nib.load(pfi_input)
+    im_header = im_input.header
+    im_header[parameter_key] = new_value_for_something
+    nib.save(im_input, pfi_output)
 # ---------- Labels processors ---------------
 
 
