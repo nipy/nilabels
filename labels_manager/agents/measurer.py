@@ -37,7 +37,7 @@ class LabelsManagerMeasure(object):
         assert os.path.exists(pfi_segm)
         im_segm = nib.load(pfi_segm)
 
-        labels_list, labels_names = labels_query(im_segm, labels)
+        labels_list, labels_names = labels_query(labels, im_segm.get_data())
 
         df_volumes_per_label = get_volumes_per_label(im_segm, labels=labels_list, labels_names=labels_names,
                                                      tot_volume_prior=tot_volume_prior, verbose=self.verbose)
@@ -75,8 +75,8 @@ class LabelsManagerMeasure(object):
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
 
-        labels_list1, labels_names1 = labels_query(im_segm1, labels)
-        labels_list2, labels_names2 = labels_query(im_segm1, labels)
+        labels_list1, labels_names1 = labels_query(labels, im_segm1.get_data())
+        labels_list2, labels_names2 = labels_query(labels, im_segm2.get_data())
 
         labels_list  = list(set(labels_list1) & set(labels_list2))
         labels_names = list(set(labels_names1) & set(labels_names2))

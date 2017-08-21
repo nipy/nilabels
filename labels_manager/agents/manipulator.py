@@ -159,15 +159,10 @@ class LabelsManagerManipulate(object):
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
         pfi_segm = connect_path_tail_head(self.pfo_in, filename_segm)
 
-        labels_list, labels_names = labels_query(im_segm, labels, exclude_zero=True)
-
         im_input = nib.load(pfi_in)
         im_segm = nib.load(pfi_segm)
 
-        labels_query
-        im_out = normalise_below_labels(im_input, im_segm, labels, stats=stats)
+        labels_list, labels_names = labels_query(labels, im_segm.get_data(), exclude_zero=True)
+        im_out = normalise_below_labels(im_input, labels_list, labels, stats=stats)
 
         nib.save(im_out, pfi_out)
-
-        # todo - normalise_below_labels
-        pass

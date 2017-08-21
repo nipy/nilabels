@@ -102,7 +102,10 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 # ---------- Labels processors ---------------
 
 
-def labels_query(labels, im_segmentation=None, exclude_zero=True):
+def labels_query(labels, segmentation_array=None, exclude_zero=True):
+
+    if labels is None:
+        labels = 'all'
 
     if isinstance(labels, int):
         labels_list = [labels, ]
@@ -111,11 +114,11 @@ def labels_query(labels, im_segmentation=None, exclude_zero=True):
         labels_list = labels
         labels_names = [str(l) for l in labels]
     elif isinstance(labels, str):
-        if labels == 'all' and im_segmentation is not None:
-            labels_list = list(np.sort(list(set(im_segmentation.flat))))
+        if labels == 'all' and segmentation_array is not None:
+            labels_list = list(np.sort(list(set(segmentation_array.flat))))
             labels_names = [str(l) for l in labels]
-        elif labels == 'tot' and im_segmentation is not None:
-            labels_list = [list(np.sort(list(set(im_segmentation.flat))))]
+        elif labels == 'tot' and segmentation_array is not None:
+            labels_list = [list(np.sort(list(set(segmentation_array.flat))))]
             labels_names = labels
         elif os.path.exists(labels):
             if labels.endswith('.txt'):
