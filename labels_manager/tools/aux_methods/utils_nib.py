@@ -210,26 +210,3 @@ def change_header_parameter(pfi_input, pfi_output, parameter_key='datatype',
     im_header = im_input.header
     im_header[parameter_key] = new_value_for_something
     nib.save(im_input, pfi_output)
-# ---------- Labels processors ---------------
-
-
-def labels_query(im_segmentation, labels, exclude_zero=True):
-
-    if isinstance(labels, int):
-        labels_list = [labels, ]
-        labels_names = [str(labels)]
-    elif isinstance(labels, list):
-        labels_list = labels
-        labels_names = [str(l) for l in labels]
-    elif labels == 'all':
-        labels_list = list(np.sort(list(set(im_segmentation.flat))))
-        labels_names = [str(l) for l in labels]
-    elif labels == 'tot':
-        labels_list = [list(np.sort(list(set(im_segmentation.flat))))]
-        labels_names = labels
-    else:
-        raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all'.")
-    if exclude_zero:
-        labels_list = np.sort(list(set() - {0}))
-        labels_names = np.sort(list(set() - {'0'}))
-    return labels_list, labels_names

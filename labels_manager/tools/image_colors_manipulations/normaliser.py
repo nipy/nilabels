@@ -1,11 +1,9 @@
 import numpy as np
 
-from labels_manager.tools.aux_methods.utils_nib import set_new_data, labels_query
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 
-def normalise_below_labels(im_input, im_segm, labels, stats=np.median):
-
-    labels_list, labels_names = labels_query(im_segm, labels, exclude_zero=True)
+def normalise_below_labels(im_input, im_segm, labels_list, stats=np.median):
 
     mask_data = np.zeros_like(im_segm.get_data(), dtype=np.bool)
     for label_k in labels_list[1:]:  # want to exclude the first one!

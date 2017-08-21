@@ -4,11 +4,13 @@ import numpy as np
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, \
     connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
+from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask_nib
 from labels_manager.tools.image_colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from labels_manager.tools.image_shape_manipulations.merger import merge_labels_from_4d
 from labels_manager.tools.image_shape_manipulations.splitter import split_labels_to_4d
+from labels_manager.tools.image_colors_manipulations.normaliser import normalise_below_labels
 
 
 class LabelsManagerManipulate(object):
@@ -152,3 +154,20 @@ class LabelsManagerManipulate(object):
         im_masked = cut_4d_volume_with_a_1_slice_mask_nib(im_dwi, im_mask)
 
         nib.save(im_masked, pfi_out)
+
+    def normalise_below_label(self, filename_in, filename_out, filename_segm, labels, stats=np.median):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
+        pfi_segm = connect_path_tail_head(self.pfo_in, filename_segm)
+
+        labels_list, labels_names = labels_query(im_segm, labels, exclude_zero=True)
+
+        im_input = nib.load(pfi_in)
+        im_segm = nib.load(pfi_segm)
+
+        labels_query
+        im_out = normalise_below_labels(im_input, im_segm, labels, stats=stats)
+
+        nib.save(im_out, pfi_out)
+
+        # todo - normalise_below_labels
+        pass

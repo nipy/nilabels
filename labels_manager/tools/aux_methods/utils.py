@@ -99,8 +99,44 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
         # os.system(cmd)
         subprocess.call(cmd, shell=True)
 
+# ---------- Labels processors ---------------
+
+
+def labels_query(labels, im_segmentation=None, exclude_zero=True):
+
+    if isinstance(labels, int):
+        labels_list = [labels, ]
+        labels_names = [str(labels)]
+    elif isinstance(labels, list):
+        labels_list = labels
+        labels_names = [str(l) for l in labels]
+    elif isinstance(labels, str):
+        if labels == 'all' and im_segmentation is not None:
+            labels_list = list(np.sort(list(set(im_segmentation.flat))))
+            labels_names = [str(l) for l in labels]
+        elif labels == 'tot' and im_segmentation is not None:
+            labels_list = [list(np.sort(list(set(im_segmentation.flat))))]
+            labels_names = labels
+        elif os.path.exists(labels):
+            if labels.endswith('.txt'):
+                labels_list = np.loadtxt(labels)
+            else:
+                labels_list = np.loadtxt(labels)
+            labels_names = [str(l) for l in labels_list]
+        else:
+            raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
+                          "file with the labels.")
+    else:
+        raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
+                      "file with the labels.")
+    if exclude_zero:
+        labels_list = np.sort(list(set() - {0}))
+        labels_names = np.sort(list(set() - {'0'}))
+    return labels_list, labels_names
+
 
 # ---------- Distributions ---------------
+
 
 def triangular_density_function(x, a, mu, b):
 
