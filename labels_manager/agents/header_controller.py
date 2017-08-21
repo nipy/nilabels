@@ -3,9 +3,11 @@ import os
 import nibabel as nib
 import numpy as np
 
+from labels_manager.tools.aux_methods.utils_rotations import get_small_orthogonal_rotation
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_path_tail_head
-from labels_manager.tools.image_shape_manipulations.spatial import modify_image_type, \
-    modify_affine_transformation
+from labels_manager.tools.aux_methods.utils_nib import modify_image_type, \
+    modify_affine_transformation, replace_translational_part
+
 
 class LabelsManagerHeaderController(object):
     """
@@ -27,28 +29,54 @@ class LabelsManagerHeaderController(object):
         new_im = modify_image_type(im, new_dtype=new_dtype, update_description=update_description, verbose=verbose)
         nib.save(new_im, pfi_out)
 
-    def modify_affine(self, filename_in, filename_aff, filename_out, q_form=True, s_form=True,
+    def modify_affine(self, filename_in, affine_in, filename_out, q_form=True, s_form=True,
                       multiplication_side='left'):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
-        if filename_aff.endswith('.txt'):
-            aff = np.loadtxt(connect_path_tail_head(self.pfo_in, filename_aff))
+        if isinstance(affine_in, str):
+
+            if affine_in.endswith('.txt'):
+                aff = np.loadtxt(connect_path_tail_head(self.pfo_in, affine_in))
+            else:
+                aff = np.load(connect_path_tail_head(self.pfo_in, affine_in))
+
+        elif isinstance(affine_in, np.ndarray):
+            aff = affine_in
         else:
-            aff = np.load(connect_path_tail_head(self.pfo_in, filename_aff))
+            raise IOError('parameter affine_in can be path to an affine matrix .txt or .npy or the numpy array'
+                          'corresponding to the affine transformation.')
 
         im = nib.load(pfi_in)
         new_im = modify_affine_transformation(im, aff, q_form=q_form, s_form=s_form,
                                               multiplication_side=multiplication_side)
         nib.save(new_im, pfi_out)
 
-    def small_spatial_rotation(self, filename_in, filename_out, angle, ):
+    def apply_small_rotation(self, filename_in, filename_out, angle=np.pi/6, principal_axis='pitch'):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
-
-        # TODO: create the small rotation and then apply to the matrix
-
         im = nib.load(pfi_in)
-        # new_im = apply_orientation_matrix()
-        # nib.save(new_im, pfi_out)
+        new_aff = get_small_orthogonal_rotation(theta=angle, principal_axis=principal_axis)
+        new_im = modify_affine_transformation(im_input=im, new_aff=new_aff, q_form=True, s_form=True,
+                                              multiplication_side='right')
+        nib.save(new_im, pfi_out)
 
+    def modify_translational_part(self, filename_in, filename_out, new_translation):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
+        im = nib.load(pfi_in)
+
+        if isinstance(new_translation, str):
+
+            if new_translation.endswith('.txt'):
+                tr = np.loadtxt(connect_path_tail_head(self.pfo_in, new_translation))
+            else:
+                tr = np.load(connect_path_tail_head(self.pfo_in, new_translation))
+
+        elif isinstance(new_translation, np.ndarray):
+            tr = new_translation
+        else:
+            raise IOError('parameter new_translation can be path to an affine matrix .txt or .npy or the numpy array'
+                          'corresponding to the new intended translational part.')
+
+        new_im = replace_translational_part(im, tr)
+        nib.save(new_im, pfi_out)

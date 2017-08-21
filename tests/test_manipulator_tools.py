@@ -112,7 +112,7 @@ def test_split_labels_to_4d():
 
 
 ''' From manipulations.symmetriser.py '''
-from labels_manager.tools.aux_methods.utils_rotations import basic_rot_ax, axial_rotations, flip_data, symmetrise_data
+from labels_manager.tools.aux_methods.utils_rotations import basic_90_rot_ax, axial_90_rotations, flip_data, symmetrise_data
 
 
 def test_basic_rotation_ax_simple_and_visual():
@@ -163,16 +163,16 @@ def test_basic_rotation_ax_simple_and_visual():
                          [[ 0,  1,  2,  3],
                           [12, 13, 14, 15]]])
 
-    assert_array_equal(basic_rot_ax(cube_id, ax=0), cube_ax0)
-    assert_array_equal(basic_rot_ax(cube_id, ax=1), cube_ax1)
-    assert_array_equal(basic_rot_ax(cube_id, ax=2), cube_ax2)
+    assert_array_equal(basic_90_rot_ax(cube_id, ax=0), cube_ax0)
+    assert_array_equal(basic_90_rot_ax(cube_id, ax=1), cube_ax1)
+    assert_array_equal(basic_90_rot_ax(cube_id, ax=2), cube_ax2)
 
 
 def test_axial_rotations_identity_test():
 
     cube = np.array(range(2 * 3 * 4)).reshape(2, 3, 4)
     for x in range(3):
-        assert_array_equal(axial_rotations(cube,rot=4, ax=x), cube)
+        assert_array_equal(axial_90_rotations(cube, rot=4, ax=x), cube)
 
 
 def test_flip_data():

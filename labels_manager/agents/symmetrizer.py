@@ -6,7 +6,7 @@ import numpy as np
 from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.image_colors_manipulations.relabeller import relabeller
-from labels_manager.tools.image_shape_manipulations.spatial import flip_data, symmetrise_data
+from labels_manager.tools.aux_methods.utils_rotations import flip_data, symmetrise_data
 
 
 class LabelsManagerSymmetrize(object):

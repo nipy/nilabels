@@ -5,6 +5,7 @@ from labels_manager.tools.descriptions.manipulate_descriptors import generate_du
 
 
 if __file__ == '__main__':
-    ldm = LabelsDescriptorManager()
+    pass
+    #ldm = LabelsDescriptorManager()
 
 

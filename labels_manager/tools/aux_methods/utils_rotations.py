@@ -1,30 +1,30 @@
 import numpy as np
 
 
-def get_small_orthogonal_rotation(im_input, theta, principal_axis='pitch'):
+def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
 
     if principal_axis == 'pitch':
         rot = np.array([[1,            0,           0,       0],
                         [0,  np.cos(theta),  -np.sin(theta), 0],
                         [0,  np.sin(theta), np.cos(theta),   0],
                         [0,             0,          0,       1]])
-    elif principal_axis == 'pitch':
+    elif principal_axis == 'roll':
         rot = np.array([[np.cos(theta), 0, np.sin(theta),  0],
                         [0,             1,      0,         0],
                         [-np.sin(theta), 0, np.cos(theta), 0],
                         [0,             0,      0,         1]])
-    elif principal_axis == 'pitch':
+    elif principal_axis == 'yaw':
         rot = np.array([[np.cos(theta), -np.sin(theta), 0, 0],
                         [np.sin(theta), np.cos(theta),  0, 0],
                         [0,                   0,        1, 0],
                         [0,                   0,        0, 1]])
     else:
-        raise IOError
+        raise IOError('principal_axis parameter can be pitch, roll or yaw')
 
     return rot  # to be multiplied on the right side as im_input.get_affine().dot(rot)
 
 
-def get_rototranslation_matrix(theta, rotation_axis=np.array([1,0,0]),  translation=np.array([0, 0, 0])):
+def get_roto_translation_matrix(theta, rotation_axis=np.array([1,0,0]),  translation=np.array([0, 0, 0])):
 
     n = np.linalg.norm(rotation_axis)
     assert not np.abs(n) < 0.001, 'rotation axis too close to zero.'
@@ -45,8 +45,7 @@ def get_rototranslation_matrix(theta, rotation_axis=np.array([1,0,0]),  translat
     return rot_transl
 
 
-
-def basic_rot_ax(m, ax=0):
+def basic_90_rot_ax(m, ax=0):
     """
     Basic rotations of a 3d matrix. Ingredient of the method axial_rotations.
     ----------
@@ -81,7 +80,7 @@ def basic_rot_ax(m, ax=0):
         return np.rot90(m, 1)
 
 
-def axial_rotations(m, rot=1, ax=2):
+def axial_90_rotations(m, rot=1, ax=2):
     """
     :param m: 3d matrix
     :param rot: number of rotations
@@ -98,7 +97,7 @@ def axial_rotations(m, rot=1, ax=2):
         return m
 
     for _ in range(rot):
-        m = basic_rot_ax(m, ax=ax)
+        m = basic_90_rot_ax(m, ax=ax)
 
     return m
 
