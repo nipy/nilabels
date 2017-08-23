@@ -2,7 +2,7 @@ import nibabel as nib
 import numpy as np
 
 from labels_manager.tools.aux_methods.utils_rotations import get_small_orthogonal_rotation
-from labels_manager.tools.aux_methods.sanity_checks import get_pfi_in_pfi_out, connect_path_tail_head
+from labels_manager.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import modify_image_type, \
     modify_affine_transformation, replace_translational_part
 

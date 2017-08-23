@@ -1,6 +1,6 @@
 import os
 
-from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head
+from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
 
 
 class LabelsManagerPropagate(object):

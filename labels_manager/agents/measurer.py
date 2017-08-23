@@ -3,7 +3,7 @@ import nibabel as nib
 import pandas as pa
 
 from labels_manager.tools.aux_methods.utils import labels_query
-from labels_manager.tools.aux_methods.sanity_checks import connect_path_tail_head
+from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
 from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels
 from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, centroid
 from labels_manager.tools.defs import definition_label
