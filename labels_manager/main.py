@@ -5,18 +5,20 @@ from labels_manager.agents.measurer import LabelsManagerMeasure
 from labels_manager.agents.fuser import LabelsManagerFuse
 from labels_manager.agents.propagator import LabelsManagerPropagate
 from labels_manager.agents.symmetrizer import LabelsManagerSymmetrize
+from labels_manager.agents.header_controller import LabelsManagerHeaderController
 
 
 class LabelsManager(object):
 
-    def __init__(self, input_data_folder, output_data_folder=None):
+    def __init__(self, input_data_folder=None, output_data_folder=None):
         """
         Main agent-class that access all the tools methods by paths through
         agents called detect, manipulate and measure.
         """
 
-        if not (os.path.isdir(input_data_folder) or input_data_folder is None):
-            raise IOError('Selected path must be None or must point to an existing folder.')
+        if input_data_folder is not None:
+            if not os.path.isdir(input_data_folder):
+                raise IOError('Selected path must be None or must point to an existing folder.')
 
         self._pfo_in = input_data_folder
 
@@ -40,3 +42,4 @@ class LabelsManager(object):
         self.fuse       = LabelsManagerFuse(self._pfo_in, self._pfo_out)
         self.propagate  = LabelsManagerPropagate(self._pfo_in, self._pfo_out)
         self.symmetrize = LabelsManagerSymmetrize(self._pfo_in, self._pfo_out)
+        self.header     = LabelsManagerHeaderController(self._pfo_in, self._pfo_out)

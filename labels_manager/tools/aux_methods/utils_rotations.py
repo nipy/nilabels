@@ -2,8 +2,12 @@ import numpy as np
 
 
 def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
-
-    if principal_axis == 'pitch':
+    if principal_axis == 'yaw':
+        rot = np.array([[np.cos(theta), -np.sin(theta), 0, 0],
+                        [np.sin(theta), np.cos(theta), 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1]])
+    elif principal_axis == 'pitch':
         rot = np.array([[1,            0,           0,       0],
                         [0,  np.cos(theta),  -np.sin(theta), 0],
                         [0,  np.sin(theta), np.cos(theta),   0],
@@ -13,11 +17,6 @@ def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
                         [0,             1,      0,         0],
                         [-np.sin(theta), 0, np.cos(theta), 0],
                         [0,             0,      0,         1]])
-    elif principal_axis == 'yaw':
-        rot = np.array([[np.cos(theta), -np.sin(theta), 0, 0],
-                        [np.sin(theta), np.cos(theta),  0, 0],
-                        [0,                   0,        1, 0],
-                        [0,                   0,        0, 1]])
     else:
         raise IOError('principal_axis parameter can be pitch, roll or yaw')
 

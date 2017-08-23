@@ -1,5 +1,3 @@
-import os
-
 import nibabel as nib
 import numpy as np
 
@@ -54,9 +52,19 @@ class LabelsManagerHeaderController(object):
 
     def apply_small_rotation(self, filename_in, filename_out, angle=np.pi/6, principal_axis='pitch'):
 
+        if isinstance(angle, list):
+            assert isinstance(principal_axis, list)
+            assert len(principal_axis) == len(angle)
+            new_aff = np.identity(4)
+            for pa, an in zip(principal_axis, angle):
+                aff = get_small_orthogonal_rotation(theta=an, principal_axis=pa)
+                new_aff = new_aff.dot(aff)
+        else:
+            new_aff = get_small_orthogonal_rotation(theta=angle, principal_axis=principal_axis)
+
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
         im = nib.load(pfi_in)
-        new_aff = get_small_orthogonal_rotation(theta=angle, principal_axis=principal_axis)
+
         new_im = modify_affine_transformation(im_input=im, new_aff=new_aff, q_form=True, s_form=True,
                                               multiplication_side='right')
         nib.save(new_im, pfi_out)
