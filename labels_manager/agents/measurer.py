@@ -60,11 +60,11 @@ class LabelsManagerMeasure(object):
         return df_volumes_per_label
 
     def dist(self, segm_1_filename, segm_2_filename, labels=None,
-             metrics=('dice score', 'dispersion', 'precision'),
+             metrics=('dice_score', 'dispersion', 'precision'),
              where_to_save=None, intermediate_files_folder_name=None):
 
         pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
-        pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_1_filename)
+        pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_2_filename)
         if intermediate_files_folder_name is None:
             pfo_intermediate_file = connect_path_tail_head(self.pfo_out, 'z_precision_files')
         else:
@@ -72,6 +72,10 @@ class LabelsManagerMeasure(object):
 
         assert os.path.exists(pfi_segm1)
         assert os.path.exists(pfi_segm2)
+
+        if self.verbose > 0:
+            print("Distances between segmentations \n{0} \n{1} \ncomputation started.".format(pfi_segm1, pfi_segm2))
+
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
 
@@ -81,15 +85,31 @@ class LabelsManagerMeasure(object):
         labels_list  = list(set(labels_list1) & set(labels_list2))
         labels_names = list(set(labels_names1) & set(labels_names2))
 
+        labels_list.sort(key=int)
+        labels_names.sort(key=int)
+
+        if self.verbose > 0:
+            print("Labels image 1: {}".format(labels_list1))
+            print("Labels image 2: {}".format(labels_list2))
+            print("Labels intersection {}".format(labels_list))
+            print("Labels disjoint union {}".format( (set(labels_names1) | set(labels_names2)) -
+                                                     (set(labels_names1) & set(labels_names2)) ) )
+
         dict_distances_per_label = {}
 
-        if 'dice score' in metrics:
+        if 'dice_score' in metrics:
+            if self.verbose > 0:
+                print('Dice score computation started')
             pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names)
             dict_distances_per_label.update({'dice score' : pa_se})
         if 'dispersion' in metrics:
+            if self.verbose > 0:
+                print('Dispersion computation started')
             pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names)
             dict_distances_per_label.update({'dispersion': pa_se})
         if 'precision' in metrics:
+            if self.verbose > 0:
+                print('precision computation started')
             pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names)
             dict_distances_per_label.update({'precision': pa_se})
 

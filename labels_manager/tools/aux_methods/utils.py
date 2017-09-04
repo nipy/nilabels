@@ -103,28 +103,36 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 
 
 def labels_query(labels, segmentation_array=None, exclude_zero=True):
-
+    """
+    Will return a list with the labels and the labels names (same order list of strings with labels names)
+    for a labels list provided in some way, and the optional segmentation image data (array)
+    :param labels: can be int, list, string as 'all' or 'tot', or a string containing a path to a .txt or a numpy array
+    :param segmentation_array: optional segmentation image data (array)
+    :param exclude_zero: remove the label with zero in the segmentation [False].
+    :return: labels_list, labels_names
+    """
     if labels is None:
         labels = 'all'
 
     if isinstance(labels, int):
+        assert labels in segmentation_array
         labels_list = [labels, ]
         labels_names = [str(labels)]
     elif isinstance(labels, list):
         labels_list = labels
-        labels_names = [str(l) for l in labels]
+        labels_names = [str(l) for l in labels_list]
     elif isinstance(labels, str):
         if labels == 'all' and segmentation_array is not None:
-            labels_list = list(np.sort(list(set(segmentation_array.flat))))
-            labels_names = [str(l) for l in labels]
+            labels_list = list(np.sort(list(set(segmentation_array.astype(np.int).flat))))
+            labels_names = [str(l) for l in labels_list]
         elif labels == 'tot' and segmentation_array is not None:
-            labels_list = [list(np.sort(list(set(segmentation_array.flat))))]
+            labels_list = [list(np.sort(list(set(segmentation_array.astype(np.int).flat))))]
             labels_names = labels
         elif os.path.exists(labels):
             if labels.endswith('.txt'):
-                labels_list = np.loadtxt(labels)
+                labels_list = list(np.loadtxt(labels))
             else:
-                labels_list = np.loadtxt(labels)
+                labels_list = list(np.load(labels))
             labels_names = [str(l) for l in labels_list]
         else:
             raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
@@ -133,8 +141,9 @@ def labels_query(labels, segmentation_array=None, exclude_zero=True):
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                       "file with the labels.")
     if exclude_zero:
-        labels_list = np.sort(list(set() - {0}))
-        labels_names = np.sort(list(set() - {'0'}))
+        labels_list = np.sort(list(set(labels_list) - {0}))
+        labels_names = (list(set(labels_names) - {'0'}))
+        labels_names.sort(key=int)
     return labels_list, labels_names
 
 

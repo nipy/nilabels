@@ -85,7 +85,7 @@ def dispersion(im_segm1, im_segm2, labels_list=None, labels_names=None, return_m
         if return_mm3:
             c1 = im_segm1.affine[:3, :3].dot(c1.astype(np.float64))
             c2 = im_segm1.affine[:3, :3].dot(c2.astype(np.float64))
-        return np.sqrt((c1 - c2)**2)
+        return np.sqrt( sum((c1 - c2)**2) )
 
     np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
     return pa.Series(np.array([dispersion_l(l) for l in labels_list]), index=labels_names)
@@ -125,10 +125,10 @@ def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_na
         t_1_2 = np.loadtxt(pfi_aff_1_2)
         t_2_1 = np.loadtxt(pfi_aff_2_1)
 
-        precision_per_label.append(np.max(np.abs(np.linalg.det(t_1_2)) ** (-1), np.abs(np.linalg.det(t_2_1)) ** (-1)))
+        precision_per_label.append(1 / float(np.max(np.abs(np.linalg.det(t_1_2)) ** (-1), np.abs(np.linalg.det(t_2_1)) ** (-1))))
 
     pa_series = pa.Series(np.array(precision_per_label), index=labels_names)
-    pa_series.dump_to_pickle(os.path.join(pfo_intermediate_files, 'final_precision.pickle'))
+    pa_series.to_pickle(os.path.join(pfo_intermediate_files, 'final_precision.pickle'))
 
     return pa_series
 
