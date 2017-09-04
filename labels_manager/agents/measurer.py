@@ -70,11 +70,11 @@ class LabelsManagerMeasure(object):
         else:
             pfo_intermediate_file = connect_path_tail_head(self.pfo_out, intermediate_files_folder_name)
 
-        assert os.path.exists(pfi_segm1)
-        assert os.path.exists(pfi_segm2)
+        assert os.path.exists(pfi_segm1), pfi_segm1
+        assert os.path.exists(pfi_segm2), pfi_segm2
 
         if self.verbose > 0:
-            print("Distances between segmentations \n{0} \n{1} \ncomputation started.".format(pfi_segm1, pfi_segm2))
+            print("Distances between segmentations: \n -> {0} \n -> {1} \n...started!".format(pfi_segm1, pfi_segm2))
 
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
@@ -92,29 +92,30 @@ class LabelsManagerMeasure(object):
             print("Labels image 1: {}".format(labels_list1))
             print("Labels image 2: {}".format(labels_list2))
             print("Labels intersection {}".format(labels_list))
-            print("Labels disjoint union {}".format( (set(labels_names1) | set(labels_names2)) -
-                                                     (set(labels_names1) & set(labels_names2)) ) )
+            disjoint_union = list( (set(labels_names1) | set(labels_names2)) - (set(labels_names1) & set(labels_names2)) )
+            print("Labels disjoint union {}".format(disjoint_union))
 
         dict_distances_per_label = {}
 
         if 'dice_score' in metrics:
             if self.verbose > 0:
                 print('Dice score computation started')
-            pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names)
+            pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
             dict_distances_per_label.update({'dice score' : pa_se})
         if 'dispersion' in metrics:
             if self.verbose > 0:
                 print('Dispersion computation started')
-            pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names)
+            pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
             dict_distances_per_label.update({'dispersion': pa_se})
         if 'precision' in metrics:
             if self.verbose > 0:
                 print('precision computation started')
-            pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names)
+            pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names,
+                              verbose=self.verbose)
             dict_distances_per_label.update({'precision': pa_se})
 
         df_distances_per_label = pa.DataFrame(dict_distances_per_label,
-                                              columns=['dice score', 'dispersion', 'precision'])
+                                              columns=dict_distances_per_label.keys())
 
         df_distances_per_label.loc['means'] = df_distances_per_label.mean()
         df_distances_per_label.loc['std'] = df_distances_per_label.std()
@@ -124,9 +125,8 @@ class LabelsManagerMeasure(object):
 
         if where_to_save is not None:
             pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
-            assert os.path.exists(pfi_output_table)
             df_distances_per_label.to_pickle(pfi_output_table)
 
     def topology(self):
         # WIP: island detections, graph detections, cc detections from detector tools
-        print('topology is a work in progress for {}'.format(self.__class__))
+        print('topology for {} is in the TODO list!'.format(self.__class__))

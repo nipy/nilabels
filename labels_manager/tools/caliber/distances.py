@@ -51,7 +51,7 @@ def centroid(im, labels, real_space_coordinates=True):
     return centers_of_mass
 
 
-def dice_score(im_segm1, im_segm2, labels_list, labels_names):
+def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
     """
     Dice score between paired labels of segmentations.
     :param im_segm1: nibabel image with labels
@@ -65,19 +65,21 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names):
         place2 = im_segm2.get_data() == lab
         assert isinstance(place1, np.ndarray)
         assert isinstance(place2, np.ndarray)
-        return 2 * np.count_nonzero(place1 * place2) / (np.count_nonzero(place1) + np.count_nonzero(place2))
+        return 2 * np.count_nonzero(place1 * place2) / float(np.count_nonzero(place1) + np.count_nonzero(place2))
 
-    scores = np.zeros(len(labels_list), dtype=np.float64)
-
-    for id_l , l in enumerate(labels_list):
-        scores[id_l] = dice_score_l(l)
+    scores = []
+    for l in labels_list:
+        d = dice_score_l(l)
+        scores.append(d)
+        if verbose > 0:
+            print('Dice scores label {0} : {1} '.format(l, d))
 
     return pa.Series(scores, index=labels_names)
 
 
-def dispersion(im_segm1, im_segm2, labels_list=None, labels_names=None, return_mm3=True):
+def dispersion(im_segm1, im_segm2, labels_list=None, labels_names=None, return_mm3=True, verbose=0):
 
-    def dispersion_l(lab):
+    def dispersion_l(lab, verbose=verbose):
         place1 = im_segm1.get_data() == lab
         place2 = im_segm2.get_data() == lab
         c1 = centroid_array(place1, labels=[True,])[0]
@@ -85,13 +87,16 @@ def dispersion(im_segm1, im_segm2, labels_list=None, labels_names=None, return_m
         if return_mm3:
             c1 = im_segm1.affine[:3, :3].dot(c1.astype(np.float64))
             c2 = im_segm1.affine[:3, :3].dot(c2.astype(np.float64))
-        return np.sqrt( sum((c1 - c2)**2) )
+        d = np.sqrt( sum((c1 - c2)**2) )
+        if verbose > 0:
+            print('Dispersion, label {0} : {1}'.format(l, d))
+        return d
 
     np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
     return pa.Series(np.array([dispersion_l(l) for l in labels_list]), index=labels_names)
 
 
-def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names):
+def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
 
     print_and_run('mkdir -p {}'.format(pfo_intermediate_files))
     precision_per_label = []
@@ -111,22 +116,26 @@ def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_na
         pfi_aff_1_2 = os.path.join(pfo_intermediate_files, 'aff_single_lab{}_1_on_2.txt'.format(l))
         pfi_aff_2_1 = os.path.join(pfo_intermediate_files, 'warped_single_lab{}_2_on_1.txt'.format(l))
 
-        cmd1_2 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0'.format(pfi_im_segm_single1,
-                                                                                   pfi_im_segm_single2,
-                                                                                   pfi_warp_1_2,
-                                                                                   pfi_aff_1_2)
-        cmd2_1 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0'.format(pfi_im_segm_single2,
-                                                                                   pfi_im_segm_single1,
-                                                                                   pfi_warp_2_1,
-                                                                                   pfi_aff_2_1)
+        cmd1_2 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -speeeeed'.format(pfi_im_segm_single1,
+                                                                                             pfi_im_segm_single2,
+                                                                                             pfi_warp_1_2,
+                                                                                             pfi_aff_1_2)
+        cmd2_1 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -speeeeed'.format(pfi_im_segm_single2,
+                                                                                             pfi_im_segm_single1,
+                                                                                             pfi_warp_2_1,
+                                                                                             pfi_aff_2_1)
         print_and_run(cmd1_2)
         print_and_run(cmd2_1)
 
         t_1_2 = np.loadtxt(pfi_aff_1_2)
         t_2_1 = np.loadtxt(pfi_aff_2_1)
 
-        precision_per_label.append(1 / float(np.max(np.abs(np.linalg.det(t_1_2)) ** (-1), np.abs(np.linalg.det(t_2_1)) ** (-1))))
-
+        d = 1 / float(np.max([np.abs(np.linalg.det(t_1_2)) ** (-1), np.abs(np.linalg.det(t_2_1)) ** (-1)]))
+        precision_per_label.append(d)
+        if verbose > 0:
+            print('------------------------------------')
+            print('Precision, label {0} : {1}'.format(l, d))
+            print('------------------------------------')
     pa_series = pa.Series(np.array(precision_per_label), index=labels_names)
     pa_series.to_pickle(os.path.join(pfo_intermediate_files, 'final_precision.pickle'))
 
