@@ -117,7 +117,7 @@ class LabelsManagerMeasure(object):
         df_distances_per_label = pa.DataFrame(dict_distances_per_label,
                                               columns=dict_distances_per_label.keys())
 
-        df_distances_per_label.loc['means'] = df_distances_per_label.mean()
+        df_distances_per_label.loc['mean'] = df_distances_per_label.mean()
         df_distances_per_label.loc['std'] = df_distances_per_label.std()
 
         if self.verbose > 0:

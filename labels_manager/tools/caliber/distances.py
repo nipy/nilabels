@@ -34,22 +34,40 @@ def centroid_array(arr, labels):
     return centers_of_mass
 
 
-def centroid(im, labels, real_space_coordinates=True):
+def centroid(im, labels, return_mm3=True):
     """
     Centroid (center of mass, baricenter) of a list of labels.
     :param im:
     :param labels: list of labels, e.g. [3] or [2, 3, 45]
-    :param real_space_coordinates: if true the answer is in mm if false in voxel indexes.
+    :param return_mm3: if true the answer is in mm if false in voxel indexes.
     :return: list of centroids, one for each label in the input order.
     """
     centers_of_mass = centroid_array(im.get_data(), labels)
 
-    if real_space_coordinates:
+    if return_mm3:
         centers_of_mass = [im.affine[:3, :3].dot(cm.astype(np.float64)) for cm in centers_of_mass]
     else:
         centers_of_mass = [np.round(cm).astype(np.uint64) for cm in centers_of_mass]
     return centers_of_mass
 
+
+def covariance_matrices(im, labels, return_mm3=True):
+    """
+    Considers the label as a point distribution in the space, and returns the covariance matrix of the points
+    distributions.
+    :param im:
+    :param labels:
+    :param return_mm3: if true the answer is in mm if false in voxel indexes.
+    :return: covariance matrix of the point distribution of the label
+    """
+    cov_matrices = [np.zeros([3, 3])] * len(labels)
+    for l_id, l in enumerate(labels):
+        cov_matrices[l_id] = np.cov(np.where(im.get_data() == l))  # returns [X_vector, Y_vector, Z_vector]
+    if return_mm3:
+        cov_matrices = [im.affine[:3, :3].dot(cm.astype(np.float64)) for cm in cov_matrices]
+    return cov_matrices
+
+# --- distances
 
 def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
     """
@@ -61,7 +79,7 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
     :return: dice score of the label label of the two segmentations.
     """
     def dice_score_l(lab):
-        place1 = im_segm1.get_data() == lab
+        place1 = im_segm1.get_data() == lab  # slow but readable, can be refactored later.
         place2 = im_segm2.get_data() == lab
         assert isinstance(place1, np.ndarray)
         assert isinstance(place2, np.ndarray)
@@ -79,25 +97,32 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
 
 def dispersion(im_segm1, im_segm2, labels_list=None, labels_names=None, return_mm3=True, verbose=0):
 
-    def dispersion_l(lab, verbose=verbose):
-        place1 = im_segm1.get_data() == lab
-        place2 = im_segm2.get_data() == lab
-        c1 = centroid_array(place1, labels=[True,])[0]
-        c2 = centroid_array(place2, labels=[True,])[0]
-        if return_mm3:
-            c1 = im_segm1.affine[:3, :3].dot(c1.astype(np.float64))
-            c2 = im_segm1.affine[:3, :3].dot(c2.astype(np.float64))
-        d = np.sqrt( sum((c1 - c2)**2) )
-        if verbose > 0:
-            print('Dispersion, label {0} : {1}'.format(l, d))
-        return d
+    # def dispersion_l(lab, verbose=verbose):
+    #     c1 = centroid_array(im_segm1.get_data(), labels=[lab,])[0]
+    #     c2 = centroid_array(im_segm2.get_data(), labels=[lab,])[0]
+    #     if return_mm3:
+    #         c1 = im_segm1.affine[:3, :3].dot(c1.astype(np.float64))
+    #         c2 = im_segm1.affine[:3, :3].dot(c2.astype(np.float64))
+    #     d = np.sqrt( sum((c1 - c2)**2) )
+    #     if verbose > 0:
+    #         print('Dispersion, label {0} : {1}'.format(l, d))
+    #     return d
+    #
+    # np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
+    # return pa.Series(np.array([dispersion_l(l) for l in labels_list]), index=labels_names)
+
+    cs1 = centroid_array(im_segm1.get_data(), labels=labels_list)
+    cs2 = centroid_array(im_segm2.get_data(), labels=labels_list)
+    if return_mm3:
+        cs1 = [im_segm1.affine[:3, :3].dot(c.astype(np.float64)) for c in cs1]
+        cs2 = [im_segm1.affine[:3, :3].dot(c.astype(np.float64)) for c in cs2]
 
     np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
-    return pa.Series(np.array([dispersion_l(l) for l in labels_list]), index=labels_names)
+    return pa.Series(np.array([np.sqrt( sum((c1 - c2)**2) ) for c1, c2 in zip(cs1, cs2)]), index=labels_names)
 
 
 def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
-
+    # deprecated as too imprecise :-) !
     print_and_run('mkdir -p {}'.format(pfo_intermediate_files))
     precision_per_label = []
 
@@ -142,6 +167,36 @@ def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_na
     return pa_series
 
 
+def covariance_distance(im_segm1, im_segm2, labels_list=None, labels_names=None, return_mm3=True):
+    """
+    Considers the label as a point distribution in the space, and returns the covariance matrix of the points
+    distributions.
+    :return:
+    See: Herdin 2005, Correlation matrix distance, a meaningful measure for evaluation of non-stationary MIMO channels
+    """
+    def cov_dist(m1, m2):
+        """
+        Covariance distance between matrices m1 and m2, defined as
+        d = 1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2))
+        :param m1: matrix
+        :param m2: matrix
+        :return: 1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2))
+        """
+        return 1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2))
+
+    cvs1 = covariance_matrices(im_segm1.get_data(), labels=labels_list, return_mm3=return_mm3)
+    cvs2 = covariance_matrices(im_segm2.get_data(), labels=labels_list, return_mm3=return_mm3)
+
+    return pa.Series(np.array([cov_dist(a1, a2) for a1, a2 in zip(cvs1, cvs2)]), index=labels_names)
+
+
+def hausdorff_distance():
+    # see Abdel Aziz Taha and Allan Hanbury 2015
+    # An Efficient Algorithm for Calculating the Exact Hausdorff Distance
+    pass
+
+
+
 # TODO below --------
 
 def box_sides(im_segmentation, labels_to_box):
@@ -162,7 +217,4 @@ def box_sides(im_segmentation, labels_to_box):
     pass
 
 
-def hausdorff_distance():
-    # see Abdel Aziz Taha and Allan Hanbury 2015
-    # An Efficient Algorithm for Calculating the Exact Hausdorff Distance
-    pass
+
