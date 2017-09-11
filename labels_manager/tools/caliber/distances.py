@@ -210,7 +210,6 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     def d_H(im1, im2, l):
         arr1 = im1.get_data() == l
         arr2 = im2.get_data() == l
-        # df1 = scipy.ndimage.morphology.distance_transform_edt(arr1)
         assert isinstance(arr2, np.ndarray)
         if return_mm3:
             df2 = nd.morphology.distance_transform_edt(arr2, sampling=list(np.diag(im1.array[:3, :3])))

@@ -6,7 +6,8 @@ import numpy as np
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
 from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels
-from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, centroid
+from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, covariance_distance, \
+    hausdorff_distance
 from labels_manager.tools.defs import definition_label
 
 
@@ -50,7 +51,6 @@ class LabelsManagerMeasure(object):
                                                                verbose=self.verbose)
 
             df_volumes_per_label['Average below label'] = df_average_below_labels.values
-            # df_volumes_per_label = pa.concat([df_volumes_per_label, df_average_below_labels])
 
         if self.verbose > 0:
             print(df_volumes_per_label)
@@ -65,38 +65,12 @@ class LabelsManagerMeasure(object):
 
         return self.volume(segmentation_filename, labels='tot')
 
-        # pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
-        # assert os.path.exists(pfi_segm)
-        # im_segm = nib.load(pfi_segm)
-        #
-        # if labels_to_exclude is not None:
-        #
-        #     seg = np.copy(im_segm.get_data())
-        #     for index_label_k, label_k in enumerate(labels_to_exclude):
-        #         places = im_segm.get_data() != label_k
-        #         seg =  seg * places.astype(np.int)
-        #
-        #     num_voxels = np.count_nonzero(seg)
-        # else:
-        #     num_voxels = np.count_nonzero(im_segm.get_data())
-        #
-        # if self.return_mm3:
-        #     one_voxel_volume = np.round(np.abs(np.prod(np.diag(im_segm.get_affine()))), decimals=6)
-        #     mm_3 = num_voxels * one_voxel_volume
-        #     return mm_3
-        # else:
-        #     return num_voxels
-
     def dist(self, segm_1_filename, segm_2_filename, labels=None,
-             metrics=('dice_score', 'dispersion', 'precision'),
-             where_to_save=None, intermediate_files_folder_name=None):
+             metrics=(dice_score, dispersion, covariance_distance, hausdorff_distance),
+             where_to_save=None):
 
         pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
         pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_2_filename)
-        if intermediate_files_folder_name is None:
-            pfo_intermediate_file = connect_path_tail_head(self.pfo_out, 'z_precision_files')
-        else:
-            pfo_intermediate_file = connect_path_tail_head(self.pfo_out, intermediate_files_folder_name)
 
         assert os.path.exists(pfi_segm1), pfi_segm1
         assert os.path.exists(pfi_segm2), pfi_segm2
@@ -130,23 +104,6 @@ class LabelsManagerMeasure(object):
                 print('{} computation started'.format(d.func_name))
             pa_se = d(im_segm1, im_segm2, labels_list, labels_names, self.return_mm3)
             dict_distances_per_label.update({d.func_name : pa_se})
-
-        # if 'dice_score' in metrics:
-        #     if self.verbose > 0:
-        #         print('Dice score computation started')
-        #     pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
-        #     dict_distances_per_label.update({'dice score' : pa_se})
-        # if 'dispersion' in metrics:
-        #     if self.verbose > 0:
-        #         print('Dispersion computation started')
-        #     pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
-        #     dict_distances_per_label.update({'dispersion': pa_se})
-        # if 'precision' in metrics:
-        #     if self.verbose > 0:
-        #         print('precision computation started')
-        #     pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names,
-        #                       verbose=self.verbose)
-        #     dict_distances_per_label.update({'precision': pa_se})
 
         df_distances_per_label = pa.DataFrame(dict_distances_per_label,
                                               columns=dict_distances_per_label.keys())

@@ -1,12 +1,9 @@
 import os
 from os.path import join as jph
 
-from os.path import join as jph
 from labels_manager.main import LabelsManager as LM
-
-from labels_manager.tools.caliber.distances import dice_score, dispersion, covariance_distance, hausdorff_distance
-
 from labels_manager.tools.defs import root_dir
+
 
 if __name__ == '__main__':
 
