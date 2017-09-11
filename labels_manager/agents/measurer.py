@@ -97,28 +97,34 @@ class LabelsManagerMeasure(object):
 
         dict_distances_per_label = {}
 
-        if 'dice_score' in metrics:
+        for d in metrics:
             if self.verbose > 0:
-                print('Dice score computation started')
-            pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
-            dict_distances_per_label.update({'dice score' : pa_se})
-        if 'dispersion' in metrics:
-            if self.verbose > 0:
-                print('Dispersion computation started')
-            pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
-            dict_distances_per_label.update({'dispersion': pa_se})
-        if 'precision' in metrics:
-            if self.verbose > 0:
-                print('precision computation started')
-            pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names,
-                              verbose=self.verbose)
-            dict_distances_per_label.update({'precision': pa_se})
+                print('{} computation started'.format(d.func_name))
+            pa_se = d(im_segm1, im_segm2, labels_list, labels_names, self.return_mm3)
+            dict_distances_per_label.update({d.func_name : pa_se})
+
+        # if 'dice_score' in metrics:
+        #     if self.verbose > 0:
+        #         print('Dice score computation started')
+        #     pa_se = dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
+        #     dict_distances_per_label.update({'dice score' : pa_se})
+        # if 'dispersion' in metrics:
+        #     if self.verbose > 0:
+        #         print('Dispersion computation started')
+        #     pa_se = dispersion(im_segm1, im_segm2, labels_list, labels_names, verbose=self.verbose)
+        #     dict_distances_per_label.update({'dispersion': pa_se})
+        # if 'precision' in metrics:
+        #     if self.verbose > 0:
+        #         print('precision computation started')
+        #     pa_se = precision(im_segm1, im_segm2, pfo_intermediate_file, labels_list, labels_names,
+        #                       verbose=self.verbose)
+        #     dict_distances_per_label.update({'precision': pa_se})
 
         df_distances_per_label = pa.DataFrame(dict_distances_per_label,
                                               columns=dict_distances_per_label.keys())
 
-        df_distances_per_label.loc['mean'] = df_distances_per_label.mean()
-        df_distances_per_label.loc['std'] = df_distances_per_label.std()
+        # df_distances_per_label.loc['mean'] = df_distances_per_label.mean()
+        # df_distances_per_label.loc['std'] = df_distances_per_label.std()
 
         if self.verbose > 0:
             print(df_distances_per_label)

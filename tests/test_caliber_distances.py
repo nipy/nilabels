@@ -81,3 +81,6 @@ def test_simple_centroid():
     assert_array_equal(ans[0], np.array([ 0.5  ,  2.625,  3.875]))
     assert_array_equal(ans[1], np.array([0.5, 5.5, 2.5]))
 
+
+
+
