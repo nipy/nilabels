@@ -1,7 +1,11 @@
 import os
 from os.path import join as jph
 
-from labels_manager.tools.caliber import SegmentationAnalyzer as SA
+from os.path import join as jph
+from labels_manager.main import LabelsManager as LM
+
+from labels_manager.tools.caliber.distances import dice_score, dispersion, covariance_distance, hausdorff_distance
+
 from labels_manager.tools.defs import root_dir
 
 if __name__ == '__main__':
@@ -15,47 +19,52 @@ if __name__ == '__main__':
         if not os.path.exists(p):
             raise IOError('Run lm.tools.benchmarking.generate_images_examples.py to create the images examples before this, please.')
 
-    # instantiate the SegmentationAnalyzer from caliber: scalar is the binary.
-    sa = SA(pfi_segmentation=pfi_im, pfi_scalar_im=pfi_im_bin)
+    m = LM()
 
     # total volume:
-    print('The image contains 4 cubes of sides 11, 17, 19 and 9:')
+    print('The image contains 4 cubes of sides 11, 17, 19 and 9:\n')
     print('11**3 +  17**3 + 19**3 + 9**3 = {} '.format(11**3 +  17**3 + 19**3 + 9**3))
-    print('sa.get_total_volume()         = {} '.format(sa.get_total_volume()))
+    print('sa.get_total_volume()         = {} '.format(m.measure.get_total_volume(pfi_im)['Volume'].values))
 
     # Get volumes per label:
     print('The 4 cubes of sides 11, 17, 19 and 9 are labelled 1, 2, 3 and 4 resp.:')
-    print('sa.get_volumes_per_label(1)[0] = {}'.format(sa.get_volumes_per_label(1)[0]))
+    print('Volume measured label 1        = {}'.format( m.measure.volume(pfi_im, labels=1)['Volume'].values) )
     print('11**3                          = {}'.format(11 ** 3))
-    print('sa.get_volumes_per_label(2)[0] = {}'.format(sa.get_volumes_per_label(2)[0]))
+    print('Volume measured label 2        = {}'.format( m.measure.volume(pfi_im, labels=2)['Volume'].values) )
     print('17**3                          = {}'.format(17 ** 3))
-    print('sa.get_volumes_per_label(3)[0] = {}'.format(sa.get_volumes_per_label(3)[0]))
+    print('Volume measured label 3        = {}'.format( m.measure.volume(pfi_im, labels=3)['Volume'].values) )
     print('19**3                          = {}'.format(19 ** 3))
-    print('sa.get_volumes_per_label(4)[0] = {}'.format(sa.get_volumes_per_label(4)[0]))
-    print('9**3                          = {}'.format(9 ** 3))
-    print('sa.get_volumes_per_label([[1, 3]]) = {}'.format(sa.get_volumes_per_label([[1, 3]])[0]))
-    print('11* 3 +  19**3                    = {0}'.format(11**3 + 19**3))
+    print('Volume measured label 4        = {}'.format( m.measure.volume(pfi_im, labels=4)['Volume'].values) )
+    print('9**3                           = {}'.format(9 ** 3))
+    print('Volume measured labels ([1, 3]) = {}'.format( m.measure.volume(pfi_im,
+                                                                          labels=[[1, 3]])['Volume'].values) )
+    print('11* 3 +  19**3                  = {}'.format(11**3 + 19**3))
     print('\nTo sum up: \n')
-    print('sa.get_volumes_per_label([1, 2, 3, 4, [1, 3]]) = {}\n\n'.format(
-        sa.get_volumes_per_label([1, 2, 3, 4, [1, 3]])[0]))
+    print('Volume measured labels ([1, 2, 3, 4, [1, 3]]) = \n{}\n'.format(
+        m.measure.volume(pfi_im, labels=[1,2, 3, 4, [1, 3]])
+        ))
 
-    # instantiate the SegmentationAnalyzer from caliber: scalar is not the bin, but have the same values
-    # as the segmentation.
-    sa = SA(pfi_segmentation=pfi_im, pfi_scalar_im=pfi_im)
+    print('------------')
+
     # Get volumes under each label, given the image weight, corresponding to the label itself:
-    print('sa.get_average_below_labels(1) = {}'.format(sa.get_average_below_labels(1)))
-    print('11**3 * 1  / 11**3             = {}'.format(11 ** 3 * 1/ float(11**3) ))
-    print('sa.get_average_below_labels(2) = {}'.format(sa.get_average_below_labels(2)))
-    print('17**3  * 2 / 17 ** 3           = {}'.format(17 ** 3 * 2 / float(17 ** 3)))
-    print('sa.get_average_below_labels(3) = {}'.format(sa.get_average_below_labels(3)))
-    print('19**3 * 3/ 19 ** 3             = {}'.format(19 ** 3 * 3 / float(19 ** 3)))
-    print('sa.get_average_below_labels(4) = {}'.format(sa.get_average_below_labels(4)))
-    print('9**3 * 4 / 9 ** 3              = {}'.format(9 ** 3 * 4 / float(9 ** 3)))
-    print('sa.get_average_below_labels([1, 3]) = {}'.format(sa.get_average_below_labels([1, 3])))
-    print('11**3 * 1  / 11**3,  19**3 * 3/ 19 ** 3   = {0}'.format([11 ** 3 * 1 / float(11 ** 3),
+    print('average below label 1 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=1)['Average below label'].values) )
+    print('11**3 * 1  / 11**3    = {}'.format(11 ** 3 * 1/ float(11**3) ))
+    print('average below label 2 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=2)['Average below label'].values) )
+    print('17**3  * 2 / 17 ** 3  = {}'.format(17 ** 3 * 2 / float(17 ** 3)))
+    print('average below label 3 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=3)['Average below label'].values) )
+    print('19**3 * 3/ 19 ** 3    = {}'.format(19 ** 3 * 3 / float(19 ** 3)))
+    print('average below label 4 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=4)['Average below label'].values) )
+    print('9**3 * 4 / 9 ** 3     = {}'.format(9 ** 3 * 4 / float(9 ** 3)))
+    print('average below labels [1,3]                = {}'.format(
+        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[1,3])['Average below label'].values)
+    )
+    print('11**3 * 1  / 11**3,  19**3 * 3/ 19 ** 3   = {}'.format([11 ** 3 * 1 / float(11 ** 3),
                                                                     19 ** 3 * 3 / float(19 ** 3)]))
-    print('sa.get_average_below_labels([[1, 3]])   = {}'.format(sa.get_average_below_labels([[1, 3]])))
+    print('average below labels [[1, 3]]   = {}'.format(
+        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[[1,3]])['Average below label'].values)
+    )
     print('( 11**3 * 1 +19**3 * 3 ) / (11**3 + 19 ** 3) = {0}'.format( (11**3 * 1 +19**3 * 3) / float(11**3 + 19 ** 3)))
     print('\n\nTo sum up: \n')
-    print('sa.get_average_below_labels([1, 2, 3, 4, [1, 3]]) = {}'.format(
-        sa.get_average_below_labels([1, 2, 3, 4, [1, 3]])))
+    print('average below labels [1, 2, 3, 4, [1, 3]] = \n{}'.format(
+        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[1, 2, 3, 4, [1, 3]] ))
+    )

@@ -30,7 +30,6 @@ def test_simple_patches_values_lncc():
 
 
 ''' Test measurements.linear.py'''
-from labels_manager.tools.caliber.distances import box_sides
 
 
 def test_box_sides():

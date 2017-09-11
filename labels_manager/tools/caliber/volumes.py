@@ -61,8 +61,8 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
     se_vol_over_tot = pa.Series(vol_over_tot, index=labels_names)
     # final data frame
     data_frame = pa.DataFrame({'Num voxels'   : se_num_voxel,
-                               'Volumes'      : se_volume,
-                               'Vol over Tot' : se_vol_over_tot}, columns=['Num voxels', 'Volumes', 'Vol over Tot'])
+                               'Volume'       : se_volume,
+                               'Vol over Tot' : se_vol_over_tot}, columns=['Num voxels', 'Volume', 'Vol over Tot'])
 
     if verbose > 0:
         # show the data-frame at console:

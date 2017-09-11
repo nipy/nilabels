@@ -1,6 +1,7 @@
 import os
 import nibabel as nib
 import pandas as pa
+import numpy as np
 
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
@@ -17,7 +18,7 @@ class LabelsManagerMeasure(object):
     and return some feature of the segmentations {}.
     """.format(definition_label)
 
-    def __init__(self, input_data_folder=None, output_data_folder=None, return_mm3=True, verbose=1):
+    def __init__(self, input_data_folder=None, output_data_folder=None, return_mm3=True, verbose=0):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
         self.return_mm3 = return_mm3
@@ -45,10 +46,11 @@ class LabelsManagerMeasure(object):
             pfi_anatomy = connect_path_tail_head(self.pfo_in, anatomy_filename)
             assert os.path.exists(pfi_anatomy)
             im_anatomy = nib.load(pfi_anatomy)
-            df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels, labels_names=labels_names,
+            df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels_list, labels_names=labels_names,
                                                                verbose=self.verbose)
 
-            df_volumes_per_label = pa.concat(df_volumes_per_label, df_average_below_labels)
+            df_volumes_per_label['Average below label'] = df_average_below_labels.values
+            # df_volumes_per_label = pa.concat([df_volumes_per_label, df_average_below_labels])
 
         if self.verbose > 0:
             print(df_volumes_per_label)
@@ -58,6 +60,32 @@ class LabelsManagerMeasure(object):
             assert os.path.exists(pfi_output_table)
             df_volumes_per_label.to_pickle(pfi_output_table)
         return df_volumes_per_label
+
+    def get_total_volume(self, segmentation_filename):
+
+        return self.volume(segmentation_filename, labels='tot')
+
+        # pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
+        # assert os.path.exists(pfi_segm)
+        # im_segm = nib.load(pfi_segm)
+        #
+        # if labels_to_exclude is not None:
+        #
+        #     seg = np.copy(im_segm.get_data())
+        #     for index_label_k, label_k in enumerate(labels_to_exclude):
+        #         places = im_segm.get_data() != label_k
+        #         seg =  seg * places.astype(np.int)
+        #
+        #     num_voxels = np.count_nonzero(seg)
+        # else:
+        #     num_voxels = np.count_nonzero(im_segm.get_data())
+        #
+        # if self.return_mm3:
+        #     one_voxel_volume = np.round(np.abs(np.prod(np.diag(im_segm.get_affine()))), decimals=6)
+        #     mm_3 = num_voxels * one_voxel_volume
+        #     return mm_3
+        # else:
+        #     return num_voxels
 
     def dist(self, segm_1_filename, segm_2_filename, labels=None,
              metrics=('dice_score', 'dispersion', 'precision'),
