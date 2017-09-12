@@ -9,29 +9,14 @@ from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.aux_methods.utils import print_and_run
 
 
-def lncc_distance(values_patch1, values_patch2):
-    """
-    Import values below the patches, containing the same number of eolem
-    :param values_patch1:
-    :param values_patch2:
-    :return:
-    """
-    patches = [values_patch1.flatten(), values_patch2.flatten()]
-    np.testing.assert_array_equal(patches[0].shape, patches[1].shape)
-
-    for index_p, p in enumerate(patches):
-        den = float(np.linalg.norm(p))
-        if den == 0: patches[index_p] = np.zeros_like(p)
-        else: patches[index_p] = patches[index_p] / den
-
-    return patches[0].dot(patches[1])
-
-
 def centroid_array(arr, labels):
     centers_of_mass = [np.array([0, 0, 0])] * len(labels)
     for l_id, l in enumerate(labels):
         coordinates_l = np.where(arr == l)  # returns [X_vector, Y_vector, Z_vector]
-        centers_of_mass[l_id] = (1 / float(len(coordinates_l[0]))) * np.array([np.sum(k) for k in coordinates_l])
+        if len(coordinates_l[0]) == 0:
+            centers_of_mass[l_id] = np.nan
+        else:
+            centers_of_mass[l_id] = (1 / float(len(coordinates_l[0]))) * np.array([np.sum(k) for k in coordinates_l])
     return centers_of_mass
 
 
@@ -51,26 +36,6 @@ def centroid(im, labels, return_mm3=True):
         centers_of_mass = [np.round(cm).astype(np.uint64) for cm in centers_of_mass]
     return centers_of_mass
 
-
-def covariance_matrices(im, labels, return_mm3=True, subtract_mean=True):
-    """
-    Considers the label as a point distribution in the space, and returns the covariance matrix of the points
-    distributions.
-    :param im: input nibabel image
-    :param labels: list of labels input.
-    :param return_mm3: if true the answer is in mm if false in voxel indexes.
-    :return: covariance matrix of the point distribution of the label
-    """
-    cov_matrices = [np.zeros([3, 3])] * len(labels)
-    for l_id, l in enumerate(labels):
-        coords = np.where(im.get_data() == l)  # returns [X_vector, Y_vector, Z_vector]
-        if subtract_mean:
-            coords = [coords[j] - np.mean(coords[j]) for j in range(3)]
-        cov_matrices[l_id] = np.cov(coords)
-    if return_mm3:
-        cov_matrices = [im.affine[:3, :3].dot(cm.astype(np.float64)) for cm in cov_matrices]
-
-    return cov_matrices
 
 # --- distances
 
@@ -172,6 +137,27 @@ def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_na
     return pa_series
 
 
+def covariance_matrices(im, labels, return_mm3=True, subtract_mean=True):
+    """
+    Considers the label as a point distribution in the space, and returns the covariance matrix of the points
+    distributions.
+    :param im: input nibabel image
+    :param labels: list of labels input.
+    :param return_mm3: if true the answer is in mm if false in voxel indexes.
+    :return: covariance matrix of the point distribution of the label
+    """
+    cov_matrices = [np.zeros([3, 3])] * len(labels)
+    for l_id, l in enumerate(labels):
+        coords = np.where(im.get_data() == l)  # returns [X_vector, Y_vector, Z_vector]
+        if subtract_mean:
+            coords = [coords[j] - np.mean(coords[j]) for j in range(3)]
+        cov_matrices[l_id] = np.cov(coords)
+    if return_mm3:
+        cov_matrices = [im.affine[:3, :3].dot(cm.astype(np.float64)) for cm in cov_matrices]
+
+    return cov_matrices
+
+
 def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     """
     Considers the label as a point distribution in the space, and returns the covariance matrix of the points
@@ -212,7 +198,7 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
         arr2 = im2.get_data() == l
         assert isinstance(arr2, np.ndarray)
         if return_mm3:
-            df2 = nd.morphology.distance_transform_edt(arr2, sampling=list(np.diag(im1.array[:3, :3])))
+            df2 = nd.morphology.distance_transform_edt(arr2, sampling=list(np.diag(im1.affine[:3, :3])))
         else:
             df2 = nd.morphology.distance_transform_edt(arr2, sampling=None)
         assert isinstance(df2, np.ndarray)

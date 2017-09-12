@@ -118,6 +118,8 @@ class LabelsManagerMeasure(object):
             pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
             df_distances_per_label.to_pickle(pfi_output_table)
 
+        return df_distances_per_label
+
     def topology(self):
         # WIP: island detections, graph detections, cc detections from detector tools
         print('topology for {} is in the TODO list!'.format(self.__class__))

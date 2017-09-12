@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 
 
-def see_array(in_array, extra_image=None, scale=None, num_fig=1, block=False,
+def see_array(in_array, num_fig=1, block=False,
               title='Image in matrix coordinates, C convention.'):
 
     fig = plt.figure(num_fig, figsize=(6, 7.5), dpi=100)

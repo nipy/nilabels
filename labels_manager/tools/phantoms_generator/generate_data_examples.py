@@ -21,15 +21,16 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
               'Buckle ellipsoids' : True,
               'Ellipsoids family' : True,
               'Cubes in the sky'  : True,
-              'Sandwich'          : True
+              'Sandwich'          : True,
+              'Four-folds'        : True
               }
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
-    examples_folder = jph(root_dir, 'data_examples')
+    pfo_examples = jph(root_dir, 'data_examples')
 
     if create['Examples folder']:
 
-        os.system('mkdir -p ' + examples_folder)
+        os.system('mkdir -p ' + pfo_examples)
 
     if create['Punt e mes']:
 
@@ -41,8 +42,8 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         nib_o_punt = nib.Nifti1Image(data_o_punt, affine=np.eye(4))
         nib_o_punt_seg = nib.Nifti1Image(data_o_punt_segmentation, affine=np.eye(4))
 
-        nib.save(nib_o_punt, filename=jph(examples_folder, 'punt.nii.gz'))
-        nib.save(nib_o_punt_seg, filename=jph(examples_folder, 'punt_seg.nii.gz'))
+        nib.save(nib_o_punt, filename=jph(pfo_examples, 'punt.nii.gz'))
+        nib.save(nib_o_punt_seg, filename=jph(pfo_examples, 'punt_seg.nii.gz'))
 
         del data_o_punt_segmentation, nib_o_punt, nib_o_punt_seg
 
@@ -56,8 +57,8 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         nib_o_mes = nib.Nifti1Image(data_o_mes, affine=np.eye(4))
         nib_o_mes_seg = nib.Nifti1Image(data_o_mes_segmentation, affine=np.eye(4))
 
-        nib.save(nib_o_mes, filename=jph(examples_folder, 'mes.nii.gz'))
-        nib.save(nib_o_mes_seg, filename=jph(examples_folder, 'mes_seg.nii.gz'))
+        nib.save(nib_o_mes, filename=jph(pfo_examples, 'mes.nii.gz'))
+        nib.save(nib_o_mes_seg, filename=jph(pfo_examples, 'mes_seg.nii.gz'))
 
         del data_o_punt, data_o_mes, data_o_mes_segmentation, nib_o_mes, nib_o_mes_seg
 
@@ -76,8 +77,8 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         nib_c = nib.Nifti1Image(data_c, affine=np.eye(4))
         nib_c_seg = nib.Nifti1Image(data_c_segmentation, affine=np.eye(4))
 
-        nib.save(nib_c, filename=jph(examples_folder, 'acee.nii.gz'))
-        nib.save(nib_c_seg, filename=jph(examples_folder, 'acee_seg.nii.gz'))
+        nib.save(nib_c, filename=jph(pfo_examples, 'acee.nii.gz'))
+        nib.save(nib_c_seg, filename=jph(pfo_examples, 'acee_seg.nii.gz'))
 
         del data_c_, data_c, data_c_segmentation, nib_c, nib_c_seg
 
@@ -103,7 +104,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         planetarium = fil.gaussian_filter(sky, np.min(radii)-np.std(radii))
 
         nib_planetarium = nib.Nifti1Image(planetarium, affine=np.eye(4))
-        nib.save(nib_planetarium, filename=jph(examples_folder, 'planetarium.nii.gz'))
+        nib.save(nib_planetarium, filename=jph(pfo_examples, 'planetarium.nii.gz'))
 
         print 'Planetarium generated'
 
@@ -125,24 +126,24 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         two_ellipsoids = fil.gaussian_filter(two_ellipsoids, sigma=sigma_smoothing)
 
         nib_ellipsoids = nib.Nifti1Image(two_ellipsoids, affine=np.eye(4))
-        nib.save(nib_ellipsoids, filename=jph(examples_folder, 'ellipsoids.nii.gz'))
+        nib.save(nib_ellipsoids, filename=jph(pfo_examples, 'ellipsoids.nii.gz'))
 
         two_ellipsoids_segmentation = intensity_segmentation(two_ellipsoids, num_levels=segmentation_levels)
 
         nib_ellipsoids_seg = nib.Nifti1Image(two_ellipsoids_segmentation, affine=np.eye(4))
-        nib.save(nib_ellipsoids_seg, filename=jph(examples_folder, 'ellipsoids_seg.nii.gz'))
+        nib.save(nib_ellipsoids_seg, filename=jph(pfo_examples, 'ellipsoids_seg.nii.gz'))
 
         two_ellipsoids_half_segmentation = np.zeros_like(two_ellipsoids_segmentation)
         two_ellipsoids_half_segmentation[:60, :, :] = two_ellipsoids_segmentation[:60, :, :]
 
         nib_ellipsoids_seg_half = nib.Nifti1Image(two_ellipsoids_half_segmentation, affine=np.eye(4))
-        nib.save(nib_ellipsoids_seg_half, filename=jph(examples_folder, 'ellipsoids_seg_half.nii.gz'))
+        nib.save(nib_ellipsoids_seg_half, filename=jph(pfo_examples, 'ellipsoids_seg_half.nii.gz'))
 
         print 'Buckle ellipsoids half segmented and whole segmented generated'
 
     if create['Ellipsoids family']:
         # Toy example for registration propagation tests
-        pfo_ellipsoids_family = jph(examples_folder, 'ellipsoids_family')
+        pfo_ellipsoids_family = jph(pfo_examples, 'ellipsoids_family')
         os.system('mkdir -p ' + pfo_ellipsoids_family)
 
         omega = (100, 100, 100)
@@ -182,12 +183,12 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
             np.testing.assert_almost_equal(mid_point, (first_focus + second_focus) / float(2) )
 
-            # get the distance from the 2 focus as a random value, having as min the distance between
-            dist_2_focus = np.linalg.norm(first_focus - second_focus)
+            # get the twice_aance from the 2 focus as a random value, having as min the twice_aance between
+            twice_a_2_focus = np.linalg.norm(first_focus - second_focus)
             epsilon = 3
-            dist = np.random.uniform(low=dist_2_focus + epsilon, high=dist_2_focus + epsilon + np.linalg.norm(first_focus - np.array([25, 25, 50])))
+            twice_a = np.random.uniform(low=twice_a_2_focus + epsilon, high=twice_a_2_focus + epsilon + np.linalg.norm(first_focus - np.array([25, 25, 50])))
             # get the ellipsoid
-            ellips_data = generate_ellipsoid(omega, first_focus, second_focus, dist, foreground_intensity=foreground, dtype=np.float64)
+            ellips_data = generate_ellipsoid(omega, first_focus, second_focus, twice_a, foreground_intensity=foreground, dtype=np.float64)
             ellips_data = fil.gaussian_filter(ellips_data, sigma=sigma_smoothing)
 
             nib_ellipsoids = nib.Nifti1Image(ellips_data, affine=np.eye(4))
@@ -230,8 +231,8 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
                generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=cube_d[2])
         im2 = nib.Nifti1Image(sky2, affine=np.eye(4))
 
-        nib.save(im1, filename=jph(examples_folder, 'cubes_in_space_bin.nii.gz'))
-        nib.save(im2, filename=jph(examples_folder, 'cubes_in_space.nii.gz'))
+        nib.save(im1, filename=jph(pfo_examples, 'cubes_in_space_bin.nii.gz'))
+        nib.save(im2, filename=jph(pfo_examples, 'cubes_in_space.nii.gz'))
 
     if create['Sandwich']:
 
@@ -243,7 +244,100 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         sandwich[:, 5:, :]  = 4 * np.ones([9, 4, 10])
         im_sandwich = nib.Nifti1Image(sandwich, affine=np.diag([0.1, 0.2, 0.3, 1]))
 
-        nib.save(im_sandwich, filename=jph(examples_folder, 'sandwich.nii.gz'))
+        nib.save(im_sandwich, filename=jph(pfo_examples, 'sandwich.nii.gz'))
+
+    if create['Four-folds']:
+        # Case A: best case, the two ellipsoids are overlapping - label id = 1
+        # Case B: ellipsoids are only translated  - label id = 2
+        # Case C: no dispersion, low precision  - label id = 3
+        # Case D: worst case, ellipsoids not overlapping  - label id = 4
+        # indexes image, quadrant - two images (1,2), four quadrant (1 2 3 4 for A B C D)
+
+        omega = [100, 100, 50]
+        foreground = 1
+
+        # A) center 75,75,25
+        first_focus_11 = [79,79,25]
+        second_focus_11 = [72,72,23]
+        twice_a_11 = 20
+
+        elli_11 = generate_ellipsoid(omega, first_focus_11, second_focus_11, twice_a_11,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        first_focus_21 = [79,79,25]
+        second_focus_21 = [72,72,23]
+        twice_a_21 = 20
+
+        elli_21 = generate_ellipsoid(omega, first_focus_21, second_focus_21, twice_a_21,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        # B) center 25, 75, 25
+        first_focus_12 = [29, 79, 25]
+        second_focus_12 = [24, 72, 23]
+        twice_a_12 = 20
+
+        elli_12 = generate_ellipsoid(omega, first_focus_12, second_focus_12, twice_a_12,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        first_focus_22 = [24, 74, 20]  # - 5 respect to the 1
+        second_focus_22 = [19, 67, 18]
+        twice_a_22 = 20
+
+        elli_22 = generate_ellipsoid(omega, first_focus_22, second_focus_22, twice_a_22,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        # C) Center 75, 25, 25
+        first_focus_13 = [75, 25, 25]  # shpere
+        second_focus_13 = [75, 25, 25]
+        twice_a_13 = 24
+
+        elli_13 = generate_ellipsoid(omega, first_focus_13, second_focus_13, twice_a_13,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        r = .5 * twice_a_13
+        # f = 15
+        # a = np.sqrt( (f ** 2 + np.sqrt(f**4 + 4*r**4)) / 2. )
+        a = 22
+        f = np.sqrt( (a**4 - r ** 4) / float(a**2))
+        assert f < a, [f, a]
+        first_focus_23 = [75 - f, 25, 25]  # ellipsoid
+        second_focus_23 = [75 + f, 25, 25]
+        twice_a_23 = 2 * a
+
+        elli_23 = generate_ellipsoid(omega, first_focus_23, second_focus_23, twice_a_23,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        # D) Center (25, 25, 25)
+        first_focus_14 = [30, 35, 25]
+        second_focus_14 = [30, 30, 25]
+        twice_a_14 = 15
+
+        elli_14 = generate_ellipsoid(omega, first_focus_14, second_focus_14, twice_a_14,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        first_focus_24 = [10, 12, 25]
+        second_focus_24 = [9, 8, 25]
+        twice_a_24 = 15
+
+        elli_24 = generate_ellipsoid(omega, first_focus_24, second_focus_24, twice_a_24,
+                                     foreground_intensity=foreground, dtype=np.float64)
+
+        # ---------- #
+        # image one: #
+        # ---------- #
+
+        elli_one = elli_11 + 2 * elli_12 + 3 * elli_13 + 4 * elli_14
+        im_four_folds_one = nib.Nifti1Image(elli_one, np.eye(4))
+        nib.save(img=im_four_folds_one, filename=jph(pfo_examples, 'fourfolds_one.nii.gz'))
+
+        # ---------- #
+        # image two: #
+        # ---------- #
+
+        elli_two = elli_21 + 2 * elli_22 + 3 * elli_23 + 4 * elli_24
+        im_four_folds_two = nib.Nifti1Image(elli_two, np.eye(4))
+        nib.save(img=im_four_folds_two, filename=jph(pfo_examples, 'fourfolds_two.nii.gz'))
+
 
 if __name__ == '__main__':
     generate_figures()
