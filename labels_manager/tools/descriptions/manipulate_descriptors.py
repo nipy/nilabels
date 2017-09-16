@@ -87,7 +87,7 @@ class LabelsDescriptorManager(object):
         # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
         # the label id
         for k in self._dict_label_descriptor.keys():
-            mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', '') : [k]})
+            mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', '') : [int(k)]})
         # second round, add the left right in dictionary entry.
         for k in mld_tmp.keys():
             if 'Right' in k:
