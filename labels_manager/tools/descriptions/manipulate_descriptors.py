@@ -69,8 +69,6 @@ class LabelsDescriptorManager(object):
         """
         self._check_path()
         label_descriptor_dict = collections.OrderedDict()
-        label_descriptor_dict.update({'type': 'Label descriptor parsed'})  # special tag for my dictionary
-
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
@@ -85,15 +83,21 @@ class LabelsDescriptorManager(object):
 
     def get_multi_label_dict(self):
         mld = collections.OrderedDict()
-        mld.update({'type': 'Multi label descriptor parsed'})
-        # first round, just switch
+        mld_tmp = collections.OrderedDict()
+        # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
+        # the label id
         for k in self._dict_label_descriptor.keys():
-            mld.update({self._dict_label_descriptor[k][-1].replace('"', '') : [self._dict_label_descriptor[k]]})
+            mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', '') : [k]})
         # second round, add the left right in dictionary entry.
-        for k in mld.keys():
+        for k in mld_tmp.keys():
             if 'Right' in k:
                 left_key = k.replace('Right', 'Left')
-                mld.update({k.replace('Right', '').strip() : mld[left_key] + mld[k]})
+                mld.update({k.replace('Right', '').strip() : mld_tmp[left_key] + mld_tmp[k]})
+            elif 'Left' in k:
+                pass
+            else:
+                mld.update({k: mld_tmp[k]})
+
         return mld
 
     def save_label_descriptor(self, pfi_where_to_save):
@@ -128,11 +132,11 @@ class LabelsDescriptorManager(object):
         mld = self.get_multi_label_dict()
         f = open(pfi_destination, 'w+')
         for k in mld.keys():
-            if not k == 'type':
-                line  = '{0: <40}'.format(k)
-                for j in mld[k]:
-                    line += '&{0: ^10}'.format(j)
-                f.write(line)
+            line  = '{0: <40}'.format(k)
+            for j in mld[k]:
+                line += '&{0: ^10}'.format(j)
+            f.write(line)
+            f.write('\n')
         f.close()
 
     def permute_labels(self, permutation):

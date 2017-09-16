@@ -9,7 +9,7 @@ from labels_manager.tools.defs import root_dir
 
 ''' Test aux_methods.morphological.py'''
 from labels_manager.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
-    get_shell_for_given_radius
+    get_circle_shell_for_given_radius
 
 
 def test_get_morpological_patch():
@@ -45,7 +45,7 @@ def test_get_shell_for_given_radius():
                     (-1, 1, 0), (-1, 1, 1), (0, -2, 0), (0, -1, -1), (0, -1, 1), (0, 0, -2), (0, 0, 2), (0, 1, -1),
                     (0, 1, 1), (0, 2, 0), (1, -1, -1), (1, -1, 0), (1, -1, 1), (1, 0, -1), (1, 0, 1), (1, 1, -1),
                     (1, 1, 0), (1, 1, 1), (2, 0, 0)]
-    computed_ans = get_shell_for_given_radius(2)
+    computed_ans = get_circle_shell_for_given_radius(2)
 
     assert len(expected_ans) == len(computed_ans)
     assert set(tuple(expected_ans)) == set(tuple(computed_ans))
