@@ -102,13 +102,12 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 # ---------- Labels processors ---------------
 
 
-def labels_query(labels, segmentation_array=None, exclude_zero=True):
+def labels_query(labels, segmentation_array=None):
     """
     Will return a list with the labels and the labels names (same order list of strings with labels names)
     for a labels list provided in some way, and the optional segmentation image data (array)
     :param labels: can be int, list, string as 'all' or 'tot', or a string containing a path to a .txt or a numpy array
     :param segmentation_array: optional segmentation image data (array)
-    :param exclude_zero: remove the label with zero in the segmentation [False].
     :return: labels_list, labels_names
     """
     if labels is None:
@@ -139,20 +138,13 @@ def labels_query(labels, segmentation_array=None, exclude_zero=True):
         labels_names = labels.keys()
         for k in labels_names:
             if len(labels[k]) > 1:
-                labels_list.append([labels[k]])
-            else:
                 labels_list.append(labels[k])
+            else:
+                labels_list.append(labels[k][0])
 
     else:
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                       "file with the labels.")
-    if exclude_zero:
-        if 0 in labels_list:
-            labels_list.remove(0)
-        for el in labels_list:
-            if isinstance(el, list):
-                if 0 in el:
-                    el.remove(0)
 
     if not isinstance(labels, dict):
         labels_names = [str(l) for l in labels_list]
