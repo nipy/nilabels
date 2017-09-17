@@ -59,6 +59,7 @@ class LabelsManagerMeasure(object):
             pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
             assert os.path.exists(pfi_output_table)
             df_volumes_per_label.to_pickle(pfi_output_table)
+
         return df_volumes_per_label
 
     def get_total_volume(self, segmentation_filename):

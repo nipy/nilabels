@@ -81,22 +81,28 @@ class LabelsDescriptorManager(object):
     def get_as_dict(self):
         return self._dict_label_descriptor
 
-    def get_multi_label_dict(self):
+    def get_multi_label_dict(self, keep_duplicate=False, combine_right_left=True):
         mld = collections.OrderedDict()
         mld_tmp = collections.OrderedDict()
         # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
         # the label id
         for k in self._dict_label_descriptor.keys():
-            mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', '') : [int(k)]})
-        # second round, add the left right in dictionary entry.
-        for k in mld_tmp.keys():
-            if 'Right' in k:
-                left_key = k.replace('Right', 'Left')
-                mld.update({k.replace('Right', '').strip() : mld_tmp[left_key] + mld_tmp[k]})
-            elif 'Left' in k:
-                pass
+            if combine_right_left:
+                mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
+                # second round, add the left right in dictionary entry.
+                for k in mld_tmp.keys():
+                    if keep_duplicate:
+                        mld.update({k: mld_tmp[k]})
+                    if 'Right' in k:
+                        left_key = k.replace('Right', 'Left')
+                        mld.update({k.replace('Right', '').strip() : mld_tmp[left_key] + mld_tmp[k]})
+                    elif 'Left' in k:
+                        pass
+                    else:
+                        if not keep_duplicate:
+                            mld.update({k: mld_tmp[k]})
             else:
-                mld.update({k: mld_tmp[k]})
+                mld.update({self._dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
 
         return mld
 

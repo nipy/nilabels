@@ -129,10 +129,20 @@ def labels_query(labels, segmentation_array=None, exclude_zero=True):
                 labels_list = list(np.loadtxt(labels))
             else:
                 labels_list = list(np.load(labels))
-
         else:
             raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                           "file with the labels.")
+    elif isinstance(labels, dict):
+        # expected input is the output of manipulate_descriptor.get_multi_label_dict (keys are labels names id are
+        # list of labels)
+        labels_list = []
+        labels_names = labels.keys()
+        for k in labels_names:
+            if len(labels[k]) > 1:
+                labels_list.append([labels[k]])
+            else:
+                labels_list.append(labels[k])
+
     else:
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                       "file with the labels.")
@@ -144,7 +154,9 @@ def labels_query(labels, segmentation_array=None, exclude_zero=True):
                 if 0 in el:
                     el.remove(0)
 
-    labels_names = [str(l) for l in labels_list]
+    if not isinstance(labels, dict):
+        labels_names = [str(l) for l in labels_list]
+
     return labels_list, labels_names
 
 
