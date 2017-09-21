@@ -145,3 +145,6 @@ def see_array(in_array, num_fig=1, block=False,
 
     plt.show(block=block)
 
+
+def stack_3dimage_to_gif():
+    pass
