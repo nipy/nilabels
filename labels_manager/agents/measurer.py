@@ -2,10 +2,12 @@ import os
 import nibabel as nib
 import pandas as pa
 import numpy as np
+from collections import OrderedDict
 
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
-from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels
+from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels, \
+    get_values_below_labels
 from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, covariance_distance, \
     hausdorff_distance
 from labels_manager.tools.defs import definition_label
@@ -47,7 +49,8 @@ class LabelsManagerMeasure(object):
             pfi_anatomy = connect_path_tail_head(self.pfo_in, anatomy_filename)
             assert os.path.exists(pfi_anatomy)
             im_anatomy = nib.load(pfi_anatomy)
-            df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels_list, labels_names=labels_names,
+            df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels_list,
+                                                               labels_names=labels_names,
                                                                verbose=self.verbose)
 
             df_volumes_per_label['Average below label'] = df_average_below_labels.values
@@ -65,6 +68,29 @@ class LabelsManagerMeasure(object):
     def get_total_volume(self, segmentation_filename):
 
         return self.volume(segmentation_filename, labels='tot')
+
+    def values_below_labels(self, segmentation_filename, anatomy_filename, labels=None):
+        """
+
+        :param segmentation_filename:
+        :param anatomy_filename:
+        :param labels:
+        :return: pandas series with label names and corresponding vectors of labels values
+        """
+        pfi_anat = connect_path_tail_head(self.pfo_in, segmentation_filename)
+        pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
+
+        assert os.path.exists(pfi_anat)
+        im_anat = nib.load(pfi_anat)
+
+        assert os.path.exists(pfi_segm)
+        im_segm = nib.load(pfi_segm)
+
+        labels_list, labels_names = labels_query(labels, segmentation_array=im_segm.get_data())
+
+        labels_values = get_values_below_labels(im_seg, im_anat, labels_list)
+
+        return pa.Series(labels_values, index=labels_names)
 
     def dist(self, segm_1_filename, segm_2_filename, labels=None,
              metrics=(dice_score, dispersion, covariance_distance, hausdorff_distance),

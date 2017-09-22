@@ -71,6 +71,39 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
     return data_frame
 
 
+def get_values_below_labels(im_seg, im_anat, labels_list):
+    """
+
+    :param im_seg: image segmentation
+    :param im_anat: image anatomy
+    :param labels_list: integer, list of labels [l1, l2, ..., ln], or list of list of labels if labels needs to be
+    considered together.
+    e.g. labels_list = [1,2,[3,4]] -> volume of label 1, volume of label 2, volume of label 3 and 4.
+    :return: list of numpy arrays, each element is the flat array of the values below the labels
+    """
+    values = []
+    for label_k in labels_list:
+        # TODO: test and optimise with np.where
+        if isinstance(label_k, int):
+            all_places = im_seg.get_data() == label_k
+        else:
+            all_places = np.zeros_like(im_seg.get_data(), dtype=np.bool)
+            for label_k_j in label_k:
+                all_places += im_seg.get_data() == label_k_j
+
+        masked_scalar_data = np.nan_to_num(
+            (all_places.astype(np.float64) * im_anat.get_data().astype(np.float64)).flatten())
+        # remove zero elements from the array:
+        non_zero_masked_scalar_data = masked_scalar_data[np.where(masked_scalar_data > 1e-6)]  # 1e-6
+
+        if non_zero_masked_scalar_data.size == 0:  # if not non_zero_masked_scalar_data is an empty array.
+            non_zero_masked_scalar_data = 0.
+
+        values.append(non_zero_masked_scalar_data)
+
+    return values
+
+
 def get_average_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
     """
     can be an integer, or a list.
@@ -91,6 +124,7 @@ def get_average_below_labels(im_segm, im_anatomical, labels, labels_names, verbo
     for index_label_k, label_k in enumerate(labels):
 
         if isinstance(label_k, int):
+            # TODO: test and integrate with get_values_below_labels
             all_places = im_segm.get_data() == label_k
         else:
             all_places = np.zeros_like(im_segm.get_data(), dtype=np.bool)
