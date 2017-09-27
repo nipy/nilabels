@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
-from labels_manager.tools.caliber.volumes import get_volumes_per_label, get_average_below_labels, \
+from labels_manager.tools.caliber.volumes_and_values import get_volumes_per_label, get_average_std_below_labels, \
     get_values_below_labels
 from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, covariance_distance, \
     hausdorff_distance
@@ -49,9 +49,9 @@ class LabelsManagerMeasure(object):
             pfi_anatomy = connect_path_tail_head(self.pfo_in, anatomy_filename)
             assert os.path.exists(pfi_anatomy)
             im_anatomy = nib.load(pfi_anatomy)
-            df_average_below_labels = get_average_below_labels(im_segm, im_anatomy, labels_list,
-                                                               labels_names=labels_names,
-                                                               verbose=self.verbose)
+            df_average_below_labels = get_average_std_below_labels(im_segm, im_anatomy, labels_list,
+                                                                   labels_names=labels_names,
+                                                                   verbose=self.verbose)
 
             df_volumes_per_label['Average below label'] = df_average_below_labels.values
 

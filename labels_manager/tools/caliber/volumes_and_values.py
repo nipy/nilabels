@@ -104,7 +104,7 @@ def get_values_below_labels(im_seg, im_anat, labels_list):
     return values
 
 
-def get_average_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
+def get_average_std_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
     """
     can be an integer, or a list.
      If it is a list, it can contain sublists.
@@ -119,39 +119,24 @@ def get_average_below_labels(im_segm, im_anatomical, labels, labels_names, verbo
     """
 
     # Get volumes per regions:
-    values = np.zeros(len(labels), dtype=np.float64)
+    values_mu  = np.zeros(len(labels), dtype=np.float64)
+    values_std = np.zeros(len(labels), dtype=np.float64)
 
     for index_label_k, label_k in enumerate(labels):
 
-        if isinstance(label_k, int):
-            # TODO: test and integrate with get_values_below_labels
-            all_places = im_segm.get_data() == label_k
-        else:
-            all_places = np.zeros_like(im_segm.get_data(), dtype=np.bool)
-            for label_k_j in label_k:
-                all_places += im_segm.get_data() == label_k_j
+        values_below_label = get_values_below_labels(im_segm, im_anatomical, label_k)[0]
 
-        masked_scalar_data = np.nan_to_num(
-            (all_places.astype(np.float64) * im_anatomical.get_data().astype(np.float64)).flatten())
-        # remove zero elements from the array:
-        non_zero_masked_scalar_data = masked_scalar_data[np.where(masked_scalar_data > 1e-6)]  # 1e-6
+        values_mu[index_label_k] = np.mean(values_below_label)
+        values_std[index_label_k] = np.std(values_below_label)
 
-        if non_zero_masked_scalar_data.size == 0:  # if not non_zero_masked_scalar_data is an empty array.
-            non_zero_masked_scalar_data = 0.
-
-        values[index_label_k] = np.mean(non_zero_masked_scalar_data)
-
-        if verbose:
-            print('Mean below the labels for the given image {0} : {1}'.format(labels[index_label_k],
-                                                                               values[index_label_k]))
-            if isinstance(non_zero_masked_scalar_data, np.ndarray):
-                print 'non zero masked scalar data : ' + str(len(non_zero_masked_scalar_data))
-
-    # pandas series:
-    se_values = pa.Series(values, index=labels_names)
+        if verbose > 1:
+            print('Mean, std below the labels for the given image {0} : {1}'.format(labels[index_label_k],
+                                                                                    values_mu[index_label_k],
+                                                                                    values_std[index_label_k]))
 
     # final data frame
-    data_frame = pa.DataFrame({'Average below label': se_values})
+    data_frame = pa.DataFrame({'Average below label' : pa.Series(values_mu, index=labels_names),
+                               'Std below label'     : pa.Series(values_std, index=labels_names)})
 
     if verbose > 0:
         print(data_frame)
