@@ -103,42 +103,37 @@ def get_values_below_labels(im_seg, im_anat, labels_list):
 
     return values
 
-
-def get_average_std_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
+def from_values_below_labels_to_mu_std(values_below_labels, labels, labels_names, verbose=0):
     """
-    can be an integer, or a list.
-     If it is a list, it can contain sublists.
-     If labels are in the sublist, volumes will be computed for all the labels in the list.
-    e.g. [1,2,[3,4]] -> volume of label 1, volume of label 2, volume of label 3 and 4.
-    :param im_anatomical:
-    :param im_segm:
-    :param labels:
-    :param labels_names:
-    :param verbose:
+    :param values_below_labels: output of values_below_labels
     :return:
     """
-
-    # Get volumes per regions:
-    values_mu  = np.zeros(len(labels), dtype=np.float64)
-    values_std = np.zeros(len(labels), dtype=np.float64)
-
-    for index_label_k, label_k in enumerate(labels):
-
-        values_below_label = get_values_below_labels(im_segm, im_anatomical, label_k)[0]
-
-        values_mu[index_label_k] = np.mean(values_below_label)
-        values_std[index_label_k] = np.std(values_below_label)
-
-        if verbose > 1:
-            print('Mean, std below the labels for the given image {0} : {1}'.format(labels[index_label_k],
-                                                                                    values_mu[index_label_k],
-                                                                                    values_std[index_label_k]))
-
-    # final data frame
-    data_frame = pa.DataFrame({'Average below label' : pa.Series(values_mu, index=labels_names),
-                               'Std below label'     : pa.Series(values_std, index=labels_names)})
+    data_frame = pa.DataFrame({'Labels'              : pa.Series(labels, index=labels_names),
+                               'Average below label' : pa.Series(np.mean(values_below_labels), index=labels_names),
+                               'Std below label'     : pa.Series(np.std(values_below_labels), index=labels_names)})
 
     if verbose > 0:
         print(data_frame)
 
     return data_frame
+
+
+
+def get_mu_std_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):
+    """
+
+    :param im_anatomical:
+    :param im_segm:
+    :param labels: can be an integer, or a list.
+     If it is a list, it can contain sublists.
+     If labels are in the sublist, volumes will be computed for all the labels in the list.
+    e.g. [1,2,[3,4]] -> volume of label 1, volume of label 2, volume of label 3 and 4.
+    :param labels_names:
+    :param verbose:
+    :return:
+    """
+    values_below_labels = get_values_below_labels(im_segm, im_anatomical, labels)
+    df = from_values_below_labels_to_mu_std(values_below_labels, labels, labels_names, verbose=verbose)
+    if verbose:
+        print(df)
+    return df
