@@ -232,4 +232,19 @@ def box_sides_length(im, labels_list, labels_names, return_mm3=True):
         index=labels_names)
 
 
-
+def mahalanobis_distance(im, im_mask=None, trim=False):
+    # mono modal, image is vectorised, covariance is the std.
+    if im_mask is None:
+        mu = np.mean(im.get_data().flatten())
+        sigma2 = np.std(im.get_data().flatten())
+        return set_new_data(im, np.sqrt((im.get_data() - mu) * sigma2 * (im.get_data() - mu)))
+    else:
+        np.testing.assert_array_equal(im.affine, im_mask.affine)
+        np.testing.assert_array_equal(im.shape, im_mask.shape)
+        mu = np.mean(im.get_data().flatten() * im_mask.get_data().flatten())
+        print mu
+        sigma2 = np.std(im.get_data().flatten() * im_mask.get_data().flatten())
+        new_data = np.sqrt((im.get_data() - mu) * sigma2**(-1) * (im.get_data() - mu))
+        if trim:
+            new_data = new_data * im_mask.get_data().astype(np.bool)
+        return set_new_data(im, new_data)

@@ -41,20 +41,34 @@ def stack_images(list_images):
 
 
 def reproduce_slice_fourth_dimension(nib_image, num_slices=10, repetition_axis=3):
-
     im_sh = nib_image.shape
     if not (len(im_sh) == 2 or len(im_sh) == 3):
         raise IOError('Methods can be used only for 2 or 3 dim images. No conflicts with existing multi, slices')
 
     new_data = np.stack([nib_image.get_data(), ] * num_slices, axis=repetition_axis)
     output_im = set_new_data(nib_image, new_data)
-
     return output_im
 
 
-def reproduce_slice_fourth_dimension_path(pfi_input_image, pfi_output_image, num_slices=10, repetition_axis=3):
-    # TODO expose in facade
-    old_im = nib.load(pfi_input_image)
-    new_im = reproduce_slice_fourth_dimension(old_im, num_slices=num_slices, repetition_axis=repetition_axis)
-    nib.save(new_im, pfi_output_image)
-    print 'New image created and saved in {0}'.format(pfi_output_image)
+def grafting(im_hosting, im_patch, im_patch_mask=None):
+    """
+    Take an hosting image, an image patch and a patch mask (optional) of the same dimension and in the same real space.
+    It crops the patch (or patch mask if present) on the hosting image, and substitute the value from the patch.
+    :param im_hosting:
+    :param im_patch:
+    :param im_patch_mask:
+    :return:
+    """
+    np.testing.assert_array_equal(im_hosting.affine, im_patch.affine)
+    if im_patch_mask is not None:
+        np.testing.assert_array_equal(im_hosting.affine, im_patch_mask.affine)
+
+    if im_patch_mask is None:
+        patch_region = im_patch.get_data().astype(np.bool)
+    else:
+        patch_region = im_patch_mask.get_data().astype(np.bool)
+    new_data = np.copy(im_hosting.get_data())
+    new_data[patch_region] = im_patch.get_data()[patch_region]
+    # np.place(new_data, patch_region, im_patch.get_data())
+
+    return set_new_data(im_hosting, new_data)
