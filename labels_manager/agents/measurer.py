@@ -77,7 +77,7 @@ class LabelsManagerMeasure(object):
         :param labels:
         :return: pandas series with label names and corresponding vectors of labels values
         """
-        pfi_anat = connect_path_tail_head(self.pfo_in, segmentation_filename)
+        pfi_anat = connect_path_tail_head(self.pfo_in, anatomy_filename)
         pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
 
         assert os.path.exists(pfi_anat)
@@ -88,7 +88,7 @@ class LabelsManagerMeasure(object):
 
         labels_list, labels_names = labels_query(labels, segmentation_array=im_segm.get_data())
 
-        labels_values = get_values_below_labels(im_seg, im_anat, labels_list)
+        labels_values = get_values_below_labels(im_segm, im_anat, labels_list)
 
         return pa.Series(labels_values, index=labels_names)
 
