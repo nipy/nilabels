@@ -223,8 +223,7 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
 #     ldm.get_dict()
 #     import nibabel as nib
 #
-#     nib.load('/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/1201/segm/1201_approved.nii.gz')
-#     im_se = nib.load('/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/1201/segm/1201_approved.nii.gz')
+#     im_se = nib.load('/Users/sebastiano/Desktop/sphdec/1201/segm/automatic/1201_S0_segm_IN_TEMPLATE.nii.gz')
 #
 #     im = ldm.get_corresponding_rgb_image(im_se)
 #     nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')
