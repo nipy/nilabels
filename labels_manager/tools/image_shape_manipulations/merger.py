@@ -72,3 +72,18 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
     # np.place(new_data, patch_region, im_patch.get_data())
 
     return set_new_data(im_hosting, new_data)
+
+
+def from_segmentation_stack_to_probabilistic_atlas(im_stack_label):
+    """
+    A probabilistic atlas has at each time-point a different label (a mapping is provided as well in
+    the conversion with correspondence time-point<->label number). Each time point has the normalised average
+    of each label.
+    :return:
+    """
+    assert len(im_stack_label.shape) == 4
+    
+    labels_list = 0
+
+
+

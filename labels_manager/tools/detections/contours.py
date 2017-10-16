@@ -7,7 +7,10 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
     From an input nibabel image segmentation, returns the contour of each segmented region with the original
     label.
     :param im_segm:
-    :return:
+    :param omit_axis: a directional axis of the segmentation will be not considered. This to avoid to have "walls"
+    when scrolling in one particular direction. Default None, can be otherwise 'x', 'y', 'z'.
+    :param verbose: 0 no, 1 yes.
+    :return: return the contour of the provided segmentation
     """
     def get_contour_single_label_from_array(im_arr, l, thr=0.3):
         if verbose > 0:

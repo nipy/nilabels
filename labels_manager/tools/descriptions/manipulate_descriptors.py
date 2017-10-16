@@ -1,7 +1,9 @@
 import os
 import collections
+import numpy as np
 
 from labels_manager.tools.descriptions.colours_rgb_lab import get_random_rgb
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 """
 Module to manipulate descriptors as formatted by ITK-snap,
@@ -55,14 +57,14 @@ class LabelsDescriptorManager(object):
 
     def __init__(self, pfi_label_descriptor):
         self.pfi_label_descriptor = pfi_label_descriptor
-        self._dict_label_descriptor = self._get_dict()
+        self._dict_label_descriptor = self.get_dict(as_string=True)
 
     def _check_path(self):
         if not os.path.exists(self.pfi_label_descriptor):
             msg = 'Label descriptor file {} does not exist'.format(self.pfi_label_descriptor)
             raise IOError(msg)
 
-    def _get_dict(self):
+    def get_dict(self, as_string=False):
         """
         Parse the ITK-Snap label descriptor into a dict.
         :return: dict with information relative to the parsed label descriptor
@@ -72,14 +74,19 @@ class LabelsDescriptorManager(object):
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
-                dd = {
-                    parsed_line[0]: [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]}
+                if as_string:
+                    dd = {parsed_line[0]: [tuple(parsed_line[1:4]),
+                                           tuple(parsed_line[4:7]),
+                                           parsed_line[7].replace('"', '')
+                                          ]}
+                else:
+                    dd = {int(parsed_line[0]): [[int(k) for k in parsed_line[1:4]],
+                                                [int(m) for m in parsed_line[4:7]],
+                                                parsed_line[7].replace('"', '')
+                                               ]}
                 label_descriptor_dict.update(dd)
 
         return label_descriptor_dict
-
-    def get_as_dict(self):
-        return self._dict_label_descriptor
 
     def get_multi_label_dict(self, keep_duplicate=False, combine_right_left=True):
         mld = collections.OrderedDict()
@@ -151,6 +158,29 @@ class LabelsDescriptorManager(object):
         # save on the same place: yes it is destructive!
         self.save_label_descriptor(self.pfi_label_descriptor)
 
+    def get_corresponding_rgb_image(self, im_segm):
+        """
+        From the labels descriptor and a nibabel segmentation image, it returns the
+        :param im_segm: nibabel segmentation whose labels corresponds to the input labels descriptor.
+        :return: a 4d image, where at each voxel there is the [rgb ]
+        """
+        labels_in_image = list(np.sort(list(set(im_segm.get_data().flatten()))))
+        labels_dict = self.get_dict(as_string=False)
+
+        assert len(im_segm.shape) == 3
+
+        rgb_image_arr = np.ones(list(im_segm.shape) + [3])
+
+        for l in labels_dict.keys():
+            if l not in labels_in_image:
+                msg = 'get_corresponding_rgb_image: Label {} present in the label descriptor and not in ' \
+                      'selected image'.format(l)
+                print(msg)
+            pl = im_segm.get_data() == l
+            rgb_image_arr[pl, :] = labels_dict[l][0]
+
+        return set_new_data(im_segm, rgb_image_arr, new_dtype=np.int32)
+
 
 def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None):
     """
@@ -181,3 +211,20 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
             f.write(line)
     f.close()
     return d
+
+# temporary test
+# if __name__ == '__main__':
+#
+#     # from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
+#
+#     pfi_descriptor = '/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/LabelsDescriptors/labels_descriptor_v9.txt'
+#
+#     ldm = LabelsDescriptorManager(pfi_descriptor)
+#     ldm.get_dict()
+#     import nibabel as nib
+#
+#     nib.load('/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/1201/segm/1201_approved.nii.gz')
+#     im_se = nib.load('/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/1201/segm/1201_approved.nii.gz')
+#
+#     im = ldm.get_corresponding_rgb_image(im_se)
+#     nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')

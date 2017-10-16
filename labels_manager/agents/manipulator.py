@@ -12,6 +12,7 @@ from labels_manager.tools.image_shape_manipulations.splitter import split_labels
 from labels_manager.tools.image_colors_manipulations.normaliser import normalise_below_labels
 from labels_manager.tools.detections.contours import contour_from_segmentation
 
+
 class LabelsManagerManipulate(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
@@ -19,7 +20,7 @@ class LabelsManagerManipulate(object):
     one or more input manipulate them according to some rule and save the
     output in the output_data_folder or in the specified paths.
     """
-    # TODO add filename for labels descriptors and manipulations of labels descriptors
+    # TODO add filename for labels descriptors and manipulations of labels descriptors.
 
     def __init__(self, input_data_folder=None, output_data_folder=None):
         self.pfo_in = input_data_folder

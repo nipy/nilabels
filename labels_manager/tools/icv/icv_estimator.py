@@ -8,9 +8,15 @@ from scipy.optimize import minimize
 from labels_manager.tools.aux_methods.utils import print_and_run
 
 
+# WARNING: to be tested!
+
 
 class ICV_estimator(object):
-
+    """
+    ICV estimation as in
+    Iglesias JE, Ferraris S, Modat M, Gsell W, Deprest J, van der Merwe JL, Vercauteren T: "Template-free estimation of
+    intracranial volume: a preterm birth animal model study", MICCAI workshop: Fetal and Infant Image Analysis, 2017
+    """
     def __init__(self, pfi_list_subjects_to_coregister, pfo_output, S=None, m=None,
                       n=0.001, a=0.001, b=0.1, alpha=0.001, beta=0.1):
         # input subjects
@@ -28,7 +34,10 @@ class ICV_estimator(object):
         self.beta = beta
         # graph connection is complete by default. Have to edit this directly.
         self.graph_connections = [[i, j] for i in xrange(self.num_subjects) for j in xrange(i+1, self.num_subjects)]
-
+        # folder structure
+        self.pfo_warped = jph(self.pfo_output, 'warped')
+        self.pfo_transformations = jph(self.pfo_output, 'transformations')
+        # run initialisations
         self.__initialise_list_id__()
 
     def __initialise_list_id__(self):
@@ -38,8 +47,9 @@ class ICV_estimator(object):
 
     def generate_transformations(self):
 
-        cmd_1 = 'mkdir -p {0} '.format(self.pfo_output, 'warped')
-        cmd_2 = 'mkdir -p {0} '.format(jph(self.pfo_output, 'transformations'))
+        cmd_1 = 'mkdir -p {0} '.format(self.pfo_warped)
+        cmd_2 = 'mkdir -p {0} '.format(self.pfo_transformations)
+
         print_and_run(cmd_1)
         print_and_run(cmd_2)
 
@@ -47,10 +57,10 @@ class ICV_estimator(object):
             for j in [c[1] for c in self.graph_connections]:
                 fname_i_j = self.subjects_id[i] + '_' + self.subjects_id[j]
                 fname_j_i = self.subjects_id[j] + '_' + self.subjects_id[i]
-                pfi_aff_i_j = jph(self.pfo_output, 'transformations', fname_i_j + '.txt')
-                pfi_res_i_j = jph(self.pfo_output, 'warped', fname_i_j + '.nii.gz')
-                pfi_aff_j_i = jph(self.pfo_output, 'transformations', fname_j_i + '.txt')
-                pfi_res_j_i = jph(self.pfo_output, 'warped', fname_j_i + '.nii.gz')
+                pfi_aff_i_j = jph(self.pfo_transformations, fname_i_j + '.txt')
+                pfi_res_i_j = jph(self.pfo_warped, fname_i_j + '.nii.gz')
+                pfi_aff_j_i = jph(self.pfo_transformations, fname_j_i + '.txt')
+                pfi_res_j_i = jph(self.pfo_warped, fname_j_i + '.nii.gz')
 
                 cmd_reg_i_j = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3} -speeeeed '.format(
                             self.pfi_list_subjects_to_coregister[i], self.pfi_list_subjects_to_coregister[j],
@@ -64,14 +74,18 @@ class ICV_estimator(object):
 
     def compute_S(self):
 
+        if not os.path.exists(self.pfo_transformations):
+            msg = "Folder {} not created. Did you run generate_transformations first?".format(self.pfo_transformations)
+            raise IOError(msg)
+
         S = np.zeros(2, 2)
 
         for i in xrange(self.num_subjects):
             for j in xrange(i+1, self.num_subjects):
 
-                pfi_aff_i_j = jph(self.pfo_output, 'transformations',
+                pfi_aff_i_j = jph(self.pfo_transformations,
                                   self.subjects_id[i] + '_' + self.subjects_id[j] + '.txt')
-                pfi_aff_j_i = jph(self.pfo_output, 'transformations',
+                pfi_aff_j_i = jph(self.pfo_transformations,
                                   self.subjects_id[j] + '_' + self.subjects_id[i] + '.txt')
 
                 S[i, j] = np.linalg.det(np.loadtxt(pfi_aff_i_j))
