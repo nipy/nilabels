@@ -21,7 +21,7 @@ if __name__ == '__main__':
     list_new_labels = [2, 3, 4, 5, 6, 7]
 
     # Using the manager to relabel the data:
-    lm.manipulate.relabel(fin_punt_seg_original, fin_punt_seg_new,
+    lm.manipulate_labels.relabel(fin_punt_seg_original, fin_punt_seg_new,
                           list_old_labels, list_new_labels)
 
     # figure before:

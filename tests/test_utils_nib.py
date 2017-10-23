@@ -3,11 +3,13 @@ from os.path import join as jph
 
 import nibabel as nib
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from labels_manager.tools.defs import root_dir
 from labels_manager.tools.phantoms_generator.generate_data_examples import generate_figures
-from labels_manager.tools.aux_methods.utils_nib import replace_translational_part
+from labels_manager.tools.aux_methods.utils_nib import replace_translational_part, remove_nan, \
+    set_new_header_description
+
 
 def test_adjust_nifti_replace_translational_part_F_F():
 
@@ -48,8 +50,6 @@ def test_adjust_nifti_replace_translational_part_F_F():
         assert_array_almost_equal(initial_qform, final_qform)
         assert_array_almost_equal(initial_sform, final_sform)
 
-
-test_adjust_nifti_replace_translational_part_F_F()
 
 def test_adjust_nifti_translation_path_F_T():
     pfi_input = jph(root_dir, 'data_examples', 'acee.nii.gz')
@@ -185,3 +185,38 @@ def test_adjust_nifti_translation_path_T_T():
     assert_array_almost_equal(initial_affine, reloaded_affine)
     assert_array_almost_equal(initial_qform, reloaded_qform)
     assert_array_almost_equal(initial_sform, reloaded_sform)
+
+
+def test_remove_nan():
+    data_ts = np.array([[[0, 1, 2, 3],
+                         [4, 5, np.nan, 7],
+                         [8, 9, 10, np.nan]],
+
+                        [[12, 13, 14, 15],
+                         [16, np.nan, 18, 19],
+                         [20, 21, 22, 23]]])
+    im = nib.Nifti1Image(data_ts, np.eye(4))
+    im_no_nan = remove_nan(im)
+
+    data_no = np.array([[[0, 1, 2, 3],
+                         [4, 5, 0, 7],
+                         [8, 9, 10, 0]],
+
+                        [[12, 13, 14, 15],
+                         [16, 0, 18, 19],
+                         [20, 21, 22, 23]]])
+
+    assert_array_equal(im_no_nan.get_data(), data_no)
+
+
+def test_set_new_header_description():
+    arr_data = np.zeros([10,10,10])
+    im = nib.Nifti1Image(arr_data, np.eye(4))
+
+    hd = im.header
+    hd['descrip'] = 'Old Spam'
+
+    im_new_header = set_new_header_description(im, new_header_description='New Spam')
+
+    new_hd = im_new_header.header
+    assert new_hd['descrip'] == 'New Spam'

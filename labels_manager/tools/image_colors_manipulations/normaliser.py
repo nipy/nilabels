@@ -35,8 +35,8 @@ def normalise_below_labels(im_input, im_segm, labels_list=None, stats=np.median,
     return output_im
 
 
-def intensties_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
-                                    toll=1e-12, percentile_range=(1, 99), output_range=(0.1, 10)):
+def intensities_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
+                                     toll=1e-12, percentile_range=(1, 99), output_range=(0.1, 10)):
     """
     Normalise the values below the binarised segmentation so that it will be between 0 and 1, based on a linear
     transformation whose parameters are learned from the values below the segmentation.
@@ -60,7 +60,8 @@ def intensties_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
 
     non_zero_below_mask = im_input.get_data()[np.where(mask_data > toll)].flatten()
 
-    min_intensities, max_intensities = np.percentile(non_zero_below_mask, percentile_range[0], percentile_range[1])
+    min_intensities = np.percentile(non_zero_below_mask, percentile_range[0])
+    max_intensities = np.percentile(non_zero_below_mask, percentile_range[1])
 
     a = (output_range[1] - output_range[0]) / (max_intensities - min_intensities)
     b = output_range[0] - a * min_intensities

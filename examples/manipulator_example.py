@@ -51,7 +51,7 @@ if __name__ == '__main__':
         list_new_labels = [2, 3, 4, 5, 6, 7]
 
         # Using the manager:
-        lm.manipulate.relabel(fin_punt_seg_original, fin_punt_seg_new,
+        lm.manipulate_labels.relabel(fin_punt_seg_original, fin_punt_seg_new,
                               list_old_labels, list_new_labels)
 
         # Without the managers: loading the data and applying the relabeller
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         perm = [[1, 2, 3], [3, 1, 2]]
 
         # Using the manager:
-        lm.manipulate.permute_labels(fin_punt_seg_original, fin_punt_seg_new, perm)
+        lm.manipulate_labels.permute_labels(fin_punt_seg_original, fin_punt_seg_new, perm)
 
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         labels_to_erase = [4, 5, 6]
 
         # using the manager:
-        lm.manipulate.erase_labels(fin_punt_seg_original, fin_punt_seg_new, labels_to_erase=labels_to_erase)
+        lm.manipulate_labels.erase_labels(fin_punt_seg_original, fin_punt_seg_new, labels_to_erase=labels_to_erase)
 
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -163,7 +163,7 @@ if __name__ == '__main__':
         new_value = 100
 
         # using the manager:
-        lm.manipulate.assign_all_other_labels_the_same_value(fin_punt_seg_original,
+        lm.manipulate_labels.assign_all_other_labels_the_same_value(fin_punt_seg_original,
                fin_punt_seg_new, labels_to_keep=labels_to_keep, same_value_label=new_value)
 
         # without the manager:
@@ -199,7 +199,7 @@ if __name__ == '__main__':
         fin_punt_seg_new      = 'punt_seg.nii.gz'
         label_to_keep = 6
         # using the manager:
-        lm.manipulate.keep_one_label(fin_punt_seg_original, fin_punt_seg_new,
+        lm.manipulate_labels.keep_one_label(fin_punt_seg_original, fin_punt_seg_new,
                                      label_to_keep=label_to_keep)
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -237,9 +237,9 @@ if __name__ == '__main__':
         new_axis = 3
         num_slices = 5
         # using the manager:
-        lm.manipulate.extend_slice_new_dimension(fin_punt_original, fin_punt_new,
+        lm.manipulate_labels.extend_slice_new_dimension(fin_punt_original, fin_punt_new,
                                                  new_axis=new_axis, num_slices=num_slices)
-        lm.manipulate.extend_slice_new_dimension(fin_punt_seg_original, fin_punt_seg_new,
+        lm.manipulate_labels.extend_slice_new_dimension(fin_punt_seg_original, fin_punt_seg_new,
                                                  new_axis=new_axis, num_slices=num_slices)
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -272,7 +272,7 @@ if __name__ == '__main__':
         fin_seg_original = 'mes_seg.nii.gz'
         fin_seg_new      = 'mes_seg_4d.nii.gz'
         # using the manager
-        lm.manipulate.split_in_4d(fin_seg_original, fin_seg_new)
+        lm.manipulate_labels.split_in_4d(fin_seg_original, fin_seg_new)
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_seg_original))
         data_seg = im_seg.get_data()
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         fin_punt_seg_new      = 'punt_seg_4d.nii.gz'
         list_labels = [4, 5, 6]
         # using the manager
-        lm.manipulate.split_in_4d(fin_punt_seg_original, fin_punt_seg_new, list_labels=list_labels,
+        lm.manipulate_intensities.split_in_4d(fin_punt_seg_original, fin_punt_seg_new, list_labels=list_labels,
                                   keep_original_values=False)
         # without the manager:
         im_seg = nib.load(jph(root_dir, 'data_examples', fin_punt_seg_original))
@@ -327,11 +327,11 @@ if __name__ == '__main__':
         fin_seg_splitted = 'mes_seg_splitted.nii.gz'
         fin_seg_merged = 'mes_seg_merged.nii.gz'
         # split:
-        lm.manipulate.split_in_4d(fin_seg_original, fin_seg_splitted)
+        lm.manipulate_intensities.split_in_4d(fin_seg_original, fin_seg_splitted)
         # merge
         lm.set_input_data_folder(jph(root_dir, 'data_output'))
 
-        lm.manipulate.merge_from_4d(fin_seg_splitted, fin_seg_merged)
+        lm.manipulate_labels.merge_from_4d(fin_seg_splitted, fin_seg_merged)
         # check you got back the same:
         pfi_seg_before = jph(root_dir, 'data_examples', fin_seg_original)
         pfi_seg_after = jph(root_dir, 'data_output', fin_seg_merged)
@@ -347,7 +347,7 @@ if __name__ == '__main__':
         fin_original = 'mes_seg.nii.gz'
         fin_transformed = 'mes_now_punt.nii.gz'
         # transform mes in a punt
-        lm.manipulate.symmetrise_axial(fin_original, fin_transformed, axis='x', plane_intercept=128,
+        lm.symmetrize.symmetrise_axial(fin_original, fin_transformed, axis='x', plane_intercept=128,
                                        side_to_copy='above', keep_in_data_dimensions=True)
 
         if open_figures:
@@ -362,7 +362,7 @@ if __name__ == '__main__':
         fin_anatomy = 'ellipsoids.nii.gz'
         fin_seg = 'ellipsoids_seg_half.nii.gz'
         # transform mes in a punt
-        lm.manipulate.symmetrise_with_registration(fin_anatomy, fin_seg,
+        lm.symmetrize.symmetrise_with_registration(fin_anatomy, fin_seg,
                                                    list_labels_input=[1, 2, 3, 4, 5, 6],
                                                    results_folder_path=jph(root_dir, 'data_output'),
                                                    result_img_path=jph(root_dir, 'data_output','ellipsoid_seg_SYM.nii.gz'),
