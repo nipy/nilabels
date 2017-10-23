@@ -210,3 +210,19 @@ def change_header_parameter(pfi_input, pfi_output, parameter_key='datatype',
     im_header = im_input.header
     im_header[parameter_key] = new_value_for_something
     nib.save(im_input, pfi_output)
+
+
+def remove_nan(im_input):
+    return set_new_data(im_input, np.nan_to_num(im_input.get_data()))
+
+
+def mark_image_with_a_message(im_input, new_header_description=''):
+    """
+    Update header description with the input new_header description
+    :param im_input: nibabel image
+    :param new_header_description: new intended header description. The current one is replaced.
+    :return: nibabel image as the input with the header description updated.
+    """
+    im_input_header = im_input.header()
+    im_input_header['descrip'] = new_header_description
+    return im_input

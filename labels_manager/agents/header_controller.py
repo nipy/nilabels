@@ -82,6 +82,8 @@ class LabelsManagerHeaderController(object):
 
         elif isinstance(new_translation, np.ndarray):
             tr = new_translation
+        elif isinstance(new_translation, list):
+            tr = np.array(new_translation)
         else:
             raise IOError('parameter new_translation can be path to an affine matrix .txt or .npy or the numpy array'
                           'corresponding to the new intended translational part.')

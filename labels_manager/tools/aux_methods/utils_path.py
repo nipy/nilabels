@@ -38,5 +38,5 @@ def get_pfi_in_pfi_out(filename_in, filename_out, pfo_in, pfo_out):
         else:
             pfi_out = connect_path_tail_head(pfo_out, filename_out)
 
-    check_pfi_io(pfi_in, pfi_out)
+    # check_pfi_io(pfi_in, pfi_out)
     return pfi_in, pfi_out
