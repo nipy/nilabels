@@ -4,9 +4,9 @@ Python 2.7
 LabelsManager is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
 
-Each tool provided can be 
-* Accessed directly as nibabel objects, numpy arrays and other Python objects.
-* Accessed indirectly trough the facades as paths to the corresponding files.
+Each tool provided can have as input 
+* Nibabel instances, numpy arrays and others.
+* Paths to the corresponding objects trough the facades called **agents**.
 
 
 ## Documentations
