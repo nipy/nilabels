@@ -1,5 +1,4 @@
 import numpy as np
-import nibabel as nib
 
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
@@ -74,7 +73,7 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
     return set_new_data(im_hosting, new_data)
 
 
-def from_segmentation_stack_to_probabilistic_atlas(im_stack_label):
+def from_segmentation_stack_to_probabilistic_segmentation(im_stack_label):
     """
     A probabilistic atlas has at each time-point a different label (a mapping is provided as well in
     the conversion with correspondence time-point<->label number). Each time point has the normalised average
@@ -82,8 +81,20 @@ def from_segmentation_stack_to_probabilistic_atlas(im_stack_label):
     :return:
     """
     assert len(im_stack_label.shape) == 4
-    
+    # TODO
     labels_list = 0
 
 
-
+def substitute_4d_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):
+    """
+    Substitute the im_input_3d image at the time point timepoint of the im_input_4d.
+    :param im_input_4d: 4d image
+    :param im_input_3d: 3d image whose shape is compatible with the fist 3 dimensions of im_input_4d
+    :param timepoint: a timepoint in the 4th dimension of the im_input_4d
+    :return: im_input_4d whose at the timepoint-th time point the data of im_input_3d are stored.
+    """
+    assert im_input_4d.shape[:-1] == im_input_3d.shape
+    assert im_input_4d.shape[-1] > timepoint
+    new_data = im_input_4d.get_data()[:]
+    new_data[..., timepoint] = im_input_3d.get_data()[:]
+    return set_new_data(im_input_4d, new_data)

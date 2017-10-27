@@ -7,6 +7,7 @@ from scipy import ndimage as nd
 from labels_manager.tools.image_colors_manipulations.relabeller import keep_only_one_label
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.aux_methods.utils import print_and_run
+from labels_manager.tools.detections.contours import contour_from_segmentation, contour_from_array_at_label_l
 
 
 def centroid_array(arr, labels):
@@ -36,7 +37,6 @@ def centroid(im, labels, return_mm3=True):
         centers_of_mass = [np.round(cm).astype(np.uint64) for cm in centers_of_mass]
     return centers_of_mass
 
-
 # --- distances
 
 def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
@@ -65,7 +65,21 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
     return pa.Series(scores, index=labels_names)
 
 
-def dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=0):
+def outline_error(im_segm1, im_segm2):
+    """
+    Volume of the binarised image differences over the average volume of the two images.
+    :param im_segm1:
+    :param im_segm2:
+    :param verbose:
+    :return:
+    """
+    num_voxels_1 = np.count_nonzero(im_segm1.get_data())
+    num_voxels_2 = np.count_nonzero(im_segm2.get_data())
+    num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
+    return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
+
+
+def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=0):
 
     # def dispersion_l(lab, verbose=verbose):
     #     c1 = centroid_array(im_segm1.get_data(), labels=[lab,])[0]
@@ -91,7 +105,7 @@ def dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, v
     return pa.Series(np.array([np.sqrt( sum((c1 - c2)**2) ) for c1, c2 in zip(cs1, cs2)]), index=labels_names)
 
 
-def precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
+def s_precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
     # deprecated as too imprecise :-) !
     print_and_run('mkdir -p {}'.format(pfo_intermediate_files))
     precision_per_label = []
@@ -165,7 +179,7 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
     :return:
     See: Herdin 2005, Correlation matrix distance, a meaningful measure for evaluation of non-stationary MIMO channels
     """
-    def cov_dist(m1, m2):
+    def covariance_distance_l(m1, m2):
         """
         Covariance distance between matrices m1 and m2, defined as
         d = 1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2))
@@ -178,11 +192,12 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
     cvs1 = covariance_matrices(im_segm1, labels=labels_list, return_mm3=return_mm3)
     cvs2 = covariance_matrices(im_segm2, labels=labels_list, return_mm3=return_mm3)
 
-    return pa.Series(np.array([cov_dist(a1, a2) for a1, a2 in zip(cvs1, cvs2)]), index=labels_names)
+    return pa.Series(np.array([covariance_distance_l(a1, a2) for a1, a2 in zip(cvs1, cvs2)]), index=labels_names)
 
 
 def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     """
+    TESTING IN PROGRESS...
     From 2 segmentations sampled in overlapping grids (with affine in starndard form) it returns the hausdoroff
     distance for each label in the labels list and list names it returns the pandas series with the corresponding
     distances for each label.
@@ -198,17 +213,51 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
         arr2 = im2.get_data() == l
         assert isinstance(arr2, np.ndarray)
         if return_mm3:
-            df2 = nd.morphology.distance_transform_edt(arr2, sampling=list(np.diag(im1.affine[:3, :3])))
+            dt2 = nd.distance_transform_edt(arr2, sampling=list(np.diag(im1.affine[:3, :3])))
         else:
-            df2 = nd.morphology.distance_transform_edt(arr2, sampling=None)
-        assert isinstance(df2, np.ndarray)
-        d = np.max(df2 * arr1)
-        return d
+            dt2 = nd.distance_transform_edt(arr2, sampling=None)
+        assert isinstance(dt2, np.ndarray)
+        return np.max(dt2 * arr1)
 
     return pa.Series(
         np.array([np.max([d_H(im_segm1, im_segm2, l), d_H(im_segm2, im_segm1, l)]) for l in labels_list]),
         index=labels_names)
 
+
+def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
+    """
+    Testing in progress
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :param labels_names:
+    :param return_mm3:
+    :return:
+    """
+    def average_symetric_contour_distance_l(im1, im2, l):
+        arr1 = im1.get_data() == l
+        arr2 = im2.get_data() == l
+        assert isinstance(arr1, np.ndarray)
+        assert isinstance(arr2, np.ndarray)
+        arr1_contour = contour_from_array_at_label_l(arr1, 1)
+        arr2_contour = contour_from_array_at_label_l(arr2, 1)
+
+        # arr1_contour_negative = 1 - arr1_contour
+        # arr2_contour_negative = 1 - arr2_contour
+        if return_mm3:
+            dtb1 = nd.distance_transform_edt(arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+            dtb2 = nd.distance_transform_edt(arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+        else:
+            dtb1 = nd.distance_transform_edt(arr1_contour)  # arr1_contour_negative
+            dtb2 = nd.distance_transform_edt(arr2_contour)
+
+        dist_border1_array2 = arr2_contour * dtb1
+        dist_border2_array1 = arr1_contour * dtb2
+
+        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.sum(np.nonzero(arr1)) + np.sum(np.nonzero(arr2)))
+
+    return pa.Series(
+        np.array([average_symetric_contour_distance_l(im_segm1, im_segm2, l) for l in labels_list]), index=labels_names)
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """
@@ -220,7 +269,7 @@ def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     :param labels_names:
     :return:
     """
-    def get_box_length_single_label(arr, l, scaling_factors):
+    def box_sides_length_l(arr, l, scaling_factors):
         coords = np.where(arr == l)  # returns [X_vector, Y_vector, Z_vector]
         dists = [np.abs(np.max(k) - np.min(k)) for k in coords]
         if return_mm3:
@@ -228,7 +277,7 @@ def box_sides_length(im, labels_list, labels_names, return_mm3=True):
         return dists
 
     return pa.Series(
-        np.array([get_box_length_single_label(im.get_data(), l, np.diag(im.affine)) for l in labels_list]),
+        np.array([box_sides_length_l(im.get_data(), l, np.diag(im.affine)) for l in labels_list]),
         index=labels_names)
 
 

@@ -19,7 +19,6 @@ class LabelsManagerFuse(object):
                       prepare_data_only=False, seg_output_name='res_4d_seg', warp_output_name='res_4d_warp',
                       output_tag=''):
         """
-        Takes into account the
         :param pfi_target: path to file to the target of the segmentation
         :param pfi_result: path to file where to store the result.
         :param list_pfi_segmentations: list of the segmentations to fuse

@@ -6,7 +6,6 @@ from labels_manager.tools.aux_methods.utils_nib import one_voxel_volume
 
 def get_total_volume(im_segm, labels_to_exclude=None):
     """
-
     :param im_segm:
     :param labels_to_exclude:
     :return:
