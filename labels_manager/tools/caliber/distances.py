@@ -6,7 +6,7 @@ from scipy import ndimage as nd
 
 from labels_manager.tools.image_colors_manipulations.relabeller import keep_only_one_label
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
-from labels_manager.tools.aux_methods.utils import print_and_run
+from labels_manager.tools.aux_methods.utils import print_and_run, labels_query
 from labels_manager.tools.detections.contours import contour_from_segmentation, contour_from_array_at_label_l
 
 
@@ -65,21 +65,36 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
     return pa.Series(scores, index=labels_names)
 
 
-def outline_error(im_segm1, im_segm2):
+def global_dice_score(im_segm1, im_segm2, labels_list):
+    """
+    Global dice score as in Munoz-Moreno et al. 2013
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :return:
+    """
+    sum_intersections = [np.count_nonzero(im_segm1.get_data() == l * im_segm2.get_data() == l)
+                         for l in labels_list]
+
+    return 2 * sum_intersections / (np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
+
+
+def global_outline_error(im_segm1, im_segm2, labels_list):
     """
     Volume of the binarised image differences over the average volume of the two images.
     :param im_segm1:
     :param im_segm2:
-    :param verbose:
+    :param labels_list:
     :return:
     """
-    num_voxels_1 = np.count_nonzero(im_segm1.get_data())
-    num_voxels_2 = np.count_nonzero(im_segm2.get_data())
+    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
+    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
     num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
     return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
 
 
 def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=0):
+    # definition of s_dispersion is not the conventional definition of precision
 
     # def dispersion_l(lab, verbose=verbose):
     #     c1 = centroid_array(im_segm1.get_data(), labels=[lab,])[0]
@@ -106,7 +121,7 @@ def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True,
 
 
 def s_precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
-    # deprecated as too imprecise :-) !
+    # deprecated as too imprecise :-) ! -  definition of s_precision is not the conventional definition of precision
     print_and_run('mkdir -p {}'.format(pfo_intermediate_files))
     precision_per_label = []
 
@@ -258,6 +273,7 @@ def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_na
 
     return pa.Series(
         np.array([average_symetric_contour_distance_l(im_segm1, im_segm2, l) for l in labels_list]), index=labels_names)
+
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """

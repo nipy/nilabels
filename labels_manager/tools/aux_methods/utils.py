@@ -110,6 +110,7 @@ def labels_query(labels, segmentation_array=None):
     :param segmentation_array: optional segmentation image data (array)
     :return: labels_list, labels_names
     """
+    labels_names = []
     if labels is None:
         labels = 'all'
 

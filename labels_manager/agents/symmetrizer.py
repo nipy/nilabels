@@ -26,15 +26,15 @@ class LabelsManagerSymmetrize(object):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
-        im_labels = nib.load(pfi_in)
-        data_labels = im_labels.get_data()
+        im_segm = nib.load(pfi_in)
+        data_labels = im_segm.get_data()
         data_symmetrised = symmetrise_data(data_labels,
                                            axis=axis,
                                            plane_intercept=plane_intercept,
                                            side_to_copy=side_to_copy,
                                            keep_in_data_dimensions=keep_in_data_dimensions)
 
-        im_symmetrised = set_new_data(im_labels, data_symmetrised)
+        im_symmetrised = set_new_data(im_segm, data_symmetrised)
         nib.save(im_symmetrised, pfi_out)
         print('Symmetrised axis {0}, plane_intercept {1}, image of {2} saved in {3}.'.format(axis, plane_intercept, pfi_in, pfi_out))
         return pfi_out
