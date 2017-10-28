@@ -1,10 +1,19 @@
 import numpy as np
 import nibabel as nib
+import os
+from scipy import ndimage as nd
 
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
+from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 from labels_manager.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
-    global_outline_error, covariance_matrices, covariance_distance
+    global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
+    average_symetric_contour_distance
+
+from labels_manager.tools.detections.contours import contour_from_segmentation
+
+from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_ellipsoid, generate_o, generate_c, \
+    generate_cube
 
 
 
@@ -143,15 +152,20 @@ def test_dice_score():
                        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
                       ])
 
+    arr_void = np.zeros_like(arr_3)
+
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
     im2 = nib.Nifti1Image(arr_2, np.eye(4))
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
+    im_void = nib.Nifti1Image(arr_void, np.eye(4))
 
     dice_1_1 = dice_score(im1, im1, [1, 2], ['lab1', 'lab2'])
     dice_1_2 = dice_score(im1, im2, [1, 2], ['lab1', 'lab2'])
     dice_1_3 = dice_score(im1, im3, [1, 2], ['lab1', 'lab2'])
 
     dice_1_3_extra_lab = dice_score(im1, im3, [1, 2, 5], ['lab1', 'lab2', 'lab5'])
+
+    dice_1_void = dice_score(im1, im_void, [1, 2], ['lab1', 'lab2'])
 
     assert_equal(dice_1_1['lab1'], 1)
     assert_equal(dice_1_1['lab2'], 1)
@@ -166,6 +180,8 @@ def test_dice_score():
     assert_equal(dice_1_3_extra_lab['lab1'], 0)
     assert_equal(dice_1_3_extra_lab['lab5'], np.nan)
 
+    assert_equal(dice_1_void['lab2'], 0)
+    assert_equal(dice_1_void['lab1'], 0)
 
 
 def test_global_dice_score():
@@ -232,19 +248,24 @@ def test_global_dice_score():
                        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
                       ])
 
+    arr_void = np.zeros_like(arr_3)
+
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
     im2 = nib.Nifti1Image(arr_2, np.eye(4))
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
+    im_void = nib.Nifti1Image(arr_void, np.eye(4))
 
     g_dice_1_1 = global_dice_score(im1, im1, [1, 2])
     g_dice_1_2 = global_dice_score(im1, im2, [1, 2])
     g_dice_1_3 = global_dice_score(im1, im3, [1, 2])
     g_dice_1_2_extra_label = global_dice_score(im1, im2, [1, 2, 4])
+    g_dice_1_void = global_dice_score(im1, im_void, [1, 2])
 
     assert_equal(g_dice_1_1, 1)
     assert_equal(g_dice_1_2, (16 + 14) / (18. + 17.))
     assert_equal(g_dice_1_3, 0)
     assert_equal(g_dice_1_2_extra_label, (16 + 14) / (18. + 17.))
+    assert_equal(g_dice_1_void, 0)
 
 
 def test_global_outline_error():
@@ -308,22 +329,24 @@ def test_global_outline_error():
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
                       ])
+    arr_void = np.zeros_like(arr_3)
 
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
     im2 = nib.Nifti1Image(arr_2, np.eye(4))
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
+    im_void = nib.Nifti1Image(arr_void, np.eye(4))
 
     goe_1_1 = global_outline_error(im1, im1, [1, 2])
-    goe_1_2 = global_outline_error(im1, im2, [1,2])
+    goe_1_2 = global_outline_error(im1, im2, [1, 2])
     goe_1_3 = global_outline_error(im1, im3, [1, 2])
-
-    assert_equal(goe_1_1, 0)
-    assert_almost_equal(goe_1_2 * .5 * (20 + 15), 5)
-    assert_almost_equal(goe_1_3 * .5 * (20 + 32), 48)
+    goe_1_2_extra = global_outline_error(im1, im2, [1, 2, 5])
+    goe_1_void = global_outline_error(im1, im_void, [1, 2])
 
     assert_equal(goe_1_1, 0)
     assert_almost_equal(goe_1_2, 5 / (.5 * (20 + 15)))
     assert_almost_equal(goe_1_3, 48 / (.5 * (20 + 32)))
+    assert_almost_equal(goe_1_2_extra, goe_1_2)
+    assert_almost_equal(goe_1_void, 2)  # interesting case!
 
 
 def test_covariance_matrices():
@@ -350,7 +373,7 @@ def test_covariance_matrices():
 
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
 
-    cov =  covariance_matrices(im1, [1,2, 3])
+    cov =  covariance_matrices(im1, [1, 2, 3])
     assert len(cov) == 3
     for i in cov:
         assert_array_equal(i.shape, [3, 3])
@@ -445,4 +468,157 @@ def test_covariance_distance():
 
 
 def test_hausdorff_distance():
-    pass
+    arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0]]
+                      ])
+
+    arr_2 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 1, 1, 1, 1, 1, 1, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+                      ])
+
+    arr_void = np.zeros_like(arr_2)
+
+    im1 = nib.Nifti1Image(arr_1, np.eye(4))
+    im2 = nib.Nifti1Image(arr_2, np.eye(4))
+    im_void = nib.Nifti1Image(arr_void, np.eye(4))
+
+    hd_1_1 = hausdorff_distance(im1, im1, [1, 2], ['label1', 'label2'])
+    hd_1_2 = hausdorff_distance(im1, im2, [1, 2], ['label1', 'label2'])
+    hd_1_2_extra = hausdorff_distance(im1, im2, [1, 2, 3], ['label1', 'label2', 'label3'])
+    hd_1_void = hausdorff_distance(im1, im_void, [1, 2], ['label1', 'label2'])
+
+    assert_almost_equal(hd_1_1['label1'], 0)
+    assert_almost_equal(hd_1_1['label2'], 0)
+
+    assert_almost_equal(hd_1_2['label1'], 6)
+    assert_almost_equal(hd_1_2['label2'], 3)
+
+    assert_almost_equal(hd_1_2_extra['label1'], 6)
+    assert_almost_equal(hd_1_2_extra['label2'], 3)
+    assert_almost_equal(hd_1_2_extra['label3'], np.nan)
+
+    assert_almost_equal(hd_1_void['label1'], np.nan)
+    assert_almost_equal(hd_1_void['label2'], np.nan)
+
+
+def test_average_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
+    o1 = generate_o(omega=(19,19,19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
+    o2 = 2 * o1
+    arr1 = np.concatenate([o1, o2], axis=2)
+
+    half_o1 = np.zeros_like(o1)
+    half_o1[:, :10, :] = o1[:, :10, :]
+    half_o2 = 2 * half_o1
+    arr2 = np.concatenate([half_o1, half_o2], axis=2)
+
+    c1 = generate_cube(omega=(19,19,19), center=(9, 9, 9), side_length=13, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
+    c2 = 2 * c1
+    arr3 = np.concatenate([c1, c2], axis=2)
+
+    arr_void = np.zeros_like(arr1)
+
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+    im3 = nib.Nifti1Image(arr3, np.eye(4))
+
+    im_void = nib.Nifti1Image(arr_void, np.eye(4))
+
+    if os.path.exists(save_data_path):
+
+        nib.save(im1, os.path.join(save_data_path, 'zzz1.nii.gz'))
+        nib.save(im2, os.path.join(save_data_path, 'zzz2.nii.gz'))
+        nib.save(im3, os.path.join(save_data_path, 'zzz3.nii.gz'))
+
+        im1_cont = contour_from_segmentation(im1)
+        im2_cont = contour_from_segmentation(im2)
+        im3_cont = contour_from_segmentation(im3)
+
+        nib.save(im1_cont, os.path.join(save_data_path, 'zzz1_contour.nii.gz'))
+        nib.save(im2_cont, os.path.join(save_data_path, 'zzz2_contour.nii.gz'))
+        nib.save(im3_cont, os.path.join(save_data_path, 'zzz3_contour.nii.gz'))
+
+        im_dtb1_l1 = set_new_data(im1_cont, nd.distance_transform_edt(1 - (im1_cont.get_data() == 1)))
+        im_dtb2_l1 = set_new_data(im2_cont, nd.distance_transform_edt(1 - (im2_cont.get_data() == 1)))
+        im_dtb3_l1 = set_new_data(im3_cont, nd.distance_transform_edt(1 - (im3_cont.get_data() == 1)))
+
+        im_dtb1_l2 = set_new_data(im1_cont, nd.distance_transform_edt(1 - (im1_cont.get_data() == 2)))
+        im_dtb2_l2 = set_new_data(im2_cont, nd.distance_transform_edt(1 - (im2_cont.get_data() == 2)))
+        im_dtb3_l2 = set_new_data(im3_cont, nd.distance_transform_edt(1 - (im3_cont.get_data() == 2)))
+
+        nib.save(im_dtb1_l1, os.path.join(save_data_path, 'zzz1_contour_dist_label1.nii.gz'))
+        nib.save(im_dtb2_l1, os.path.join(save_data_path, 'zzz2_contour_dist_label1.nii.gz'))
+        nib.save(im_dtb3_l1, os.path.join(save_data_path, 'zzz3_contour_dist_label1.nii.gz'))
+
+        nib.save(im_dtb1_l2, os.path.join(save_data_path, 'zzz1_contour_dist_label2.nii.gz'))
+        nib.save(im_dtb2_l2, os.path.join(save_data_path, 'zzz2_contour_dist_label2.nii.gz'))
+        nib.save(im_dtb3_l2, os.path.join(save_data_path, 'zzz3_contour_dist_label2.nii.gz'))
+
+        print('Images testing saved in {}'.format(save_data_path))
+
+    ascd_1_1       = average_symetric_contour_distance(im1, im1, [1, 2], ['label1', 'label2'])
+    ascd_1_2       = average_symetric_contour_distance(im1, im2, [1, 2], ['label1', 'label2'])
+    ascd_1_3       = average_symetric_contour_distance(im1, im3, [1, 2], ['label1', 'label2'])
+    ascd_1_2_extra = average_symetric_contour_distance(im1, im2, [1, 2, 3], ['label1', 'label2', 'label3'])
+    ascd_1_void    = average_symetric_contour_distance(im1, im_void, [1, 2], ['label1', 'label2'])
+
+    if verbose:
+        print '\n 1 1'
+        print ascd_1_1
+        print '\n 1 2'
+        print ascd_1_2
+        print '\n 1 3'
+        print ascd_1_3
+        print '\n 1 2 extra'
+        print ascd_1_2_extra
+        print '\n 1 void'
+        print ascd_1_void
+
+    assert_almost_equal(ascd_1_1['label1'], 0)
+    assert_almost_equal(ascd_1_1['label2'], 0)
+
+    assert_almost_equal(ascd_1_2['label1'], 0.032473, decimal=4)
+    assert_almost_equal(ascd_1_2['label2'], 0.018815, decimal=4)
+
+    assert_almost_equal(ascd_1_3['label1'], 0.025885, decimal=4)
+    assert_almost_equal(ascd_1_3['label2'], 0.015193, decimal=4)
+
+    assert_almost_equal(ascd_1_2_extra['label3'], np.nan)
+
+    assert_almost_equal(ascd_1_void['label1'], np.nan)
+    assert_almost_equal(ascd_1_void['label2'], np.nan)
+
+test_average_symetric_contour_distance()

@@ -6,8 +6,8 @@ from scipy import ndimage as nd
 
 from labels_manager.tools.image_colors_manipulations.relabeller import keep_only_one_label
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
-from labels_manager.tools.aux_methods.utils import print_and_run, labels_query
-from labels_manager.tools.detections.contours import contour_from_segmentation, contour_from_array_at_label_l
+from labels_manager.tools.aux_methods.utils import print_and_run
+from labels_manager.tools.detections.contours import contour_from_array_at_label_l
 
 
 def centroid_array(arr, labels):
@@ -153,7 +153,6 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
 
 def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     """
-    TESTING IN PROGRESS...
     From 2 segmentations sampled in overlapping grids (with affine in starndard form) it returns the hausdoroff
     distance for each label in the labels list and list names it returns the pandas series with the corresponding
     distances for each label.
@@ -167,12 +166,12 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     def d_H(im1, im2, l):
         arr1 = im1.get_data() == l
         arr2 = im2.get_data() == l
-        assert isinstance(arr2, np.ndarray)
+        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
+            return np.nan
         if return_mm3:
-            dt2 = nd.distance_transform_edt(arr2, sampling=list(np.diag(im1.affine[:3, :3])))
+            dt2 = nd.distance_transform_edt(1 - arr2, sampling=list(np.diag(im1.affine[:3, :3])))
         else:
-            dt2 = nd.distance_transform_edt(arr2, sampling=None)
-        assert isinstance(dt2, np.ndarray)
+            dt2 = nd.distance_transform_edt(1 - arr2, sampling=None)
         return np.max(dt2 * arr1)
 
     return pa.Series(
@@ -193,19 +192,19 @@ def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_na
     def average_symetric_contour_distance_l(im1, im2, l):
         arr1 = im1.get_data() == l
         arr2 = im2.get_data() == l
-        assert isinstance(arr1, np.ndarray)
-        assert isinstance(arr2, np.ndarray)
+
+        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
+            return np.nan
+
         arr1_contour = contour_from_array_at_label_l(arr1, 1)
         arr2_contour = contour_from_array_at_label_l(arr2, 1)
 
-        # arr1_contour_negative = 1 - arr1_contour
-        # arr2_contour_negative = 1 - arr2_contour
         if return_mm3:
-            dtb1 = nd.distance_transform_edt(arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-            dtb2 = nd.distance_transform_edt(arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+            dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+            dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
         else:
-            dtb1 = nd.distance_transform_edt(arr1_contour)  # arr1_contour_negative
-            dtb2 = nd.distance_transform_edt(arr2_contour)
+            dtb1 = nd.distance_transform_edt(1 - arr1_contour)  # arr1_contour_negative
+            dtb2 = nd.distance_transform_edt(1 - arr2_contour)
 
         dist_border1_array2 = arr2_contour * dtb1
         dist_border2_array1 = arr1_contour * dtb2
