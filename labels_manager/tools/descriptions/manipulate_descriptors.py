@@ -72,9 +72,11 @@ class LabelsDescriptorManager(object):
         self._check_path()
         label_descriptor_dict = collections.OrderedDict()
         for l in open(self.pfi_label_descriptor, 'r'):
-            if not l.startswith('#'):
+            if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
                 args = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
+                if parsed_line[0] == '# 213':
+                    print 'Spam'
                 if '(' in args[2]:  # there is the abbreviation - it gets separated in a new args element:
                     name = args[2].split('(')[0].strip()
                     abbrev = args[2].split('(')[1].replace(')', '').strip()
@@ -164,13 +166,12 @@ class LabelsDescriptorManager(object):
         f.write(descriptor_standard_header)
         ld_dict = self.get_dict(as_string=False)
         for j in ld_dict.keys():
-            if j.isdigit():
-                if len(ld_dict[j]) == 4:  # there is an abbreviation
-                    abbr =  ld_dict[j][3]
-                else:
-                    abbr = ''
-                line = '{0: >5}{1: >6}\n'.format(j, abbr)
-                f.write(line)
+            if len(ld_dict[j]) == 4:  # there is an abbreviation
+                abbr =  ld_dict[j][3]
+            else:
+                abbr = ''
+            line = '{0: <10}{1: <10}\n'.format(j, abbr)
+            f.write(line)
         f.close()
 
     def permute_labels(self, permutation):
@@ -183,7 +184,7 @@ class LabelsDescriptorManager(object):
         """
         From the labels descriptor and a nibabel segmentation image, it returns the
         :param im_segm: nibabel segmentation whose labels corresponds to the input labels descriptor.
-        :return: a 4d image, where at each voxel there is the [rgb ]
+        :return: a 4d image, where at each voxel there is the [r, g, b] vector in the fourth dimension.
         """
         labels_in_image = list(np.sort(list(set(im_segm.get_data().flatten()))))
         labels_dict = self.get_dict(as_string=False)
@@ -234,17 +235,28 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
     return d
 
 # temporary test
-# if __name__ == '__main__':
-#
-#     # from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
-#
-#     pfi_descriptor = '/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_internal_template/LabelsDescriptors/labels_descriptor_v9.txt'
-#
-#     ldm = LabelsDescriptorManager(pfi_descriptor)
-#     ldm.get_dict()
-#     import nibabel as nib
-#
-#     im_se = nib.load('/Users/sebastiano/Desktop/sphdec/1201/segm/automatic/1201_S0_segm_IN_TEMPLATE.nii.gz')
-#
-#     im = ldm.get_corresponding_rgb_image(im_se)
-#     nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')
+if __name__ == '__main__':
+    pass
+    # TODO move this part in examples.
+
+    # # from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
+    # import nibabel as nib
+    #
+    # pfi_descriptor = '/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_atlas/labels_descriptor_abbrev.txt'
+    #
+    # ldm = LabelsDescriptorManager(pfi_descriptor)
+    # dict = ldm.get_dict()
+    # pfi_hwere_to_save = '/Users/sebastiano/Desktop/zzz_lab_abbrev.txt'
+    #
+    # ldm.save_labels_and_abbreviations(pfi_hwere_to_save)
+    #
+    # for d in dict.keys():
+    #     if len(dict[d]) == 4:
+    #         print "{0} : '{1}',".format(d, dict[d][3])
+
+    #
+    #
+    # im_se = nib.load('/Users/sebastiano/Desktop/sphdec/1201/segm/automatic/1201_S0_segm_IN_TEMPLATE.nii.gz')
+    #
+    # im = ldm.get_corresponding_rgb_image(im_se)
+    # nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')
