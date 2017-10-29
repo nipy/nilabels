@@ -5,17 +5,12 @@ from scipy import ndimage as nd
 
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
+from labels_manager.tools.detections.contours import contour_from_segmentation
+from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_o, generate_cube
 
 from labels_manager.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
     average_symetric_contour_distance
-
-from labels_manager.tools.detections.contours import contour_from_segmentation
-
-from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_ellipsoid, generate_o, generate_c, \
-    generate_cube
-
-
 
 
 def test_centroid_array():
@@ -620,5 +615,3 @@ def test_average_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desk
 
     assert_almost_equal(ascd_1_void['label1'], np.nan)
     assert_almost_equal(ascd_1_void['label2'], np.nan)
-
-test_average_symetric_contour_distance()

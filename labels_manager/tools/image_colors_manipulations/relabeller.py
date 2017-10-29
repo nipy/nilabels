@@ -91,3 +91,46 @@ def keep_only_one_label(in_data, label_to_keep):
 
     labels_not_to_keep = list(set(list_labels) - {label_to_keep})
     return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0,]*len(labels_not_to_keep), verbose=False)
+
+
+def relabel_half_side_one_label(in_data, label_old, label_new, side_to_copy, axis, plane_intercept):
+    """
+
+    :param in_data:
+    :param label_old:
+    :param label_new:
+    :param side_to_copy:
+    :param axis:
+    :param plane_intercept:
+    :return:
+    """
+
+    msg = 'Input array must be 3-dimensional.'
+    assert in_data.ndim == 3, msg
+
+    msg = 'side_to_copy must be one of the two {}.'.format(['below', 'above'])
+    assert side_to_copy in ['below', 'above'], msg
+
+    msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
+    assert axis in ['x', 'y', 'z'], msg
+
+    positions = in_data == label_old
+    halfed_positions = np.zeros_like(positions)
+    if axis == 'x':
+        if side_to_copy == 'above':
+            halfed_positions[plane_intercept:, :, :] = positions[plane_intercept:, :, :]
+        if side_to_copy == 'below':
+            halfed_positions[:plane_intercept, :, :] = positions[:plane_intercept, :, :]
+    if axis == 'y':
+        if side_to_copy == 'above':
+            halfed_positions[: ,plane_intercept:, :] = positions[:, plane_intercept:, :]
+        if side_to_copy == 'below':
+            halfed_positions[:, plane_intercept, :, :] = positions[:, plane_intercept, :]
+    if axis == 'z':
+        if side_to_copy == 'above':
+            halfed_positions[ :, :, plane_intercept:] = positions[ :, :, plane_intercept:]
+        if side_to_copy == 'below':
+            halfed_positions[:, :, :plane_intercept] = positions[:, :, :plane_intercept]
+
+    new_data = in_data * np.invert(halfed_positions) + label_new * halfed_positions.astype(np.int)
+    return new_data

@@ -7,6 +7,7 @@ import subprocess
 
 
 def lift_list(input_list):
+    # return sum(input_list, [])
     return [val for sublist in input_list for val in sublist]
 
 
@@ -24,7 +25,6 @@ def eliminates_consecutive_duplicates(input_list):
 
 
 # ---- Matrices and Arrays utils ----
-
 
 def binarise_a_matrix(in_matrix, labels=None, dtype=np.bool):
     """
@@ -46,28 +46,7 @@ def binarise_a_matrix(in_matrix, labels=None, dtype=np.bool):
     return out_matrix.astype(dtype)
 
 
-# def get_values_below_label(image, segmentation, label):
-#     """
-#     Given an image (matrix) and a segmentation (another matrix), provides a list
-#     :param image: np.array of an image
-#     :param segmentation: np.array of the segmentation of the same image
-#     :param label: a label in the segmentation
-#     :return: np.array with all the values below the label.
-#     """
-#     np.testing.assert_array_equal(image.shape, segmentation.shape)
-#     below_label_places = segmentation == label
-#     coord = np.nonzero(below_label_places.flatten())[0]
-#     return np.take(image.flatten(), coord)
-
-# ---- Paths Utils
-
-
-def scan_and_remove_path(msg):
-    """
-    Take a string with a series of paths separated by a space and keeps only the base-names of each path.
-    """
-    a = [os.path.basename(p) for p in msg.split(' ')]
-    return ' '.join(a)
+# ---- Command executions utils ----
 
 
 def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
@@ -81,6 +60,13 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
     :param safety_on: safety, in case you want to see the messages at a first run.
     :return:
     """
+
+    def scan_and_remove_path(msg):
+        """
+        Take a string with a series of paths separated by a space and keeps only the base-names of each path.
+        """
+        a = [os.path.basename(p) for p in msg.split(' ')]
+        return ' '.join(a)
 
     # if len(cmd) > 249:
     #     print(cmd)
@@ -166,3 +152,4 @@ def triangular_density_function(x, a, mu, b):
         return 2 * (b - x) / float((b - a) * (b - mu))
     else:
         return 0
+
