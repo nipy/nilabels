@@ -45,6 +45,37 @@ def centroid(im, labels, return_mm3=True):
                 ans += [cm]
     return ans
 
+# --- global distances
+
+
+def global_dice_score(im_segm1, im_segm2, labels_list):
+    """
+    Global dice score as in Munoz-Moreno et al. 2013
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :return:
+    """
+    sum_intersections = np.sum([np.count_nonzero((im_segm1.get_data() == l) * (im_segm2.get_data() == l))
+                         for l in labels_list])
+
+    return 2 * sum_intersections / float(np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
+
+
+def global_outline_error(im_segm1, im_segm2, labels_list):
+    """
+    Volume of the binarised image differences over the average volume of the two images.
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :return:
+    """
+    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
+    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
+    num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
+    return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
+
+
 # --- distances
 
 def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
@@ -74,34 +105,6 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
             print('Dice scores label {0} : {1} '.format(l, d))
 
     return pa.Series(scores, index=labels_names)
-
-
-def global_dice_score(im_segm1, im_segm2, labels_list):
-    """
-    Global dice score as in Munoz-Moreno et al. 2013
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :return:
-    """
-    sum_intersections = np.sum([np.count_nonzero((im_segm1.get_data() == l) * (im_segm2.get_data() == l))
-                         for l in labels_list])
-
-    return 2 * sum_intersections / float(np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
-
-
-def global_outline_error(im_segm1, im_segm2, labels_list):
-    """
-    Volume of the binarised image differences over the average volume of the two images.
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :return:
-    """
-    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
-    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
-    num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
-    return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
 
 
 def covariance_matrices(im, labels, return_mm3=True):
@@ -179,7 +182,7 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
         index=labels_names)
 
 
-def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
+def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     """
     Testing in progress
     :param im_segm1:
@@ -189,7 +192,7 @@ def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_na
     :param return_mm3:
     :return:
     """
-    def average_symetric_contour_distance_l(im1, im2, l):
+    def normalised_symmetric_contour_distance_l(im1, im2, l):
         arr1 = im1.get_data() == l
         arr2 = im2.get_data() == l
 
@@ -212,7 +215,7 @@ def average_symetric_contour_distance(im_segm1, im_segm2, labels_list, labels_na
         return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.sum(np.nonzero(arr1)) + np.sum(np.nonzero(arr2)))
 
     return pa.Series(
-        np.array([average_symetric_contour_distance_l(im_segm1, im_segm2, l) for l in labels_list]), index=labels_names)
+        np.array([normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l) for l in labels_list]), index=labels_names)
 
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):

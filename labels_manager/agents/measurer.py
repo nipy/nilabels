@@ -8,8 +8,8 @@ from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
 from labels_manager.tools.caliber.volumes_and_values import get_volumes_per_label, get_mu_std_below_labels, \
     get_values_below_labels
-from labels_manager.tools.caliber.distances import dice_score, dispersion, precision, covariance_distance, \
-    hausdorff_distance
+from labels_manager.tools.caliber.distances import dice_score, covariance_distance, \
+    hausdorff_distance, global_outline_error, global_dice_score, normalised_symmetric_contour_distance
 from labels_manager.tools.defs import definition_label
 
 
@@ -92,8 +92,8 @@ class LabelsManagerMeasure(object):
 
         return pa.Series(labels_values, index=labels_names)
 
-    def dist(self, segm_1_filename, segm_2_filename, labels=None,
-             metrics=(dice_score, dispersion, covariance_distance, hausdorff_distance),
+    def dist(self, segm_1_filename, segm_2_filename, labels_list=None, labels_names=None,
+             metrics=(dice_score, covariance_distance, hausdorff_distance, normalised_symmetric_contour_distance),
              where_to_save=None):
 
         pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
@@ -107,22 +107,16 @@ class LabelsManagerMeasure(object):
 
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
+        if labels_list is None:
+            labels_list1, labels_names1 = labels_query('all', im_segm1.get_data())
+            labels_list2, labels_names2 = labels_query('all', im_segm2.get_data())
+            labels_list  = list(set(labels_list1) & set(labels_list2))
+            labels_names = list(set(labels_names1) & set(labels_names2))
+            labels_list.sort(key=int)
+            labels_names.sort(key=int)
 
-        labels_list1, labels_names1 = labels_query(labels, im_segm1.get_data())
-        labels_list2, labels_names2 = labels_query(labels, im_segm2.get_data())
-
-        labels_list  = list(set(labels_list1) & set(labels_list2))
-        labels_names = list(set(labels_names1) & set(labels_names2))
-
-        labels_list.sort(key=int)
-        labels_names.sort(key=int)
-
-        if self.verbose > 0:
-            print("Labels image 1: {}".format(labels_list1))
-            print("Labels image 2: {}".format(labels_list2))
-            print("Labels intersection {}".format(labels_list))
-            disjoint_union = list( (set(labels_names1) | set(labels_names2)) - (set(labels_names1) & set(labels_names2)) )
-            print("Labels disjoint union {}".format(disjoint_union))
+        if labels_names is None:
+            labels_names = labels_list
 
         dict_distances_per_label = {}
 
@@ -146,6 +140,33 @@ class LabelsManagerMeasure(object):
             df_distances_per_label.to_pickle(pfi_output_table)
 
         return df_distances_per_label
+
+    def global_dist(self, segm_1_filename, segm_2_filename, labels_list=None,
+                    global_metrics=(global_outline_error, global_dice_score)):
+
+        pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
+        pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_2_filename)
+
+        assert os.path.exists(pfi_segm1), pfi_segm1
+        assert os.path.exists(pfi_segm2), pfi_segm2
+
+        if self.verbose > 0:
+            print("Distances between segmentations: \n -> {0} \n -> {1} \n...started!".format(pfi_segm1, pfi_segm2))
+
+        im_segm1 = nib.load(pfi_segm1)
+        im_segm2 = nib.load(pfi_segm2)
+
+        if labels_list is None:
+            labels_list1, labels_names1 = labels_query('all', im_segm1.get_data())
+            labels_list2, labels_names2 = labels_query('all', im_segm2.get_data())
+            labels_list  = list(set(labels_list1) & set(labels_list2))
+
+        for d in global_metrics:
+            measure = d(im_segm1, im_segm2, labels_list)
+
+        return pa.Series(
+            np.array([d(im_segm1, im_segm2, labels_list) for d in global_metrics]),
+            index=[d.__name__ for d in global_metrics])
 
     def topology(self):
         # WIP: island detections, graph detections, cc detections from detector tools
