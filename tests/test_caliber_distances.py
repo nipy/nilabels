@@ -10,7 +10,7 @@ from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_o, 
 
 from labels_manager.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
-    normalised_symetric_contour_distance
+    normalised_symmetric_contour_distance
 
 
 def test_centroid_array():
@@ -584,11 +584,11 @@ def test_average_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desk
 
         print('Images testing saved in {}'.format(save_data_path))
 
-    ascd_1_1       = normalised_symetric_contour_distance(im1, im1, [1, 2], ['label1', 'label2'])
-    ascd_1_2       = normalised_symetric_contour_distance(im1, im2, [1, 2], ['label1', 'label2'])
-    ascd_1_3       = normalised_symetric_contour_distance(im1, im3, [1, 2], ['label1', 'label2'])
-    ascd_1_2_extra = normalised_symetric_contour_distance(im1, im2, [1, 2, 3], ['label1', 'label2', 'label3'])
-    ascd_1_void    = normalised_symetric_contour_distance(im1, im_void, [1, 2], ['label1', 'label2'])
+    ascd_1_1       = normalised_symmetric_contour_distance(im1, im1, [1, 2], ['label1', 'label2'])
+    ascd_1_2       = normalised_symmetric_contour_distance(im1, im2, [1, 2], ['label1', 'label2'])
+    ascd_1_3       = normalised_symmetric_contour_distance(im1, im3, [1, 2], ['label1', 'label2'])
+    ascd_1_2_extra = normalised_symmetric_contour_distance(im1, im2, [1, 2, 3], ['label1', 'label2', 'label3'])
+    ascd_1_void    = normalised_symmetric_contour_distance(im1, im_void, [1, 2], ['label1', 'label2'])
 
     if verbose:
         print '\n 1 1'

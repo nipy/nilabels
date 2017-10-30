@@ -78,7 +78,7 @@ def global_outline_error(im_segm1, im_segm2, labels_list):
 
 # --- distances
 
-def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
+def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=1):
     """
     Dice score between paired labels of segmentations.
     :param im_segm1: nibabel image with labels
@@ -102,7 +102,7 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=0):
         d = dice_score_l(l)
         scores.append(d)
         if verbose > 0:
-            print('Dice scores label {0} : {1} '.format(l, d))
+            print('    Dice scores label {0} : {1} '.format(l, d))
 
     return pa.Series(scores, index=labels_names)
 
@@ -129,7 +129,7 @@ def covariance_matrices(im, labels, return_mm3=True):
     return cov_matrices
 
 
-def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
+def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
     """
     Considers the label as a point distribution in the space, and returns the covariance matrix of the points
     distributions.
@@ -151,10 +151,17 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
     cvs1 = covariance_matrices(im_segm1, labels=labels_list, return_mm3=return_mm3)
     cvs2 = covariance_matrices(im_segm2, labels=labels_list, return_mm3=return_mm3)
 
-    return pa.Series(np.array([covariance_distance_l(a1, a2) for a1, a2 in zip(cvs1, cvs2)]), index=labels_names)
+    cov_dist = []
+    for l, a1, a2 in zip(labels_list, cvs1, cvs2):
+        d = covariance_distance_l(a1, a2)
+        cov_dist.append(d)
+        if verbose > 0:
+            print('    Covariance distance label {0} : {1} '.format(l, d))
+
+    return pa.Series(np.array(cov_dist), index=labels_names)
 
 
-def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
+def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
     """
     From 2 segmentations sampled in overlapping grids (with affine in starndard form) it returns the hausdoroff
     distance for each label in the labels list and list names it returns the pandas series with the corresponding
@@ -177,12 +184,17 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
             dt2 = nd.distance_transform_edt(1 - arr2, sampling=None)
         return np.max(dt2 * arr1)
 
-    return pa.Series(
-        np.array([np.max([d_H(im_segm1, im_segm2, l), d_H(im_segm2, im_segm1, l)]) for l in labels_list]),
-        index=labels_names)
+    hausd_dist = []
+    for l in labels_list:
+        d = np.max([d_H(im_segm1, im_segm2, l), d_H(im_segm2, im_segm1, l)])
+        hausd_dist.append(d)
+        if verbose > 0:
+            print('    Hausdoroff distance label {0} : {1} '.format(l, d))
+
+    return pa.Series(np.array(hausd_dist), index=labels_names)
 
 
-def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
+def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
     """
     Testing in progress
     :param im_segm1:
@@ -214,8 +226,14 @@ def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, label
 
         return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.sum(np.nonzero(arr1)) + np.sum(np.nonzero(arr2)))
 
-    return pa.Series(
-        np.array([normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l) for l in labels_list]), index=labels_names)
+    nscd_dist = []
+    for l in labels_list:
+        d = normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l)
+        nscd_dist.append(d)
+        if verbose > 0:
+            print('    NSCD {0} : {1} '.format(l, d))
+
+    return pa.Series(np.array(nscd_dist), index=labels_names)
 
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):

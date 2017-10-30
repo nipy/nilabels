@@ -133,12 +133,12 @@ def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=
                     interpolation='nearest', origin='lower')
 
     rows, cols = confusion_data_frame.shape
-
-    for x in xrange(rows):
-        for y in xrange(cols):
-            ax.annotate(str(annotation_data_frame.as_matrix()[x, y]), xy=(y, x),
-                        horizontalalignment='center',
-                        verticalalignment='center')
+    if annotation_data_frame is not None:
+        for x in xrange(rows):
+            for y in xrange(cols):
+                ax.annotate(str(annotation_data_frame.as_matrix()[x, y]), xy=(y, x),
+                            horizontalalignment='center',
+                            verticalalignment='center')
 
     fig.colorbar(res)
 
