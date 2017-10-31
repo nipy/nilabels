@@ -545,7 +545,7 @@ def test_hausdorff_distance():
     assert_almost_equal(hd_1_void['label2'], np.nan)
 
 
-def test_average_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
+def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
     o1 = generate_o(omega=(19,19,19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
     o2 = 2 * o1
     arr1 = np.concatenate([o1, o2], axis=2)
@@ -620,13 +620,18 @@ def test_average_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desk
     assert_almost_equal(ascd_1_1['label1'], 0)
     assert_almost_equal(ascd_1_1['label2'], 0)
 
-    assert_almost_equal(ascd_1_2['label1'], 0.032473, decimal=4)
-    assert_almost_equal(ascd_1_2['label2'], 0.018815, decimal=4)
+    assert_almost_equal(ascd_1_2['label1'], 1.01226261459, decimal=4)
+    assert_almost_equal(ascd_1_2['label2'], 1.01226261459, decimal=4)
 
-    assert_almost_equal(ascd_1_3['label1'], 0.025885, decimal=4)
-    assert_almost_equal(ascd_1_3['label2'], 0.015193, decimal=4)
+    assert_almost_equal(ascd_1_3['label1'], 0.866793279546 , decimal=4)
+    assert_almost_equal(ascd_1_3['label2'], 0.866793279546, decimal=4)
 
     assert_almost_equal(ascd_1_2_extra['label3'], np.nan)
 
     assert_almost_equal(ascd_1_void['label1'], np.nan)
     assert_almost_equal(ascd_1_void['label2'], np.nan)
+
+
+def test_average_symmetric_contour_distance():
+    # TODO
+    pass

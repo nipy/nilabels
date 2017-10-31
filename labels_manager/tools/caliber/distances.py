@@ -227,7 +227,8 @@ def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, label
         dist_border1_array2 = arr2_contour * dtb1
         dist_border2_array1 = arr1_contour * dtb2
 
-        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.sum(np.nonzero(arr1)) + np.sum(np.nonzero(arr2)))
+        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / \
+               (np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
 
     nscd_dist = []
     for l in labels_list:
@@ -237,6 +238,50 @@ def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, label
             print('    NSCD {0} : {1} '.format(l, d))
 
     return pa.Series(np.array(nscd_dist), index=labels_names)
+
+
+def averaged_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
+    """
+    Testing in progress
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :param labels_names:
+    :param return_mm3:
+    :return:
+    """
+    def normalised_symmetric_contour_distance_l(im1, im2, l):
+        arr1 = im1.get_data() == l
+        arr2 = im2.get_data() == l
+
+        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
+            return np.nan
+
+        arr1_contour = contour_from_array_at_label_l(arr1, 1)
+        arr2_contour = contour_from_array_at_label_l(arr2, 1)
+
+        if return_mm3:
+            dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+            dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+        else:
+            dtb1 = nd.distance_transform_edt(1 - arr1_contour)  # arr1_contour_negative
+            dtb2 = nd.distance_transform_edt(1 - arr2_contour)
+
+        dist_border1_array2 = arr2_contour * dtb1
+        dist_border2_array1 = arr1_contour * dtb2
+
+        return .5 * (np.mean(dist_border1_array2[dist_border1_array2 > 0]) + np.mean(dist_border2_array1[dist_border2_array1 > 0]))
+
+
+    nscd_dist = []
+    for l in labels_list:
+        d = normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l)
+        nscd_dist.append(d)
+        if verbose > 0:
+            print('    NSCD {0} : {1} '.format(l, d))
+
+    return pa.Series(np.array(nscd_dist), index=labels_names)
+
 
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
