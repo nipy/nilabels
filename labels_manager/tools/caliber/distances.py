@@ -129,23 +129,25 @@ def covariance_matrices(im, labels, return_mm3=True):
     return cov_matrices
 
 
-def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
+def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1, factor=100):
     """
     Considers the label as a point distribution in the space, and returns the covariance matrix of the points
     distributions.
     :return:
     See: Herdin 2005, Correlation matrix distance, a meaningful measure for evaluation of non-stationary MIMO channels
     """
-    def covariance_distance_l(m1, m2):
+    def covariance_distance_l(m1, m2, mul_factor=factor):
         """
         Covariance distance between matrices m1 and m2, defined as
-        d = 1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2))
+        d = factor * (1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2)))
         :param m1: matrix
         :param m2: matrix
-        :return: 1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2))
+        :param mul_factor: multiplicative factor for the formula
+        :return: mul_factor * (1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2)))
         """
         if np.nan not in m1 and np.nan not in m2:
-            return 1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro')))
+            return \
+                mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
         else:
             return np.nan
     cvs1 = covariance_matrices(im_segm1, labels=labels_list, return_mm3=return_mm3)
@@ -171,6 +173,7 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     :param labels_list:
     :param labels_names:
     :param return_mm3:
+    :param verbose:
     :return:
     """
     def d_H(im1, im2, l):

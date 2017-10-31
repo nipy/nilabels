@@ -447,10 +447,10 @@ def test_covariance_distance():
     im2 = nib.Nifti1Image(arr_2, np.eye(4))
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
 
-    cd_1_1 = covariance_distance(im1, im1, [1, 2], ['label1', 'label2'])
-    cd_1_2 = covariance_distance(im1, im2, [1, 2], ['label1', 'label2'])
-    cd_1_3 = covariance_distance(im1, im3, [1, 2], ['label1', 'label2'])
-    cd_1_2_extra_label = covariance_distance(im1, im2, [1, 2, 4], ['label1', 'label2', 'label4'])
+    cd_1_1 = covariance_distance(im1, im1, [1, 2], ['label1', 'label2'], factor=1)
+    cd_1_2 = covariance_distance(im1, im2, [1, 2], ['label1', 'label2'], factor=1)
+    cd_1_3 = covariance_distance(im1, im3, [1, 2], ['label1', 'label2'], factor=1)
+    cd_1_2_extra_label = covariance_distance(im1, im2, [1, 2, 4], ['label1', 'label2', 'label4'], factor=1)
 
     assert_almost_equal(cd_1_1['label1'], 0)
     assert_almost_equal(cd_1_1['label2'], 0)
@@ -460,6 +460,21 @@ def test_covariance_distance():
     # maximised for 90deg linear structures.
     assert_almost_equal(cd_1_3['label1'], 1)
     assert_almost_equal(cd_1_2_extra_label['label4'], np.nan)
+
+
+def test_covariance_distance_range():
+    factor = 10
+    m1 = np.random.randint(3, size=[20, 20, 20])
+    im1 = nib.Nifti1Image(m1, np.eye(4))
+    for _ in range(20):
+        m2 = np.random.randint(3, size=[20, 20, 20])
+        im2 = nib.Nifti1Image(m2, np.eye(4))
+        cd = covariance_distance(im1, im2, [1, 2], ['label1', 'label2'], factor=factor)
+        print m1
+        print m2
+        print cd
+        assert 0 <= cd['label1'] <= factor
+        assert 0 <= cd['label2'] <= factor
 
 
 def test_hausdorff_distance():

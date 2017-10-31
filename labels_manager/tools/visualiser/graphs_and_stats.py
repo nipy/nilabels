@@ -5,10 +5,12 @@ from matplotlib.collections import PatchCollection
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.ticker as ticker
 
 
 def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
-              centered=(True, False, False, True), add_nomenclatures=True, cell_resolution=128):
+              centered=(True, False, False, True), add_nomenclatures=True, cell_resolution=128,
+              pfi_where_to_save=None):
     """
     Clockwise, from smaller radius to bigger radius.
     :param ax:
@@ -19,6 +21,7 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
     :param centered:
     :param add_nomenclatures:
     :param cell_resolution:
+    :param pfi_where_to_save:
     :return:
     """
     line_width = 1.5
@@ -74,19 +77,23 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
                     cell_center = (0, 0)
                 else:
                     cell_center = ((theta_i + theta_i_plus_one) / 2., r[rs_id] + .5 * r[1] )
-                ax.annotate(str(nomenclatures[cell_id]), xy=cell_center,
+                ax.annotate(r"${:.3g}$".format(nomenclatures[cell_id]), xy=cell_center,
                             xytext=(cell_center[0], cell_center[1]),
-                            horizontalalignment='center', verticalalignment='center')
+                            horizontalalignment='center', verticalalignment='center', size=8)
 
     ax.grid(False)
     ax.set_ylim([0, 1])
     ax.set_yticklabels([])
     ax.set_xticklabels([])
 
+    if pfi_where_to_save is not None:
+        plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
+
 
 def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
-                    titles=None, units=None, raidal_subdivisions=(2, 8, 8, 11),
-                    centered=(True, False, False, True), add_nomenclatures=True):
+                    global_title=None, canvas_title='title', titles=None, units=None, raidal_subdivisions=(2, 8, 8, 11),
+                    centered=(True, False, False, True), add_nomenclatures=(True, True, True, True),
+                    pfi_where_to_save=None, show=True):
     n_fig = len(multi_data)
     if cbar is None:
         cbar = [True] * n_fig
@@ -97,29 +104,43 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
                           for i in range(n_fig)]
     if titles is None:
         titles = ['Title {}'.format(i) for i in range(n_fig)]
-    if units is None:
-        units = ['Units {}'.format(i) for i in range(n_fig)]
 
     h_space = 0.15 / n_fig
     h_dim_fig = .8
     w_dim_fig = .8 / n_fig
 
+    def fmt(x, pos):
+        # a, b = '{:.2e}'.format(x).split('e')
+        # b = int(b)
+        # return r'${} \times 10^{{{}}}$'.format(a, b)
+        return r"${:.4g}$".format(x)
+
     # Make a figure and axes with dimensions as desired.
-    fig = plt.figure(figsize=(3 * n_fig, 6))
-    fig.canvas.set_window_title('Bulls Eyes - segmentation assessment')
+    fig = plt.figure(figsize=(3 * n_fig, 4))
+    fig.canvas.set_window_title(canvas_title)
+    if global_title is not None:
+        plt.suptitle(global_title)
 
     for n in range(n_fig):
         origin_fig = (h_space * (n + 1) + w_dim_fig * n, 0.15)
         ax = fig.add_axes([origin_fig[0], origin_fig[1], w_dim_fig, h_dim_fig], polar=True)
         bulls_eye(ax, multi_data[n], cmap=cmaps[n], norm=normalisations[n], raidal_subdivisions=raidal_subdivisions,
-                  centered=centered, add_nomenclatures=True)
-        ax.set_title(titles[n])
+                  centered=centered, add_nomenclatures=add_nomenclatures[n])
+        ax.set_title(titles[n], size=10)
 
         if cbar[n]:
             origin_cbar = (h_space * (n + 1) + w_dim_fig * n, .15)
             axl = fig.add_axes([origin_cbar[0], origin_cbar[1], w_dim_fig, .05])
-            cb1 = mpl.colorbar.ColorbarBase(axl, cmap=cmaps[n], norm=normalisations[n], orientation='horizontal')
-            cb1.set_label(units[n])
+            cb1 = mpl.colorbar.ColorbarBase(axl, cmap=cmaps[n], norm=normalisations[n], orientation='horizontal',
+                                            format=ticker.FuncFormatter(fmt))
+            cb1.ax.tick_params(labelsize=8)
+            if units is not None:
+                cb1.set_label(units[n])
+
+    if pfi_where_to_save is not None:
+        plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
+    if show:
+        plt.show()
 
 
 def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=(4,4), title='Title', cmap=plt.cm.jet,
@@ -228,7 +249,7 @@ if __name__ == '__main__':
 
         plt.show()
 
-    if False:
+    if True:
 
         # multi_data = [data for _ in range(3)]
         # print multi_data
@@ -236,14 +257,14 @@ if __name__ == '__main__':
         #
         # plt.show(block=False)
 
-        multi_data = [data[:16] for _ in range(3)]
+        multi_data = [range(1,17), list( 0.000000001 * np.array(range(1,17))), list( 0.001 * np.array(range(1,17)))]
         print multi_data
         multi_bull_eyes(multi_data, raidal_subdivisions=(3,3,4,6),
-                  centered=(True, True, True, True), add_nomenclatures=True)
+                  centered=(True, True, True, True), add_nomenclatures=[True]*3)
 
         plt.show(block=True)
 
-    if True:
+    if False :
         d = {'one': pd.Series([1., 2., 3.], index=['a', 'b', 'c']),
              'two': pd.Series([1.5, 2.5, 3.5, 4.5], index=['a', 'b', 'c', 'd'])}
         df = pd.DataFrame(d)
