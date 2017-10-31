@@ -10,6 +10,8 @@ from labels_manager.tools.aux_methods.utils import print_and_run
 from labels_manager.tools.detections.contours import contour_from_array_at_label_l
 
 
+# --- Auxiliaries
+
 def centroid_array(arr, labels):
     centers_of_mass = [np.array([0, 0, 0])] * len(labels)
     for l_id, l in enumerate(labels):
@@ -45,67 +47,6 @@ def centroid(im, labels, return_mm3=True):
                 ans += [cm]
     return ans
 
-# --- global distances
-
-
-def global_dice_score(im_segm1, im_segm2, labels_list):
-    """
-    Global dice score as in Munoz-Moreno et al. 2013
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :return:
-    """
-    sum_intersections = np.sum([np.count_nonzero((im_segm1.get_data() == l) * (im_segm2.get_data() == l))
-                         for l in labels_list])
-
-    return 2 * sum_intersections / float(np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
-
-
-def global_outline_error(im_segm1, im_segm2, labels_list):
-    """
-    Volume of the binarised image differences over the average volume of the two images.
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :return:
-    """
-    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
-    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
-    num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
-    return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
-
-
-# --- distances
-
-def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=1):
-    """
-    Dice score between paired labels of segmentations.
-    :param im_segm1: nibabel image with labels
-    :param im_segm2: nibabel image with labels
-    :param labels_list:
-    :param labels_names:
-    :return: dice score of the label label of the two segmentations.
-    """
-    def dice_score_l(lab):
-        place1 = im_segm1.get_data() == lab  # slow but readable, can be refactored later.
-        place2 = im_segm2.get_data() == lab
-        non_zero_place1 = np.count_nonzero(place1)
-        non_zero_place2 = np.count_nonzero(place2)
-        if non_zero_place1 + non_zero_place2 == 0:
-            return np.nan
-        else:
-            return 2 * np.count_nonzero(place1 * place2) / float(non_zero_place1 + non_zero_place2)
-
-    scores = []
-    for l in labels_list:
-        d = dice_score_l(l)
-        scores.append(d)
-        if verbose > 0:
-            print('    Dice scores label {0} : {1} '.format(l, d))
-
-    return pa.Series(scores, index=labels_names)
-
 
 def covariance_matrices(im, labels, return_mm3=True):
     """
@@ -129,6 +70,145 @@ def covariance_matrices(im, labels, return_mm3=True):
     return cov_matrices
 
 
+def covariance_distance_from_matrices(m1, m2, mul_factor=1):
+    """
+    Covariance distance between matrices m1 and m2, defined as
+    d = factor * (1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2)))
+    :param m1: matrix
+    :param m2: matrix
+    :param mul_factor: multiplicative factor for the formula
+    :return: mul_factor * (1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2)))
+    """
+    if np.nan not in m1 and np.nan not in m2:
+        return \
+            mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
+    else:
+        return np.nan
+
+
+# --- global distances: (segm, segm) |-> real
+
+
+def global_dice_score(im_segm1, im_segm2, labels_list):
+    """
+    Global dice score as in Munoz-Moreno et al. 2013
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :return:
+    """
+    sum_intersections = np.sum([np.count_nonzero((im_segm1.get_data() == l) * (im_segm2.get_data() == l))
+                         for l in labels_list])
+    return 2 * sum_intersections / float(np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
+
+
+def global_outline_error(im_segm1, im_segm2, labels_list):
+    """
+    Volume of the binarised image differences over the average volume of the two images.
+    :param im_segm1:
+    :param im_segm2:
+    :param labels_list:
+    :return:
+    """
+    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
+    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
+    num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
+    return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
+
+
+# --- Single labels distances (segm, segm, label) |-> real
+
+
+def dice_score_l(im_segm1, im_segm2, lab):
+    place1 = im_segm1.get_data() == lab  # slow but readable, can be refactored later.
+    place2 = im_segm2.get_data() == lab
+    non_zero_place1 = np.count_nonzero(place1)
+    non_zero_place2 = np.count_nonzero(place2)
+    if non_zero_place1 + non_zero_place2 == 0:
+        return np.nan
+    else:
+        return 2 * np.count_nonzero(place1 * place2) / float(non_zero_place1 + non_zero_place2)
+
+
+def d_H(im1, im2, lab, return_mm3):
+    """
+    Asymmetric component of the Hausdorff distance.
+    :param im1: first image
+    :param im2: second image
+    :param lab: label in the image
+    :param return_mm3: final unit of measures of the result.
+    :return: max(d(x, contourY)), x point in the first segmentation, contourY contour of the second distance.
+    """
+    arr1 = im1.get_data() == lab
+    arr2 = im2.get_data() == lab
+    if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
+        return np.nan
+    if return_mm3:
+        dt2 = nd.distance_transform_edt(1 - arr2, sampling=list(np.diag(im1.affine[:3, :3])))
+    else:
+        dt2 = nd.distance_transform_edt(1 - arr2, sampling=None)
+    return np.max(dt2 * arr1)
+
+
+def hausdorff_distance_l(im_segm1, im_segm2, lab, return_mm3):
+    return np.max([d_H(im_segm1, im_segm2, lab, return_mm3), d_H(im_segm2, im_segm1, lab, return_mm3)])
+
+
+def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'):
+    # generalised normalised symmetric contour distance.
+    arr1 = im1.get_data() == lab
+    arr2 = im2.get_data() == lab
+
+    if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
+        return np.nan
+
+    arr1_contour = contour_from_array_at_label_l(arr1, 1)
+    arr2_contour = contour_from_array_at_label_l(arr2, 1)
+
+    if return_mm3:
+        dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+        dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+    else:
+        dtb1 = nd.distance_transform_edt(1 - arr1_contour)
+        dtb2 = nd.distance_transform_edt(1 - arr2_contour)
+
+    dist_border1_array2 = arr2_contour * dtb1
+    dist_border2_array1 = arr1_contour * dtb2
+
+    if formula == 'normalised':
+        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
+    elif formula == 'averaged':
+        return .5 * (np.mean(dist_border1_array2[dist_border1_array2 > 0]) + np.mean(dist_border2_array1[dist_border2_array1 > 0]))
+    elif formula == 'median':
+        return .5 * (np.median(dist_border1_array2[dist_border1_array2 > 0]) + np.median(dist_border2_array1[dist_border2_array1 > 0]))
+    elif formula == 'std':
+        return .5 * (np.std(dist_border1_array2[dist_border1_array2 > 0]) + np.std(dist_border2_array1[dist_border2_array1 > 0]))
+    else:
+        raise IOError
+
+
+# --- distances - (segm, segm) |-> pandas.Series (indexed by labels)
+
+def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=1):
+    """
+    Dice score between paired labels of segmentations.
+    :param im_segm1: nibabel image with labels
+    :param im_segm2: nibabel image with labels
+    :param labels_list:
+    :param labels_names:
+    :param verbose:
+    :return: dice score of the label label of the two segmentations.
+    """
+    scores = []
+    for l in labels_list:
+        d = dice_score_l(im_segm1, im_segm2, l)
+        scores.append(d)
+        if verbose > 0:
+            print('    Dice scores label {0} : {1} '.format(l, d))
+
+    return pa.Series(scores, index=labels_names)
+
+
 def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1, factor=100):
     """
     Considers the label as a point distribution in the space, and returns the covariance matrix of the points
@@ -136,26 +216,12 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
     :return:
     See: Herdin 2005, Correlation matrix distance, a meaningful measure for evaluation of non-stationary MIMO channels
     """
-    def covariance_distance_l(m1, m2, mul_factor=factor):
-        """
-        Covariance distance between matrices m1 and m2, defined as
-        d = factor * (1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2)))
-        :param m1: matrix
-        :param m2: matrix
-        :param mul_factor: multiplicative factor for the formula
-        :return: mul_factor * (1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2)))
-        """
-        if np.nan not in m1 and np.nan not in m2:
-            return \
-                mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
-        else:
-            return np.nan
     cvs1 = covariance_matrices(im_segm1, labels=labels_list, return_mm3=return_mm3)
     cvs2 = covariance_matrices(im_segm2, labels=labels_list, return_mm3=return_mm3)
 
     cov_dist = []
     for l, a1, a2 in zip(labels_list, cvs1, cvs2):
-        d = covariance_distance_l(a1, a2)
+        d = covariance_distance_from_matrices(a1, a2, mul_factor=factor)
         cov_dist.append(d)
         if verbose > 0:
             print('    Covariance distance label {0} : {1} '.format(l, d))
@@ -176,20 +242,9 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     :param verbose:
     :return:
     """
-    def d_H(im1, im2, l):
-        arr1 = im1.get_data() == l
-        arr2 = im2.get_data() == l
-        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
-            return np.nan
-        if return_mm3:
-            dt2 = nd.distance_transform_edt(1 - arr2, sampling=list(np.diag(im1.affine[:3, :3])))
-        else:
-            dt2 = nd.distance_transform_edt(1 - arr2, sampling=None)
-        return np.max(dt2 * arr1)
-
     hausd_dist = []
     for l in labels_list:
-        d = np.max([d_H(im_segm1, im_segm2, l), d_H(im_segm2, im_segm1, l)])
+        d = hausdorff_distance_l(im_segm1, im_segm2, l, return_mm3)
         hausd_dist.append(d)
         if verbose > 0:
             print('    Hausdoroff distance label {0} : {1} '.format(l, d))
@@ -197,92 +252,42 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     return pa.Series(np.array(hausd_dist), index=labels_names)
 
 
-def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
-    """
-    Testing in progress
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :param labels_names:
-    :param return_mm3:
-    :return:
-    """
-    def normalised_symmetric_contour_distance_l(im1, im2, l):
-        arr1 = im1.get_data() == l
-        arr2 = im2.get_data() == l
-
-        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
-            return np.nan
-
-        arr1_contour = contour_from_array_at_label_l(arr1, 1)
-        arr2_contour = contour_from_array_at_label_l(arr2, 1)
-
-        if return_mm3:
-            dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-            dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-        else:
-            dtb1 = nd.distance_transform_edt(1 - arr1_contour)  # arr1_contour_negative
-            dtb2 = nd.distance_transform_edt(1 - arr2_contour)
-
-        dist_border1_array2 = arr2_contour * dtb1
-        dist_border2_array1 = arr1_contour * dtb2
-
-        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / \
-               (np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
-
+def symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1,
+                               formula='normalised'):
     nscd_dist = []
     for l in labels_list:
-        d = normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l)
+        d = symmetric_contour_distance_l(im_segm1, im_segm2, l, return_mm3, formula)
         nscd_dist.append(d)
         if verbose > 0:
-            print('    NSCD {0} : {1} '.format(l, d))
+            print('    {0}-SCD {1} : {2} '.format(formula, l, d))
 
     return pa.Series(np.array(nscd_dist), index=labels_names)
+
+
+# --- varaizioni over symmetric contour distance:
+
+
+def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
+    return symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names,
+                                      return_mm3=return_mm3, verbose=verbose, formula='normalised')
 
 
 def averaged_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
-    """
-    Testing in progress
-    :param im_segm1:
-    :param im_segm2:
-    :param labels_list:
-    :param labels_names:
-    :param return_mm3:
-    :return:
-    """
-    def normalised_symmetric_contour_distance_l(im1, im2, l):
-        arr1 = im1.get_data() == l
-        arr2 = im2.get_data() == l
-
-        if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
-            return np.nan
-
-        arr1_contour = contour_from_array_at_label_l(arr1, 1)
-        arr2_contour = contour_from_array_at_label_l(arr2, 1)
-
-        if return_mm3:
-            dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-            dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-        else:
-            dtb1 = nd.distance_transform_edt(1 - arr1_contour)  # arr1_contour_negative
-            dtb2 = nd.distance_transform_edt(1 - arr2_contour)
-
-        dist_border1_array2 = arr2_contour * dtb1
-        dist_border2_array1 = arr1_contour * dtb2
-
-        return .5 * (np.mean(dist_border1_array2[dist_border1_array2 > 0]) + np.mean(dist_border2_array1[dist_border2_array1 > 0]))
+    return symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names,
+                                      return_mm3=return_mm3, verbose=verbose, formula='averaged')
 
 
-    nscd_dist = []
-    for l in labels_list:
-        d = normalised_symmetric_contour_distance_l(im_segm1, im_segm2, l)
-        nscd_dist.append(d)
-        if verbose > 0:
-            print('    NSCD {0} : {1} '.format(l, d))
-
-    return pa.Series(np.array(nscd_dist), index=labels_names)
+def median_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
+    return symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names,
+                                      return_mm3=return_mm3, verbose=verbose, formula='median')
 
 
+def std_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
+    return symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names,
+                                      return_mm3=return_mm3, verbose=verbose, formula='std')
+
+
+# --- extra:
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """
@@ -292,13 +297,14 @@ def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     :param im: sampled on an orthogonal grid.
     :param labels_list:
     :param labels_names:
+    :param return_mm3:
     :return:
     """
-    def box_sides_length_l(arr, l, scaling_factors):
-        coords = np.where(arr == l)  # returns [X_vector, Y_vector, Z_vector]
-        dists = [np.abs(np.max(k) - np.min(k)) for k in coords]
+    def box_sides_length_l(arr, lab, scaling_factors):
+        coordinates = np.where(arr == lab)  # returns [X_vector, Y_vector, Z_vector]
+        dists = [np.abs(np.max(k) - np.min(k)) for k in coordinates]
         if return_mm3:
-            dists = [d * dd for d, dd in zip(coords, scaling_factors)]
+            dists = [d * dd for d, dd in zip(coordinates, scaling_factors)]
         return dists
 
     return pa.Series(
@@ -326,7 +332,7 @@ def mahalanobis_distance(im, im_mask=None, trim=False):
 
 
 
-def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=0):
+def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     # definition of s_dispersion is not the conventional definition of precision
 
     # def dispersion_l(lab, verbose=verbose):
