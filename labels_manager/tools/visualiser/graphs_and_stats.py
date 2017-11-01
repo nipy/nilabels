@@ -94,6 +94,7 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
                     global_title=None, canvas_title='title', titles=None, units=None, raidal_subdivisions=(2, 8, 8, 11),
                     centered=(True, False, False, True), add_nomenclatures=(True, True, True, True),
                     pfi_where_to_save=None, show=True):
+    plt.clf()
     n_fig = len(multi_data)
     if cbar is None:
         cbar = [True] * n_fig

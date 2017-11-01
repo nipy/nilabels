@@ -2,7 +2,6 @@ import os
 import nibabel as nib
 import pandas as pa
 import numpy as np
-from collections import OrderedDict
 
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
