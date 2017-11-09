@@ -139,7 +139,7 @@ class LabelsManagerMeasure(object):
 
         return df_distances_per_label
 
-    def global_dist(self, segm_1_filename, segm_2_filename, labels_list=None, where_to_save=None,
+    def global_dist(self, segm_1_filename, segm_2_filename, where_to_save=None,
                     global_metrics=(global_outline_error, global_dice_score)):
 
         pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
@@ -149,17 +149,13 @@ class LabelsManagerMeasure(object):
         assert os.path.exists(pfi_segm2), pfi_segm2
 
         if self.verbose > 0:
-            print("\nDistances between segmentations: \n -> {0} \n -> {1} \n...started!".format(pfi_segm1, pfi_segm2))
+            print("\nGlobal distances between segmentations: \n -> {0} \n -> {1} "
+                  "\nComputations started!".format(pfi_segm1, pfi_segm2))
 
         im_segm1 = nib.load(pfi_segm1)
         im_segm2 = nib.load(pfi_segm2)
 
-        if labels_list is None:
-            labels_list1, labels_names1 = labels_query('all', im_segm1.get_data())
-            labels_list2, labels_names2 = labels_query('all', im_segm2.get_data())
-            labels_list  = list(set(labels_list1) & set(labels_list2))
-
-        se_global_distances = pa.Series(np.array([d(im_segm1, im_segm2, labels_list) for d in global_metrics]),
+        se_global_distances = pa.Series(np.array([d(im_segm1, im_segm2) for d in global_metrics]),
                                         index=[d.__name__ for d in global_metrics])
         if where_to_save is not None:
             where_to_save = connect_path_tail_head(self.pfo_out, where_to_save)

@@ -250,16 +250,14 @@ def test_global_dice_score():
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
     im_void = nib.Nifti1Image(arr_void, np.eye(4))
 
-    g_dice_1_1 = global_dice_score(im1, im1, [1, 2])
-    g_dice_1_2 = global_dice_score(im1, im2, [1, 2])
-    g_dice_1_3 = global_dice_score(im1, im3, [1, 2])
-    g_dice_1_2_extra_label = global_dice_score(im1, im2, [1, 2, 4])
-    g_dice_1_void = global_dice_score(im1, im_void, [1, 2])
+    g_dice_1_1 = global_dice_score(im1, im1)
+    g_dice_1_2 = global_dice_score(im1, im2)
+    g_dice_1_3 = global_dice_score(im1, im3)
+    g_dice_1_void = global_dice_score(im1, im_void)
 
     assert_equal(g_dice_1_1, 1)
     assert_equal(g_dice_1_2, (16 + 14) / (18. + 17.))
     assert_equal(g_dice_1_3, 0)
-    assert_equal(g_dice_1_2_extra_label, (16 + 14) / (18. + 17.))
     assert_equal(g_dice_1_void, 0)
 
 
@@ -331,16 +329,14 @@ def test_global_outline_error():
     im3 = nib.Nifti1Image(arr_3, np.eye(4))
     im_void = nib.Nifti1Image(arr_void, np.eye(4))
 
-    goe_1_1 = global_outline_error(im1, im1, [1, 2])
-    goe_1_2 = global_outline_error(im1, im2, [1, 2])
-    goe_1_3 = global_outline_error(im1, im3, [1, 2])
-    goe_1_2_extra = global_outline_error(im1, im2, [1, 2, 5])
-    goe_1_void = global_outline_error(im1, im_void, [1, 2])
+    goe_1_1 = global_outline_error(im1, im1)
+    goe_1_2 = global_outline_error(im1, im2)
+    goe_1_3 = global_outline_error(im1, im3)
+    goe_1_void = global_outline_error(im1, im_void)
 
     assert_equal(goe_1_1, 0)
     assert_almost_equal(goe_1_2, 5 / (.5 * (20 + 15)))
     assert_almost_equal(goe_1_3, 48 / (.5 * (20 + 32)))
-    assert_almost_equal(goe_1_2_extra, goe_1_2)
     assert_almost_equal(goe_1_void, 2)  # interesting case!
 
 

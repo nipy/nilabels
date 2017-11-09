@@ -76,7 +76,7 @@ def covariance_distance_from_matrices(m1, m2, mul_factor=1):
     d = factor * (1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2)))
     :param m1: matrix
     :param m2: matrix
-    :param mul_factor: multiplicative factor for the formula
+    :param mul_factor: multiplicative factor for the formula, it equals to the maximal value the distance can reach
     :return: mul_factor * (1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2)))
     """
     if np.nan not in m1 and np.nan not in m2:
@@ -89,7 +89,7 @@ def covariance_distance_from_matrices(m1, m2, mul_factor=1):
 # --- global distances: (segm, segm) |-> real
 
 
-def global_dice_score(im_segm1, im_segm2, labels_list):
+def global_dice_score(im_segm1, im_segm2):
     """
     Global dice score as in Munoz-Moreno et al. 2013
     :param im_segm1:
@@ -97,21 +97,22 @@ def global_dice_score(im_segm1, im_segm2, labels_list):
     :param labels_list:
     :return:
     """
+    all_labels1 = set(im_segm1.get_data().astype(np.int).flat) - {0}
+    all_labels2 = set(im_segm1.get_data().astype(np.int).flat) - {0}
     sum_intersections = np.sum([np.count_nonzero((im_segm1.get_data() == l) * (im_segm2.get_data() == l))
-                         for l in labels_list])
+                         for l in set.union(all_labels1, all_labels2)])
     return 2 * sum_intersections / float(np.count_nonzero(im_segm1.get_data()) + np.count_nonzero(im_segm2.get_data()))
 
 
-def global_outline_error(im_segm1, im_segm2, labels_list):
+def global_outline_error(im_segm1, im_segm2):
     """
-    Volume of the binarised image differences over the average volume of the two images.
+    Volume of the binarised image differences over the average binarised volume of the two images.
     :param im_segm1:
     :param im_segm2:
     :param labels_list:
     :return:
     """
-    num_voxels_1 = np.sum([np.count_nonzero(im_segm1.get_data() == l) for l in labels_list])
-    num_voxels_2 = np.sum([np.count_nonzero(im_segm2.get_data() == l) for l in labels_list])
+    num_voxels_1, num_voxels_2 = np.count_nonzero(im_segm1.get_data()), np.count_nonzero(im_segm2.get_data())
     num_voxels_diff = np.count_nonzero(im_segm1.get_data() - im_segm2.get_data())
     return num_voxels_diff / (.5 * (num_voxels_1 + num_voxels_2))
 
@@ -137,7 +138,8 @@ def d_H(im1, im2, lab, return_mm3):
     :param im2: second image
     :param lab: label in the image
     :param return_mm3: final unit of measures of the result.
-    :return: max(d(x, contourY)), x point in the first segmentation, contourY contour of the second distance.
+    :return: max(d(x, contourY)), x: point belonging to the first contour,
+                                  contourY: contour of the second segmentation.
     """
     arr1 = im1.get_data() == lab
     arr2 = im2.get_data() == lab
@@ -155,7 +157,22 @@ def hausdorff_distance_l(im_segm1, im_segm2, lab, return_mm3):
 
 
 def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'):
-    # generalised normalised symmetric contour distance.
+    """
+    Generalised normalised symmetric contour distance.
+    On the set {d(x, contourY)) | x in contourX}, several statistics can be computed.
+     Mean, median and standard deviation can be useful, as well as a more robust normalisation
+     Formula can be
+    :param im1:
+    :param im2:
+    :param lab:
+    :param return_mm3:
+    :param formula: 'normalised', 'averaged', 'median', 'std'
+    'normalised' = (\sum_{x in contourX} d(x, contourY))  + \sum_{y in contourY} d(y, contourX))) / (|contourX| + |contourY|)
+    'averaged'   = 0.5 (mean({d(x, contourY)) | x in contourX}) + mean({d(y, contourX)) | y in contourY}))
+    'median'     = 0.5 (median({d(x, contourY)) | x in contourX}) + median({d(y, contourX)) | y in contourY}))
+    'std'        = 0.5 \sqrt(std({d(x, contourY)) | x in contourX})^2 + std({d(y, contourX)) | y in contourY})^2)
+    :return:
+    """
     arr1 = im1.get_data() == lab
     arr2 = im2.get_data() == lab
 
@@ -178,11 +195,11 @@ def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'
     if formula == 'normalised':
         return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
     elif formula == 'averaged':
-        return .5 * (np.mean(dist_border1_array2[dist_border1_array2 > 0]) + np.mean(dist_border2_array1[dist_border2_array1 > 0]))
+        return .5 * (np.mean(dist_border1_array2) + np.mean(dist_border2_array1))
     elif formula == 'median':
-        return .5 * (np.median(dist_border1_array2[dist_border1_array2 > 0]) + np.median(dist_border2_array1[dist_border2_array1 > 0]))
+        return .5 * (np.median(dist_border1_array2) + np.median(dist_border2_array1))
     elif formula == 'std':
-        return .5 * (np.std(dist_border1_array2[dist_border1_array2 > 0]) + np.std(dist_border2_array1[dist_border2_array1 > 0]))
+        return np.sqrt( .5 * (np.std(dist_border1_array2)**2 + np.std(dist_border2_array1)**2))
     else:
         raise IOError
 

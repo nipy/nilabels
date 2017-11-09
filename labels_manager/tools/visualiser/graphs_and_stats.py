@@ -10,7 +10,7 @@ import matplotlib.ticker as ticker
 
 def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
               centered=(True, False, False, True), add_nomenclatures=True, cell_resolution=128,
-              pfi_where_to_save=None):
+              pfi_where_to_save=None, colors_bound='-k'):
     """
     Clockwise, from smaller radius to bigger radius.
     :param ax:
@@ -39,18 +39,19 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
     nomenclatures = []
     if isinstance(add_nomenclatures, bool):
         if add_nomenclatures:
-            nomenclatures = range(sum(raidal_subdivisions))
+            nomenclatures = range(1, sum(raidal_subdivisions)+1)
     elif isinstance(add_nomenclatures, list) or isinstance(add_nomenclatures, tuple):
         assert len(add_nomenclatures) == sum(raidal_subdivisions)
         nomenclatures = add_nomenclatures[:]
         add_nomenclatures = True
+
 
     # Create the circular bounds
     line_width_circular = line_width
     for i in range(r.shape[0]):
         if i == range(r.shape[0])[-1]:
             line_width_circular = int(line_width / 2.)
-        ax.plot(theta, np.repeat(r[i], theta.shape), '-k', lw=line_width_circular)
+        ax.plot(theta, np.repeat(r[i], theta.shape), colors_bound, lw=line_width_circular)
 
     # iterate over cells divided by radial subdivision
     for rs_id, rs in enumerate(raidal_subdivisions):
@@ -70,16 +71,22 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
 
             # Create radial bounds
             if rs  > 1:
-                ax.plot([theta_i, theta_i], [r[rs_id], r[rs_id+1]], '-k', lw=line_width)
+                ax.plot([theta_i, theta_i], [r[rs_id], r[rs_id+1]], colors_bound, lw=line_width)
             # Add centered nomenclatures if needed
             if add_nomenclatures:
                 if rs == 1 and rs_id ==0:
                     cell_center = (0, 0)
                 else:
                     cell_center = ((theta_i + theta_i_plus_one) / 2., r[rs_id] + .5 * r[1] )
-                ax.annotate(r"${:.3g}$".format(nomenclatures[cell_id]), xy=cell_center,
-                            xytext=(cell_center[0], cell_center[1]),
-                            horizontalalignment='center', verticalalignment='center', size=8)
+
+                if isinstance(nomenclatures[0], (int, long, float, complex)):
+                    ax.annotate(r"${:.3g}$".format(nomenclatures[cell_id]), xy=cell_center,
+                                xytext=(cell_center[0], cell_center[1]),
+                                horizontalalignment='center', verticalalignment='center', size=8)
+                else:
+                    ax.annotate(nomenclatures[cell_id], xy=cell_center,
+                                xytext=(cell_center[0], cell_center[1]),
+                                horizontalalignment='center', verticalalignment='center', size=12)
 
     ax.grid(False)
     ax.set_ylim([0, 1])
@@ -139,7 +146,7 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
                 cb1.set_label(units[n])
 
     if pfi_where_to_save is not None:
-        plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
+        plt.savefig(pfi_where_to_save, format='pdf', dpi=330)
     if show:
         plt.show()
 

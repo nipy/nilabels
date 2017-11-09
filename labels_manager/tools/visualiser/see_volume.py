@@ -1,3 +1,7 @@
+import numpy as np
+import nibabel as nib
+from matplotlib import rc
+
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 
@@ -148,3 +152,111 @@ def see_array(in_array, num_fig=1, block=False,
 
 def stack_3dimage_to_gif():
     pass
+
+
+def see_image_slice_with_a_grid(pfi_image, fig_num=1, axis_quote=('y', 230), vmin=None, vmax=None, cmap='gray',
+                                pfi_where_to_save=None):
+    rc('text', usetex=True)
+    fig = plt.figure(fig_num, figsize=(6, 6))
+    fig.canvas.set_window_title('canvas {}'.format(fig_num))
+    ax = fig.add_subplot(111)
+
+    im = nib.load(pfi_image)
+    if axis_quote[0] == 'x':
+
+        data = im.get_data()[axis_quote[1], :, :].T
+        shape = data.shape
+
+        voxel_origin = np.array([axis_quote[1], 0, 0, 1])
+        voxel_x = np.array([axis_quote[1], shape[1], 0, 1])
+        voxel_y = np.array([axis_quote[1], 0, shape[0], 1])
+
+        affine = im.affine
+
+        pt_origin = affine.dot(voxel_origin)
+        pt_x = affine.dot(voxel_x)
+        pt_y = affine.dot(voxel_y)
+
+        horizontal_min = pt_origin[1]
+        horizontal_max = pt_x[1]
+        vertical_min = pt_origin[2]
+        vertical_max = pt_y[2]
+
+        extent = [horizontal_min, horizontal_max, vertical_min, vertical_max]
+        print extent
+
+    elif axis_quote[0] == 'y':
+        data = im.get_data()[:, axis_quote[1], :].T
+        shape = data.shape
+
+        voxel_origin = np.array([0, axis_quote[1], 0, 1])
+        voxel_x = np.array([shape[1], axis_quote[1], 0, 1])
+        voxel_y = np.array([0, axis_quote[1], shape[0], 1])
+
+        affine = im.affine
+
+        pt_origin = affine.dot(voxel_origin)
+        pt_x = affine.dot(voxel_x)
+        pt_y = affine.dot(voxel_y)
+
+        horizontal_min = pt_origin[0]
+        horizontal_max = pt_x[0]
+        vertical_min = pt_origin[2]
+        vertical_max = pt_y[2]
+
+        extent = [horizontal_min, horizontal_max, vertical_min, vertical_max]
+
+    elif axis_quote[0] == 'z':
+
+        data = im.get_data()[:, :, axis_quote[1]].T
+        shape = data.shape
+
+        voxel_origin = np.array([0, 0, axis_quote[1], 1])
+        voxel_x = np.array([shape[1], 0, axis_quote[1], 1])
+        voxel_y = np.array([0, shape[0], axis_quote[1], 1])
+
+        affine = im.affine
+
+        pt_origin = affine.dot(voxel_origin)
+        pt_x = affine.dot(voxel_x)
+        pt_y = affine.dot(voxel_y)
+
+        horizontal_min = pt_origin[0]
+        horizontal_max = pt_x[0]
+        vertical_min = pt_origin[1]
+        vertical_max = pt_y[1]
+
+        extent = [horizontal_min, horizontal_max, vertical_min, vertical_max]
+
+    else:
+        raise IOError
+
+    print voxel_origin
+    print voxel_x
+    print voxel_y
+    print pt_origin
+    print pt_x
+    print pt_y
+    print extent
+    res = ax.imshow(data,
+                    extent=extent,
+                    origin='lower',
+                    interpolation='nearest',
+                    cmap=cmap, vmin=vmin, vmax=vmax)
+
+    ax.grid(color='grey', linestyle='-', linewidth=0.5)
+    ax.set_aspect('equal')
+
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(8)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(8)
+
+    if pfi_where_to_save is not None:
+        plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
+
+
+
+
+
+
