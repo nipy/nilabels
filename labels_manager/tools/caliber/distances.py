@@ -200,6 +200,9 @@ def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'
         return .5 * (np.median(dist_border1_array2) + np.median(dist_border2_array1))
     elif formula == 'std':
         return np.sqrt( .5 * (np.std(dist_border1_array2)**2 + np.std(dist_border2_array1)**2))
+    elif formula == 'average_std':
+        return .5 * (np.mean(dist_border1_array2) + np.mean(dist_border2_array1)), \
+               np.sqrt(.5 * (np.std(dist_border1_array2) ** 2 + np.std(dist_border2_array1) ** 2))
     else:
         raise IOError
 
