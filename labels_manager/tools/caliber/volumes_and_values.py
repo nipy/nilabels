@@ -29,7 +29,7 @@ def get_values_below_labels(im_seg, im_anat, labels_list, labels_names=None):
     :param im_anat: image anatomy
     :param labels_list: integer, list of labels [l1, l2, ..., ln], or list of list of labels if labels needs to be
     considered together.
-    e.g. labels_list = [1,2,[3,4]] -> volume of label 1, volume of label 2, volume of label 3 and 4.
+    e.g. labels_list = [1,2,[3,4]] -> values below label 1, values below label 2, values below label 3 and 4.
     :return: list of numpy arrays, each element is the flat array of the values below the labels
     """
     values = []
@@ -55,6 +55,7 @@ def get_values_below_labels(im_seg, im_anat, labels_list, labels_names=None):
         return values
     else:
         return pa.Series(values, index=labels_names)
+
 
 def from_values_below_labels_to_volumes(values_below_labels, im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
     """

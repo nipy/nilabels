@@ -15,7 +15,8 @@ class ICV_estimator(object):
     """
     ICV estimation as in
     Iglesias JE, Ferraris S, Modat M, Gsell W, Deprest J, van der Merwe JL, Vercauteren T: "Template-free estimation of
-    intracranial volume: a preterm birth animal model study", MICCAI workshop: Fetal and Infant Image Analysis, 2017
+    intracranial volume: a preterm birth animal model study", MICCAI workshop: Fetal and Infant Image Analysis, 2017.
+    Note: not the same code used to produce the paper
     """
     def __init__(self, pfi_list_subjects_to_coregister, pfo_output, S=None, m=None,
                       n=0.001, a=0.001, b=0.1, alpha=0.001, beta=0.1):

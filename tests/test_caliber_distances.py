@@ -6,7 +6,7 @@ from scipy import ndimage as nd
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.detections.contours import contour_from_segmentation
-from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_o, generate_cube
+from labels_manager.tools.phantoms_generator.shapes_for_phantoms import o_shape, cube_shape
 
 from labels_manager.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
@@ -542,7 +542,7 @@ def test_hausdorff_distance():
 
 
 def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
-    o1 = generate_o(omega=(19,19,19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
+    o1 = o_shape(omega=(19, 19, 19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
     o2 = 2 * o1
     arr1 = np.concatenate([o1, o2], axis=2)
 
@@ -551,7 +551,7 @@ def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/D
     half_o2 = 2 * half_o1
     arr2 = np.concatenate([half_o1, half_o2], axis=2)
 
-    c1 = generate_cube(omega=(19,19,19), center=(9, 9, 9), side_length=13, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
+    c1 = cube_shape(omega=(19, 19, 19), center=(9, 9, 9), side_length=13, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
     c2 = 2 * c1
     arr3 = np.concatenate([c1, c2], axis=2)
 

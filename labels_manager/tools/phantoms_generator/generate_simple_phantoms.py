@@ -8,8 +8,8 @@ import scipy.ndimage.filters as fil
 from labels_manager.tools.aux_methods.utils import binarise_a_matrix
 from labels_manager.tools.defs import root_dir
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
-from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_ellipsoid, generate_o, generate_c, \
-    generate_cube
+from labels_manager.tools.phantoms_generator.shapes_for_phantoms import ellipsoid_shape, o_shape, c_shape, \
+    cube_shape
 
 
 def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
@@ -34,7 +34,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
     if create['Punt e mes']:
 
-        data_o_punt = generate_o(omega=(256, 256, 256), foreground_intensity=foreground, dtype=np.float64)
+        data_o_punt = o_shape(omega=(256, 256, 256), foreground_intensity=foreground, dtype=np.float64)
         data_o_punt = fil.gaussian_filter(data_o_punt, sigma=sigma_smoothing)
 
         data_o_punt_segmentation = intensity_segmentation(data_o_punt, num_levels=segmentation_levels)
@@ -66,7 +66,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
     if create['C']:
 
-        data_c_ = generate_c(omega=(256, 256, 256), foreground_intensity=foreground)
+        data_c_ = c_shape(omega=(256, 256, 256), foreground_intensity=foreground)
         data_c_ = fil.gaussian_filter(data_c_, sigma_smoothing)
 
         data_c = np.zeros_like(data_c_)
@@ -118,8 +118,8 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         d_left = 95
         d_right = 95
 
-        ellipsoid_left  = generate_ellipsoid(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left, foreground_intensity=foreground)
-        ellipsoid_right = generate_ellipsoid(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right, foreground_intensity=foreground)
+        ellipsoid_left  = ellipsoid_shape(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left, foreground_intensity=foreground)
+        ellipsoid_right = ellipsoid_shape(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right, foreground_intensity=foreground)
 
         two_ellipsoids = foreground * binarise_a_matrix(ellipsoid_left + ellipsoid_right, dtype=np.float64)
 
@@ -150,7 +150,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         num_ellipsoids = 10
 
         # Target image:
-        target_data = generate_o(omega=omega, radius=25, foreground_intensity=foreground, dtype=np.float64)
+        target_data = o_shape(omega=omega, radius=25, foreground_intensity=foreground, dtype=np.float64)
         target_data = fil.gaussian_filter(target_data, sigma=sigma_smoothing)
         target_seg = intensity_segmentation(target_data, num_levels=segmentation_levels)
 
@@ -188,7 +188,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
             epsilon = 3
             twice_a = np.random.uniform(low=twice_a_2_focus + epsilon, high=twice_a_2_focus + epsilon + np.linalg.norm(first_focus - np.array([25, 25, 50])))
             # get the ellipsoid
-            ellips_data = generate_ellipsoid(omega, first_focus, second_focus, twice_a, foreground_intensity=foreground, dtype=np.float64)
+            ellips_data = ellipsoid_shape(omega, first_focus, second_focus, twice_a, foreground_intensity=foreground, dtype=np.float64)
             ellips_data = fil.gaussian_filter(ellips_data, sigma=sigma_smoothing)
 
             nib_ellipsoids = nib.Nifti1Image(ellips_data, affine=np.eye(4))
@@ -219,16 +219,16 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         cube_c = [[25, 20, 20], 19, 3]
         cube_d = [[55, 16, 9], 9, 4]
 
-        sky1 = generate_cube(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=1) + \
-               generate_cube(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=1) + \
-               generate_cube(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=1) + \
-               generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=1)
+        sky1 = cube_shape(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=1) + \
+               cube_shape(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=1) + \
+               cube_shape(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=1) + \
+               cube_shape(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=1)
         im1 = nib.Nifti1Image(sky1, affine=np.eye(4))
 
-        sky2 = generate_cube(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=cube_a[2]) + \
-               generate_cube(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=cube_b[2]) + \
-               generate_cube(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=cube_c[2]) + \
-               generate_cube(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=cube_d[2])
+        sky2 = cube_shape(omega, center=cube_a[0], side_length=cube_a[1], foreground_intensity=cube_a[2]) + \
+               cube_shape(omega, center=cube_b[0], side_length=cube_b[1], foreground_intensity=cube_b[2]) + \
+               cube_shape(omega, center=cube_c[0], side_length=cube_c[1], foreground_intensity=cube_c[2]) + \
+               cube_shape(omega, center=cube_d[0], side_length=cube_d[1], foreground_intensity=cube_d[2])
         im2 = nib.Nifti1Image(sky2, affine=np.eye(4))
 
         nib.save(im1, filename=jph(pfo_examples, 'cubes_in_space_bin.nii.gz'))
@@ -261,38 +261,38 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         second_focus_11 = [72,72,23]
         twice_a_11 = 20
 
-        elli_11 = generate_ellipsoid(omega, first_focus_11, second_focus_11, twice_a_11,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_11 = ellipsoid_shape(omega, first_focus_11, second_focus_11, twice_a_11,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         first_focus_21 = [79,79,25]
         second_focus_21 = [72,72,23]
         twice_a_21 = 20
 
-        elli_21 = generate_ellipsoid(omega, first_focus_21, second_focus_21, twice_a_21,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_21 = ellipsoid_shape(omega, first_focus_21, second_focus_21, twice_a_21,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         # B) center 25, 75, 25
         first_focus_12 = [29, 79, 25]
         second_focus_12 = [24, 72, 23]
         twice_a_12 = 20
 
-        elli_12 = generate_ellipsoid(omega, first_focus_12, second_focus_12, twice_a_12,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_12 = ellipsoid_shape(omega, first_focus_12, second_focus_12, twice_a_12,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         first_focus_22 = [24, 74, 20]  # - 5 respect to the 1
         second_focus_22 = [19, 67, 18]
         twice_a_22 = 20
 
-        elli_22 = generate_ellipsoid(omega, first_focus_22, second_focus_22, twice_a_22,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_22 = ellipsoid_shape(omega, first_focus_22, second_focus_22, twice_a_22,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         # C) Center 75, 25, 25
         first_focus_13 = [75, 25, 25]  # shpere
         second_focus_13 = [75, 25, 25]
         twice_a_13 = 24
 
-        elli_13 = generate_ellipsoid(omega, first_focus_13, second_focus_13, twice_a_13,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_13 = ellipsoid_shape(omega, first_focus_13, second_focus_13, twice_a_13,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         r = .5 * twice_a_13
         # f = 15
@@ -304,23 +304,23 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         second_focus_23 = [75 + f, 25, 25]
         twice_a_23 = 2 * a
 
-        elli_23 = generate_ellipsoid(omega, first_focus_23, second_focus_23, twice_a_23,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_23 = ellipsoid_shape(omega, first_focus_23, second_focus_23, twice_a_23,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         # D) Center (25, 25, 25)
         first_focus_14 = [30, 35, 25]
         second_focus_14 = [30, 30, 25]
         twice_a_14 = 15
 
-        elli_14 = generate_ellipsoid(omega, first_focus_14, second_focus_14, twice_a_14,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_14 = ellipsoid_shape(omega, first_focus_14, second_focus_14, twice_a_14,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         first_focus_24 = [10, 12, 25]
         second_focus_24 = [9, 8, 25]
         twice_a_24 = 15
 
-        elli_24 = generate_ellipsoid(omega, first_focus_24, second_focus_24, twice_a_24,
-                                     foreground_intensity=foreground, dtype=np.float64)
+        elli_24 = ellipsoid_shape(omega, first_focus_24, second_focus_24, twice_a_24,
+                                  foreground_intensity=foreground, dtype=np.float64)
 
         # ---------- #
         # image one: #

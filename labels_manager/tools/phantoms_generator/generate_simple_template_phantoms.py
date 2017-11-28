@@ -15,7 +15,7 @@ import numpy as np
 import scipy.ndimage.filters as fil
 from scipy import ndimage
 
-from labels_manager.tools.phantoms_generator.shapes_phantoms import generate_o, generate_ellipsoid
+from labels_manager.tools.phantoms_generator.shapes_for_phantoms import o_shape, ellipsoid_shape
 from labels_manager.tools.detections.get_segmentation import intensity_segmentation
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.defs import root_dir
@@ -174,10 +174,10 @@ def create_template_target(pfo_destination, t_type='Template'):
         # Ellipsoid - 00
         pfi_mod_00 = jph(pfo_ch_mod, '{0}_{1}.nii.gz'.format(ch, template_list_suffix_modalities[0][0]))
         if t_type == 'Template':
-            ellips_data = generate_ellipsoid(omega, first_focus, second_focus, dist,
-                                             foreground_intensity=foreground, dtype=np.float64)
+            ellips_data = ellipsoid_shape(omega, first_focus, second_focus, dist,
+                                          foreground_intensity=foreground, dtype=np.float64)
         elif t_type == 'Target':
-            ellips_data = generate_o(omega=omega, radius=25, foreground_intensity=foreground, dtype=np.float64)
+            ellips_data = o_shape(omega=omega, radius=25, foreground_intensity=foreground, dtype=np.float64)
         else:
             raise IOError
         ellips_data = fil.gaussian_filter(ellips_data, sigma=sigma_smoothing)

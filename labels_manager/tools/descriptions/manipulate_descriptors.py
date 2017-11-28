@@ -75,8 +75,6 @@ class LabelsDescriptorManager(object):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
                 args = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
-                if parsed_line[0] == '# 213':
-                    print 'Spam'
                 if '(' in args[2]:  # there is the abbreviation - it gets separated in a new args element:
                     name = args[2].split('(')[0].strip()
                     abbrev = args[2].split('(')[1].replace(')', '').strip()
@@ -233,6 +231,7 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
             f.write(line)
     f.close()
     return d
+
 
 # temporary test
 if __name__ == '__main__':
