@@ -5,6 +5,7 @@ import nibabel as nib
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
 from labels_manager.tools.aux_methods.utils_nib import set_new_data
 from labels_manager.tools.detections.check_imperfections import check_missing_labels
+from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
 
 
 class LabelsManagerChecker(object):
@@ -16,6 +17,7 @@ class LabelsManagerChecker(object):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
 
-    def missing_labels(self, pfi_segmentation, pfi_labels_descriptor=None):
-        # TODO with check_segmentation
-        pass
+    def missing_labels(self, pfi_segmentation, pfi_labels_descriptor, pfi_where_to_save_the_log_file=None):
+        ldm = LabelsDescriptorManager(pfi_labels_descriptor)
+        im_se = nib.load(pfi_segmentation)
+        check_missing_labels(im_se, ldm, pfi_where_log=pfi_where_to_save_the_log_file)
