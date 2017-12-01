@@ -10,6 +10,7 @@ from labels_manager.tools.caliber.volumes_and_values import get_volumes_per_labe
 from labels_manager.tools.caliber.distances import dice_score, covariance_distance, \
     hausdorff_distance, global_outline_error, global_dice_score, normalised_symmetric_contour_distance
 from labels_manager.tools.defs import definition_label
+from labels_manager.tools.caliber import distances as dist
 
 
 class LabelsManagerMeasure(object):
@@ -166,3 +167,39 @@ class LabelsManagerMeasure(object):
     def topology(self):
         # WIP: island detections, graph detections, cc detections from detector tools
         print('topology for {} is in the TODO list!'.format(self.__class__))
+
+    def groupwise_global_measures_comparisons(self, list_path_A, list_path_B, pfo_where_to_save,
+                                              list_distances=(global_dice_score, global_outline_error),
+                                              prefix_output='distances_comparison', verbose=1):
+        list_path_A = [connect_path_tail_head(self.pfo_in, ph) for ph in list_path_A]
+        list_path_B = [connect_path_tail_head(self.pfo_in, ph) for ph in list_path_B]
+
+        name_list_path_A = [n.basename().replace('.nii', '').replace('.gz', '') for n in list_path_A]
+        name_list_path_B = [n.basename().replace('.nii', '').replace('.gz', '') for n in list_path_B]
+
+        # Initialise one data-frame for each metric/score selected
+        dictionary_of_measurements = {}
+        for d in list_distances:
+            dictionary_of_measurements.update({d.__name__: pa.DataFrame(np.zeros([len(list_path_A), len(list_path_B)]),
+                                               index=name_list_path_A, columns=name_list_path_B)})
+
+        # Fill values in each data-frame
+        for pfi_im_A, name_A in zip(list_path_A, name_list_path_A):
+            assert os.path.exists(pfi_im_A)
+            for pfi_im_B, name_B in zip(list_path_B, name_list_path_A):
+                assert os.path.exists(pfi_im_B)
+                im_A = nib.load(pfi_im_A)
+                im_B = nib.load(pfi_im_B)
+                for d in list_distances:
+                    d_A_B = d(im_A, im_B)
+                    if verbose > 0:
+                        print ' {0:<15} {1:<15} {2:<15} : {3}'.format(pfi_im_A, pfi_im_B, d.__name__, d_A_B)
+                    dictionary_of_measurements[d.__name__][name_A][name_B] = d_A_B
+
+        # prepare output folder
+        os.system('mkdir -p {}'.format(pfo_where_to_save))
+
+        for d in list_distances:
+            # Save each dataframe independently
+            pfi_df_global_dice_score = os.path.join(pfo_where_to_save, prefix_output + d.__name__ + '.pickle')
+            dictionary_of_measurements[d.__name__].to_pickle(pfi_df_global_dice_score)

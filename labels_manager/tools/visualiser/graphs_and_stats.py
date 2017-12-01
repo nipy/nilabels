@@ -257,7 +257,7 @@ if __name__ == '__main__':
 
         plt.show()
 
-    if True:
+    if False:
 
         # multi_data = [data for _ in range(3)]
         # print multi_data
@@ -272,7 +272,7 @@ if __name__ == '__main__':
 
         plt.show(block=True)
 
-    if False :
+    if True :
         d = {'one': pd.Series([1., 2., 3.], index=['a', 'b', 'c']),
              'two': pd.Series([1.5, 2.5, 3.5, 4.5], index=['a', 'b', 'c', 'd'])}
         df = pd.DataFrame(d)
