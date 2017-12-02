@@ -200,10 +200,10 @@ class LabelsManagerMeasure(object):
                 im_B = nib.load(pfi_im_B)
                 for d in list_distances:
                     d_A_B = d(im_A, im_B)
+                    dictionary_of_measurements[d.__name__][name_B][name_A] = d_A_B
                     if verbose > 0:
                         print '{0:<15} {1:<15} \n{2:<15} : {3}'.format(pfi_im_A, pfi_im_B, d.__name__, d_A_B)
                         print dictionary_of_measurements[d.__name__]
-                    dictionary_of_measurements[d.__name__][name_B][name_A] = d_A_B
 
         # prepare output folder
         os.system('mkdir -p {}'.format(pfo_where_to_save))

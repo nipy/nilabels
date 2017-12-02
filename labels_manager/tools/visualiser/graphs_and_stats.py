@@ -152,12 +152,13 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
 
 
 def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=(4,4), title='Title', cmap=plt.cm.jet,
-                     pfi_where_to_save=None, show_fig=True):
+                     pfi_where_to_save=None, show_fig=True, axis_position=None, margin=None, top_adjust=None):
 
     fig = plt.figure(figsize=fig_size)
     plt.clf()
     ax = fig.add_subplot(111)
     ax.set_aspect(1)
+
     res = ax.imshow(confusion_data_frame.as_matrix(), cmap=cmap,
                     interpolation='nearest', origin='lower')
 
@@ -183,12 +184,17 @@ def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=
     ax.invert_yaxis()
     ax.xaxis.tick_top()
 
-    # plt.tight_layout()
-    if show_fig:
-        plt.show()
+    if axis_position is not None:
+        ax.set_position(axis_position)
+    if margin is not None:
+        plt.margins(margin)
+    if top_adjust is not None:
+        plt.subplots_adjust(top=top_adjust)
+
     if pfi_where_to_save is not None:
         plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
-
+    if show_fig:
+        plt.show()
 
 if __name__ == '__main__':
 
