@@ -69,6 +69,9 @@ def assign_all_other_labels_the_same_value(in_data, labels_to_keep, same_value_l
              value same_value_label.
     """
     list_labels = sorted(list(set(in_data.flat)))
+    if isinstance(labels_to_keep, int):
+        labels_to_keep = [labels_to_keep, ]
+
     labels_that_will_have_the_same_value = list(set(list_labels) - set(labels_to_keep) - {0})
 
     return relabeller(in_data, list_old_labels=labels_that_will_have_the_same_value,

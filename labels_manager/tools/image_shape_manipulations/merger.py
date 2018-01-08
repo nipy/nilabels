@@ -67,8 +67,12 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
     else:
         patch_region = im_patch_mask.get_data().astype(np.bool)
     new_data = np.copy(im_hosting.get_data())
-    new_data[patch_region] = im_patch.get_data()[patch_region]
+    # new_data[patch_region] = im_patch.get_data()[patch_region]
     # np.place(new_data, patch_region, im_patch.get_data())
+    # np.putmask(new_data, patch_region, im_patch.get_data())
+
+    background_only = np.invert(patch_region)
+    new_data = im_hosting.get_data() * background_only / np.max(im_hosting.get_data()) + im_patch.get_data()
 
     return set_new_data(im_hosting, new_data)
 
