@@ -67,7 +67,8 @@ class LabelsDescriptorManager(object):
     def get_dict(self, as_string=False):
         """
         Parse the ITK-Snap label descriptor into a dict.
-        :return: dict with information relative to the parsed label descriptor
+        :return: dict with information relative to the parsed label descriptor.
+        id : ''
         """
         self._check_path()
         label_descriptor_dict = collections.OrderedDict()
@@ -84,7 +85,7 @@ class LabelsDescriptorManager(object):
                     dd = {parsed_line[0]: args}
                 else:
                     args[0] = [int(k) for k in args[0]]
-                    args[1] = [int(k) for k in args[1]]
+                    args[1] = [float(k) for k in args[1]]
                     dd = {int(parsed_line[0]): args}
                 label_descriptor_dict.update(dd)
 
@@ -178,9 +179,9 @@ class LabelsDescriptorManager(object):
         # save on the same place: yes it is destructive!
         self.save_label_descriptor(self.pfi_label_descriptor)
 
-    def get_corresponding_rgb_image(self, im_segm):
+    def get_corresponding_rgb_image(self, im_segm, invert_black_white=False):
         """
-        From the labels descriptor and a nibabel segmentation image, it returns the
+        From the labels descriptor and a nibabel segmentation image.
         :param im_segm: nibabel segmentation whose labels corresponds to the input labels descriptor.
         :return: a 4d image, where at each voxel there is the [r, g, b] vector in the fourth dimension.
         """
@@ -199,6 +200,9 @@ class LabelsDescriptorManager(object):
             pl = im_segm.get_data() == l
             rgb_image_arr[pl, :] = labels_dict[l][0]
 
+        if invert_black_white:
+            pl = im_segm.get_data() == 0
+            rgb_image_arr[pl, :] = np.array([255, 255, 255])
         return set_new_data(im_segm, rgb_image_arr, new_dtype=np.int32)
 
 

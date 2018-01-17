@@ -9,7 +9,9 @@ import matplotlib.ticker as ticker
 
 
 def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
-              centered=(True, False, False, True), add_nomenclatures=True, cell_resolution=128,
+              centered=(True, False, False, True), add_nomenclatures=True,
+              nomenclature_white=False,
+              cell_resolution=128,
               pfi_where_to_save=None, colors_bound='-k'):
     """
     Clockwise, from smaller radius to bigger radius.
@@ -20,6 +22,8 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
     :param raidal_subdivisions:
     :param centered:
     :param add_nomenclatures:
+    :param nomenclature_white: False, annotation colours are black. True annotation colours is white.
+    if it is a string like '>40' means above 40% is white '<20' means below 20 is white
     :param cell_resolution:
     :param pfi_where_to_save:
     :return:
@@ -44,7 +48,6 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
         assert len(add_nomenclatures) == sum(raidal_subdivisions)
         nomenclatures = add_nomenclatures[:]
         add_nomenclatures = True
-
 
     # Create the circular bounds
     line_width_circular = line_width
@@ -72,16 +75,29 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
             # Create radial bounds
             if rs  > 1:
                 ax.plot([theta_i, theta_i], [r[rs_id], r[rs_id+1]], colors_bound, lw=line_width)
-            # Add centered nomenclatures if needed
+            # Add centered nomenclatures if needed, with selected colour
             if add_nomenclatures:
                 if rs == 1 and rs_id ==0:
                     cell_center = (0, 0)
                 else:
                     cell_center = ((theta_i + theta_i_plus_one) / 2., r[rs_id] + .5 * r[1] )
 
+                color_nomenclature = 'black'
+                if nomenclature_white == True:
+                    color_nomenclature = 'w'
+                elif isinstance(nomenclature_white, str):
+                    sign, perc = nomenclature_white[0], int(nomenclature_white[1:]) / 100.
+                    data_interval = np.max(data) - np.min(data)
+                    if sign == '>':
+                        if data[cell_id] >  perc * data_interval + np.min(data):
+                            color_nomenclature = 'w'
+                    if sign == '<':
+                        if data[cell_id] < perc * data_interval + np.min(data):
+                            color_nomenclature = 'w'
+
                 if isinstance(nomenclatures[0], (int, long, float, complex)):
                     ax.annotate(r"${:.3g}$".format(nomenclatures[cell_id]), xy=cell_center,
-                                xytext=(cell_center[0], cell_center[1]),
+                                xytext=(cell_center[0], cell_center[1]), color=color_nomenclature,
                                 horizontalalignment='center', verticalalignment='center', size=8)
                 else:
                     ax.annotate(nomenclatures[cell_id], xy=cell_center,
@@ -100,6 +116,7 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
 def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
                     global_title=None, canvas_title='title', titles=None, units=None, raidal_subdivisions=(2, 8, 8, 11),
                     centered=(True, False, False, True), add_nomenclatures=(True, True, True, True),
+                    nomenclature_white=(False, False, False, False),
                     pfi_where_to_save=None, show=True):
     plt.clf()
     n_fig = len(multi_data)
@@ -113,9 +130,9 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
     if titles is None:
         titles = ['Title {}'.format(i) for i in range(n_fig)]
 
-    h_space = 0.15 / n_fig
-    h_dim_fig = .8
-    w_dim_fig = .8 / n_fig
+    h_space = 0.1 / n_fig
+    h_dim_fig = .85
+    w_dim_fig = .85 / n_fig
 
     def fmt(x, pos):
         # a, b = '{:.2e}'.format(x).split('e')
@@ -130,10 +147,10 @@ def multi_bull_eyes(multi_data, cbar=None, cmaps=None, normalisations=None,
         plt.suptitle(global_title)
 
     for n in range(n_fig):
-        origin_fig = (h_space * (n + 1) + w_dim_fig * n, 0.15)
+        origin_fig = (h_space * (n + 1) + w_dim_fig * n, 0.14)
         ax = fig.add_axes([origin_fig[0], origin_fig[1], w_dim_fig, h_dim_fig], polar=True)
         bulls_eye(ax, multi_data[n], cmap=cmaps[n], norm=normalisations[n], raidal_subdivisions=raidal_subdivisions,
-                  centered=centered, add_nomenclatures=add_nomenclatures[n])
+                  centered=centered, add_nomenclatures=add_nomenclatures[n], nomenclature_white=nomenclature_white[n])
         ax.set_title(titles[n], size=10)
 
         if cbar[n]:
