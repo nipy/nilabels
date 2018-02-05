@@ -94,9 +94,50 @@ def cube_shape(omega, center, side_length, background_intensity=0, foreground_in
 # ---------- Head-like experiments ---------------
 
 
-def oval_shape():
+def oval_shape(omega, centre, foreground_intensity=1, direction='y', eta=2, alpha=(0.18,0.18)):
     """
     From the ellipsoid equation in canonic form.
+    :param alpha: between 0.1 and 0.3 maximal range
     :return:
     """
+    sky = np.zeros(omega)
+
+    # parameters:
+    if direction == 'x':
+        dd = 2 * np.sqrt(omega[0])
+        a_b_c = dd * np.array([2, 1, 1])
+    elif direction == 'y':
+        dd = 2 * np.sqrt(omega[1])
+        a_b_c = dd * np.array([1, 2, 1])
+    elif direction == 'z':
+        dd = 2 * np.sqrt(omega[2])
+        a_b_c = dd * np.array([1, 1, 2])
+
+    for xi in range(omega[0]):
+        for yi in range(omega[1]):
+            for zi in range(omega[2]):
+                cond = False
+                if direction == 'x':
+                    cond = (np.abs(xi - centre[0]) / float(a_b_c[0])) ** eta + \
+                           (np.abs(yi - centre[1]) / float(a_b_c[1])) ** eta * (1 + alpha[0] * xi) / dd + \
+                           (np.abs(zi - centre[2]) / float(a_b_c[2])) ** eta * (1 + alpha[1] * yi) / dd < 1
+                elif direction == 'y':
+                    cond = (np.abs(xi - centre[0]) / float(a_b_c[0])) ** eta * (1 + alpha[0] * zi) / dd + \
+                           (np.abs(yi - centre[1]) / float(a_b_c[1])) ** eta + \
+                           (np.abs(zi - centre[2]) / float(a_b_c[2])) ** eta * (1 + alpha[1] * yi) / dd < 1
+                elif direction == 'z':
+                    cond = (np.abs(xi - centre[0]) / float(a_b_c[0])) ** eta * (1 + alpha[0] * yi) / dd + \
+                           (np.abs(yi - centre[1]) / float(a_b_c[1])) ** eta * (1 + alpha[1] * zi) / dd + \
+                           (np.abs(zi - centre[2]) / float(a_b_c[2])) ** eta  < 1
+                if cond:
+                    sky[xi, yi, zi] = foreground_intensity
+
+    return sky
+
+if __name__ == '__main__':
+    import nibabel as nib
+    sky = oval_shape(omega=(81,101,71), centre=(40,50,35))
+    im = nib.Nifti1Image(sky, np.eye(4))
+    nib.save(im, '/Users/sebastiano/Desktop/zzz_test.nii.gz')
+
     pass

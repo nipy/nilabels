@@ -31,8 +31,6 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
     :param verbose: 0 no, 1 yes.
     :return: return the contour of the provided segmentation
     """
-
-
     list_labels = sorted(list(set(im_segm.get_data().flat)))[1:]
     output_arr = np.zeros_like(im_segm.get_data(), dtype=im_segm.get_data_dtype())
 

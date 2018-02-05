@@ -69,7 +69,7 @@ def apply_sobel_filter(array):
 
 def apply_laplacian_filter(array, alpha=30):
     """
-    Laplacian is approximated with difference of Gaussian
+    Laplacian is approximated with a difference of Gaussians.
     :param array:
     :param alpha:
     :return:

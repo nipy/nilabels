@@ -18,7 +18,7 @@ Each tool provided can have as input
 
 ## Code testing
 
-To check that everything works run `nosetests` in the root directory of the project.
+To run the test, type `nosetests` in the root directory of the project.
 
 ## Licence
 
