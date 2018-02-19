@@ -89,16 +89,21 @@ def from_segmentation_stack_to_probabilistic_segmentation(im_stack_label):
     labels_list = 0
 
 
-def substitute_4d_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):
+def substitute_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):
     """
     Substitute the im_input_3d image at the time point timepoint of the im_input_4d.
     :param im_input_4d: 4d image
     :param im_input_3d: 3d image whose shape is compatible with the fist 3 dimensions of im_input_4d
     :param timepoint: a timepoint in the 4th dimension of the im_input_4d
     :return: im_input_4d whose at the timepoint-th time point the data of im_input_3d are stored.
+    Handle base case: If the input 4d volume is actually a 3d and timepoint is 0, then just return the same volume.
     """
-    assert im_input_4d.shape[:-1] == im_input_3d.shape
-    assert im_input_4d.shape[-1] > timepoint
-    new_data = im_input_4d.get_data()[:]
-    new_data[..., timepoint] = im_input_3d.get_data()[:]
-    return set_new_data(im_input_4d, new_data)
+    
+    if len(im_input_4d.shape) == 3 and timepoint == 0:
+        return im_input_3d
+    elif len(im_input_4d.shape) == 4 and timepoint < im_input_4d.shape[-1]:
+        new_data = im_input_4d.get_data()[:]
+        new_data[..., timepoint] = im_input_3d.get_data()[:]
+        return set_new_data(im_input_4d, new_data)
+    else:
+        raise IOError('Incompatible shape input volume.')

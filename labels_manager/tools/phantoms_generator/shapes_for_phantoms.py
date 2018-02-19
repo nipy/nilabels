@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import ndimage
 
 
 # ---------- Simple shapes generators ---------------
@@ -94,23 +95,28 @@ def cube_shape(omega, center, side_length, background_intensity=0, foreground_in
 # ---------- Head-like experiments ---------------
 
 
-def oval_shape(omega, centre, foreground_intensity=1, direction='y', eta=2, alpha=(0.18,0.18)):
+def oval_shape(omega, centre, foreground_intensity=1, direction='y', eta=2, alpha=(0.18,0.18), dd=None):
     """
     From the ellipsoid equation in canonic form.
+    Pebble-like stone shape with a principal direction. Can represent a biological shape phantom.
     :param alpha: between 0.1 and 0.3 maximal range
+    :param dd: maximal extension, smaller than 2 * np.sqrt(omega[direction])
     :return:
     """
     sky = np.zeros(omega)
 
     # parameters:
     if direction == 'x':
-        dd = 2 * np.sqrt(omega[0])
+        if dd is None:
+            dd = 2 * np.sqrt(omega[0])
         a_b_c = dd * np.array([2, 1, 1])
     elif direction == 'y':
-        dd = 2 * np.sqrt(omega[1])
+        if dd is None:
+            dd = 2 * np.sqrt(omega[1])
         a_b_c = dd * np.array([1, 2, 1])
     elif direction == 'z':
-        dd = 2 * np.sqrt(omega[2])
+        if dd is None:
+            dd = 2 * np.sqrt(omega[2])
         a_b_c = dd * np.array([1, 1, 2])
 
     for xi in range(omega[0]):
@@ -133,6 +139,22 @@ def oval_shape(omega, centre, foreground_intensity=1, direction='y', eta=2, alph
                     sky[xi, yi, zi] = foreground_intensity
 
     return sky
+
+
+def artifactor(omega, kind='bias field', strengths=0.5):
+    """
+    Add random artefact to a domain. Different kinds of artefacts and strengths can be selected.
+    :param omega: a domain of a 3d volume image.
+    :param kind: 'bias field', 'salt and pepper', 'salt pepper and curry', 'gaussian field'
+    :param strengths: Value in the interval [0, 1]. 0 nothing happen. 1 strongest artefact.
+    :return: All the artefacts are normalised between 0 and 1. This is not related with strengths.
+    """
+    assert len(omega) == 3
+
+
+
+
+
 
 if __name__ == '__main__':
     import nibabel as nib

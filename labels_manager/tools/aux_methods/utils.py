@@ -90,10 +90,10 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 
 def labels_query(labels, segmentation_array=None):
     """
-    Will return a list with the labels and the labels names (same order list of strings with labels names)
-    for a labels list provided in some way, and the optional segmentation image data (array)
+    labels_list can be a list or a list of lists in case some labels have to be considered together. labels_names
     :param labels: can be int, list, string as 'all' or 'tot', or a string containing a path to a .txt or a numpy array
     :param segmentation_array: optional segmentation image data (array)
+    :param remove_zero: do not return zero
     :return: labels_list, labels_names
     """
     labels_names = []
@@ -110,6 +110,8 @@ def labels_query(labels, segmentation_array=None):
             labels_list = list(np.sort(list(set(segmentation_array.astype(np.int).flat))))
         elif labels == 'tot' and segmentation_array is not None:
             labels_list = [list(np.sort(list(set(segmentation_array.astype(np.int).flat))))]
+            if labels_list[0][0] == 0:
+                labels_list = [labels_list[0][1:]]  # remove zeros!
         elif os.path.exists(labels):
             if labels.endswith('.txt'):
                 labels_list = list(np.loadtxt(labels))
@@ -134,7 +136,12 @@ def labels_query(labels, segmentation_array=None):
                       "file with the labels.")
 
     if not isinstance(labels, dict):
-        labels_names = [str(l) for l in labels_list]
+        if labels == 'all':
+            labels_names = 'all'
+        elif labels == 'tot':
+            labels_names = 'tot'
+        else:
+            labels_names = [str(l) for l in labels_list]
 
     return labels_list, labels_names
 

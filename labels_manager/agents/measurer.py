@@ -27,12 +27,10 @@ class LabelsManagerMeasure(object):
         self.return_mm3 = return_mm3
         self.verbose = verbose
 
-    def volume(self, segmentation_filename, labels=None, anatomy_filename=None, tot_volume_prior=None,
-               where_to_save=None):
+    def volume(self, segmentation_filename, labels=None, tot_volume_prior=None, where_to_save=None):
         """
         :param segmentation_filename: filename of the segmentation S.
         :param labels: list of labels, multi-labels (as sublists, e.g. left right will be considered one label)
-        :param anatomy_filename: filename of the anatomical image A. (A,S) forms a chart.
         :param tot_volume_prior: as an intra-cranial volume factor.
         :param where_to_save:
         :return:
@@ -45,15 +43,6 @@ class LabelsManagerMeasure(object):
 
         df_volumes_per_label = get_volumes_per_label(im_segm, labels=labels_list, labels_names=labels_names,
                                                      tot_volume_prior=tot_volume_prior, verbose=self.verbose)
-        if anatomy_filename is not None:
-            pfi_anatomy = connect_path_tail_head(self.pfo_in, anatomy_filename)
-            assert os.path.exists(pfi_anatomy)
-            im_anatomy = nib.load(pfi_anatomy)
-            df_average_below_labels = get_mu_std_below_labels(im_segm, im_anatomy, labels_list,
-                                                              labels_names=labels_names,
-                                                              verbose=self.verbose)
-
-            df_volumes_per_label['Average below label'] = df_average_below_labels.values
 
         if self.verbose > 0:
             print(df_volumes_per_label)

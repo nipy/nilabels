@@ -36,7 +36,7 @@ def get_values_below_labels(im_seg, im_anat, labels_list, labels_names=None):
     for label_k in labels_list:
         # TODO: optimise with np.where after testing
         if isinstance(label_k, int):
-            all_places = im_seg.get_data() == label_k
+            all_places += im_seg.get_data() == label_k
         else:
             all_places = np.zeros_like(im_seg.get_data(), dtype=np.bool)
             for label_k_j in label_k:
@@ -55,43 +55,6 @@ def get_values_below_labels(im_seg, im_anat, labels_list, labels_names=None):
         return values
     else:
         return pa.Series(values, index=labels_names)
-
-
-def from_values_below_labels_to_volumes(values_below_labels, im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
-    """
-
-    :param values_below_labels:
-    :param im_segm:
-    :param labels:
-    :param labels_names:
-    :param tot_volume_prior:
-    :param verbose:
-    :return:
-    """
-    count_voxels_below_labels = []
-    for v in values_below_labels:
-        if isinstance(v, np.ndarray):
-            count_voxels_below_labels.append(len(v))
-        else:
-            count_voxels_below_labels.append(0)
-
-    count_voxels_below_labels = np.array(count_voxels_below_labels).astype(np.int32)
-    volumes = one_voxel_volume(im_segm) * count_voxels_below_labels.astype(np.float64)
-
-    if tot_volume_prior is None:
-        tot_volume_prior = get_total_volume(im_segm, labels_to_exclude=[0])[1]
-
-    vol_over_tot = volumes / float(tot_volume_prior)
-
-
-    data_frame = pa.DataFrame({'Labels'              : pa.Series(labels, index=labels_names),
-                               'Num voxels'          : pa.Series(count_voxels_below_labels, index=labels_names),
-                               'Volume'              : pa.Series(volumes, index=labels_names),
-                               'Vol over Tot'        : pa.Series(vol_over_tot, index=labels_names)})
-    if verbose > 0:
-        print(data_frame)
-
-    return data_frame
 
 
 def from_values_below_labels_to_mu_std(values_below_labels, labels, labels_names, verbose=0):
@@ -113,7 +76,7 @@ def from_values_below_labels_to_mu_std(values_below_labels, labels, labels_names
     return data_frame
 
 
-def get_volumes_per_label(im_segm, im_anatomical, labels, labels_names, tot_volume_prior=None, verbose=0):
+def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
     """
     :param im_segm:
     :param labels:
@@ -122,10 +85,43 @@ def get_volumes_per_label(im_segm, im_anatomical, labels, labels_names, tot_volu
     :param verbose:
     :return:
     """
-    values_below_labels = get_values_below_labels(im_segm, im_anatomical, labels)
-    df = from_values_below_labels_to_volumes(values_below_labels, im_segm, labels, labels_names,
-                                             tot_volume_prior=tot_volume_prior, verbose=verbose)
-    return df
+    if labels_names == 'tot':
+
+        num_voxels, vol_mm3 = get_total_volume(im_segm)
+        if tot_volume_prior is None:
+            tot_volume_prior = 1
+
+        data_frame = pa.DataFrame({'Labels': pa.Series(labels, index=[labels_names]),
+                                   'Num voxels': pa.Series(num_voxels, index=[labels_names]),
+                                   'Volume': pa.Series(vol_mm3, index=[labels_names]),
+                                   'Vol over Tot': pa.Series(vol_mm3 / tot_volume_prior, index=[labels_names])})
+
+    else:
+        all_places = np.zeros_like(im_segm.get_data(), dtype=np.bool)
+        for label_k in labels:
+            if isinstance(label_k, int):
+                all_places += im_segm.get_data() == label_k
+            else:
+                for label_k_j in label_k:
+                    all_places += im_segm.get_data() == label_k_j
+
+        flat_volume_voxel = np.nan_to_num( (all_places.astype(np.float64)).flatten() )
+
+        non_zero_voxels = np.count_nonzero(flat_volume_voxel)
+        volumes = non_zero_voxels * one_voxel_volume(im_segm)
+        if tot_volume_prior is None:
+            tot_volume_prior = get_total_volume(im_segm, labels_to_exclude=[0])[1]
+
+        vol_over_tot = volumes / float(tot_volume_prior)
+
+        data_frame = pa.DataFrame({'Labels': pa.Series(labels, index=labels_names),
+                                   'Num voxels': pa.Series(non_zero_voxels, index=labels_names),
+                                   'Volume': pa.Series(volumes, index=labels_names),
+                                   'Vol over Tot': pa.Series(vol_over_tot, index=labels_names)})
+    if verbose > 0:
+        print(data_frame)
+
+    return data_frame
 
 
 def get_mu_std_below_labels(im_segm, im_anatomical, labels, labels_names, verbose=0):

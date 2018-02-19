@@ -5,6 +5,8 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
+from scipy import ndimage
+
 from labels_manager.tools.phantoms_generator.shapes_for_phantoms import oval_shape
 
 
@@ -16,27 +18,31 @@ def headlike_phantom(modality=('basic', 'gabor'), omega=(161, 181, 201), anatomy
     :param anatomy_randomness: in interval [0,1].
     :param background_noise:
     :param sharpness:
-    :param artifacts:
+    :param artifacts: list of artifactor parameters or None. The strings has to be ...
     :param name:
     :return:
     """
     for d in omega:
         assert d > 50, 'Omega must be at least (50, 50, 50)'
 
-    # parameters
+    # Parameters
     skull_thickness = 3
     spacing_skull_brain = 2
-
-
-
 
     # omega centre
     omega_c = [int(omega[k] / 2) for k in range(3)]
 
-    for i in range(omega[0]):
-        for j in range(omega[0]):
-            for k in range(omega[0]):
-                pass
+
+    sh = oval_shape(omega, omega_c, foreground_intensity=1, direction='y', eta=2, alpha=(0.18,0.18), dd=None)
+
+    if 'bias field' in artifacts:
+        pass
+
+    if 'hyper holes' in artifacts:
+        pass
+
+    if 'hyper holes' in artifacts:
+        pass
 
 
     pass
