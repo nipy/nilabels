@@ -5,8 +5,7 @@ import numpy as np
 
 from labels_manager.tools.aux_methods.utils import labels_query
 from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head
-from labels_manager.tools.caliber.volumes_and_values import get_volumes_per_label, get_mu_std_below_labels, \
-    get_values_below_labels
+from labels_manager.tools.caliber.volumes_and_values import get_values_below_labels_list, get_volumes_per_label
 from labels_manager.tools.caliber.distances import dice_score, covariance_distance, \
     hausdorff_distance, global_outline_error, global_dice_score, normalised_symmetric_contour_distance
 from labels_manager.tools.defs import definition_label
@@ -76,7 +75,7 @@ class LabelsManagerMeasure(object):
 
         labels_list, labels_names = labels_query(labels, segmentation_array=im_segm.get_data())
 
-        labels_values = get_values_below_labels(im_segm, im_anat, labels_list)
+        labels_values = get_values_below_labels_list(im_segm, im_anat, labels_list)
 
         return pa.Series(labels_values, index=labels_names)
 
