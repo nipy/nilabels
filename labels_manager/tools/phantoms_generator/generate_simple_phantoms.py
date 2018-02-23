@@ -12,27 +12,16 @@ from labels_manager.tools.phantoms_generator.shapes_for_phantoms import ellipsoi
     cube_shape
 
 
-def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
-
-    create = {'Examples folder'   : True,
-              'Punt e mes'        : True,
-              'C'                 : True,
-              'Planetaruim'       : True,
-              'Buckle ellipsoids' : True,
-              'Ellipsoids family' : True,
-              'Cubes in the sky'  : True,
-              'Sandwich'          : True,
-              'Four-folds'        : True
-              }
+def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
     print('\n.\n.\n\nGenerate figures for the examples, may take some seconds, and will take approx 150MB.\n.\n.')
     pfo_examples = jph(root_dir, 'data_examples')
 
-    if create['Examples folder']:
+    if creation_list['Examples folder']:
 
         os.system('mkdir -p ' + pfo_examples)
 
-    if create['Punt e mes']:
+    if creation_list['Punt e mes']:
 
         data_o_punt = o_shape(omega=(256, 256, 256), foreground_intensity=foreground, dtype=np.float64)
         data_o_punt = fil.gaussian_filter(data_o_punt, sigma=sigma_smoothing)
@@ -64,7 +53,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         print 'mes generated'
 
-    if create['C']:
+    if creation_list['C']:
 
         data_c_ = c_shape(omega=(256, 256, 256), foreground_intensity=foreground)
         data_c_ = fil.gaussian_filter(data_c_, sigma_smoothing)
@@ -84,7 +73,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         print 'C generated'
 
-    if create['Planetaruim']:
+    if creation_list['Planetaruim']:
 
         omega = (256, 256, 256)
         centers = [(32, 36, 40),    (100, 61, 94),   (130, 140, 99),  (220, 110, 210),
@@ -108,7 +97,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         print 'Planetarium generated'
 
-    if create['Buckle ellipsoids']:
+    if creation_list['Buckle ellipsoids']:
         # Toy example for symmetrisation with registration test
 
         omega = (120, 140, 160)
@@ -141,7 +130,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         print 'Buckle ellipsoids half segmented and whole segmented generated'
 
-    if create['Ellipsoids family']:
+    if creation_list['Ellipsoids family']:
         # Toy example for registration propagation tests
         pfo_ellipsoids_family = jph(pfo_examples, 'ellipsoids_family')
         os.system('mkdir -p ' + pfo_ellipsoids_family)
@@ -211,7 +200,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
                                                     str_pfi_ellipsoids)
         os.system(cmd)
 
-    if create['Cubes in the sky']:
+    if creation_list['Cubes in the sky']:
 
         omega = [80, 80, 80]
         cube_a = [[10, 60, 55], 11, 1]
@@ -234,7 +223,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
         nib.save(im1, filename=jph(pfo_examples, 'cubes_in_space_bin.nii.gz'))
         nib.save(im2, filename=jph(pfo_examples, 'cubes_in_space.nii.gz'))
 
-    if create['Sandwich']:
+    if creation_list['Sandwich']:
 
         omega = [9, 9, 10]
         sandwich = np.zeros(omega)
@@ -246,7 +235,7 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
         nib.save(im_sandwich, filename=jph(pfo_examples, 'sandwich.nii.gz'))
 
-    if create['Four-folds']:
+    if creation_list['Four-folds']:
         # Case A: best case, the two ellipsoids are overlapping - label id = 1
         # Case B: ellipsoids are only translated  - label id = 2
         # Case C: no dispersion, low precision  - label id = 3
@@ -340,4 +329,16 @@ def generate_figures(segmentation_levels=7, sigma_smoothing=6, foreground=10):
 
 
 if __name__ == '__main__':
-    generate_figures()
+
+    creation_list = {'Examples folder'    : True,
+                      'Punt e mes'        : True,
+                      'C'                 : True,
+                      'Planetaruim'       : True,
+                      'Buckle ellipsoids' : True,
+                      'Ellipsoids family' : True,
+                      'Cubes in the sky'  : True,
+                      'Sandwich'          : True,
+                      'Four-folds'        : True
+                      }
+
+    generate_figures(creation_list)
