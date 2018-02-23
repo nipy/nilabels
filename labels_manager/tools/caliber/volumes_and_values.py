@@ -15,7 +15,7 @@ from labels_manager.tools.aux_methods.utils_nib import one_voxel_volume
 def get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=None):
     """
     :param im_segm:
-    :param labels_to_exclude:
+    :param list_labels_to_exclude:
     :return:
     """
     seg = np.copy(im_segm.get_data())
@@ -26,8 +26,7 @@ def get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=None):
         num_voxels = np.count_nonzero(seg)
     else:
         num_voxels = np.count_nonzero(im_segm.get_data())
-    # vol_mm3 = num_voxels * one_voxel_volume(im_segm)
-    return num_voxels  #, vol_mm3
+    return num_voxels
 
 
 def get_num_voxels_from_labels_list(im_segm, labels_list):

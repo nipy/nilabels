@@ -160,3 +160,23 @@ def triangular_density_function(x, a, mu, b):
     else:
         return 0
 
+
+# --------- Pandas Utils ----------------
+
+def custom_dataframe_to_csv(df, pfi_where_to_save):
+    with open(pfi_where_to_save, "w") as text_file:
+
+        header = ' , '
+        for hd in list(df.columns):
+            header += hd + ', '
+        text_file.write(header + '\n')
+        for i in df.index:
+            m = str(i).replace(',', ' ') + ', '
+            for c in df.columns:
+                if isinstance(df[c][i], str):
+                    m += df[c][i] + ', '
+                elif isinstance(df[c][i], list):
+                    m += str(df[c][i]).replace(',', ' ') + ', '
+                else:
+                    m += str(list(df[c][i])).replace('[', '').replace(']', '')
+            text_file.write(m +'\n')
