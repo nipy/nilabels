@@ -3,6 +3,7 @@ import numpy as np
 
 def intensity_segmentation(in_data, num_levels=5):
     """
+    Very very very simple way of getting an intensity based segmentation.
     :param in_data: image data in a numpy array.
     :param num_levels: maximum allowed 65535 - 1.
     :return: segmentation of the result in levels levels based on the intensities of the in_data.

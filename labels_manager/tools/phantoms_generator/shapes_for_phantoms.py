@@ -99,6 +99,12 @@ def oval_shape(omega, centre, foreground_intensity=1, direction='y', eta=2, alph
     """
     From the ellipsoid equation in canonic form.
     Pebble-like stone shape with a principal direction. Can represent a biological shape phantom.
+
+    :param omega:
+    :param centre:
+    :param foreground_intensity:
+    :param direction:
+    :param eta:
     :param alpha: between 0.1 and 0.3 maximal range
     :param dd: maximal extension, smaller than 2 * np.sqrt(omega[direction])
     :return:

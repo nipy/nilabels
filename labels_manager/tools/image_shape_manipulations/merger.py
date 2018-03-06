@@ -77,16 +77,21 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
     return set_new_data(im_hosting, new_data)
 
 
-def from_segmentation_stack_to_probabilistic_segmentation(im_stack_label):
+def from_segmentations_stack_to_probabilistic_segmentation(arr_labels_stack):
     """
     A probabilistic atlas has at each time-point a different label (a mapping is provided as well in
     the conversion with correspondence time-point<->label number). Each time point has the normalised average
     of each label.
+    :param arr_labels_stack: stack of 1D arrays (segmentations x num_voxels) containing a different discrete segmentation.
+    Values of labels needs to be consecutive, or there will be empty images in the result.
     :return:
     """
-    assert len(im_stack_label.shape) == 4
-    # TODO
-    labels_list = 0
+    J, N = arr_labels_stack.shape  # N number of voxels, J number of segmentations
+    K = np.max(arr_labels_stack) + 1
+    prob = np.zeros([K, N]).astype(np.float64)
+    for k in range(K):
+        prob[k, :] = np.sum(arr_labels_stack == k, axis=0)
+    return 1/float(J) * prob
 
 
 def substitute_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):

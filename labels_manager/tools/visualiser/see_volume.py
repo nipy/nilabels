@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 
 
-def see_array(in_array, num_fig=1, block=False,
+def see_array(in_array, shape=None, num_fig=1, block=False,
               title='Image in matrix coordinates, C convention.'):
 
     fig = plt.figure(num_fig, figsize=(6, 7.5), dpi=100)
@@ -14,6 +14,11 @@ def see_array(in_array, num_fig=1, block=False,
     ax.set_position([0.1, 0.29, 0.8, 0.7])
 
     fig.canvas.set_window_title(title)
+
+    if shape is not None:
+        assert in_array.ndim == 1, 'only 1dim allowed if shape is defined'
+        assert np.prod(shape) == in_array.shape
+        in_array = in_array.reshape(shape)
 
     dims = in_array.shape  # (i,j,k,t,d)
     dims_mean = [int(d / 2) for d in dims]

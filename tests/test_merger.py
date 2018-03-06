@@ -1,11 +1,11 @@
 import nibabel as nib
 import numpy as np
 from nose.tools import assert_raises
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
 ''' From manipulations.merger.py'''
-from labels_manager.tools.image_shape_manipulations.merger import stack_images, merge_labels_from_4d, grafting
+from labels_manager.tools.image_shape_manipulations.merger import stack_images, merge_labels_from_4d, grafting, from_segmentations_stack_to_probabilistic_segmentation
 
 
 def test_merge_labels_from_4d_fake_input():
@@ -137,3 +137,45 @@ def test_grafting_ok_input_output():
     # test with mask
     # im_output_mask = grafting(im_array_host, im_array_patch, im_array_mask)
     # assert_array_equal(im_output_mask.get_data(), expected_mask)
+
+
+def test_from_segmentations_stack_to_probabilistic_segmentation_simple():
+
+    # Generate initial 1D segmentations:
+    #     1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9
+    a1 = [0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4]
+    a2 = [0, 0, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4]
+    a3 = [0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4]
+    a4 = [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4]
+    a5 = [0, 0, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4]
+    a6 = [0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4]
+
+    stack = np.stack([np.array(a) for a in [a1, a2, a3, a4, a5, a6]])
+
+    prob = from_segmentations_stack_to_probabilistic_segmentation(stack)
+
+    # expected output probability for each class, computed manually(!)
+    k0 = [6, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    k1 = [0, 1, 4, 6, 5, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    k2 = [0, 0, 0, 0, 1, 1, 4, 6, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    k3 = [0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 5, 6, 5, 5, 3, 3, 2, 1, 0]
+    k4 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 4, 5, 6]
+
+    k0 = 1 / 6. * np.array(k0)
+    k1 = 1 / 6. * np.array(k1)
+    k2 = 1 / 6. * np.array(k2)
+    k3 = 1 / 6. * np.array(k3)
+    k4 = 1 / 6. * np.array(k4)
+
+    prob_expected = np.stack([k0, k1, k2, k3, k4], axis=0)
+    assert_array_equal(prob, prob_expected)
+
+
+def test_from_segmentations_stack_to_probabilistic_segmentation_random_sum_rows_to_get_one():
+    J = 12
+    N = 120
+    K = 7
+    stack = np.stack([np.random.choice(range(K), N) for _ in range(J)])
+    prob = from_segmentations_stack_to_probabilistic_segmentation(stack)
+    s = np.sum(prob, axis=0)
+    assert_array_almost_equal(s, np.ones(N))
