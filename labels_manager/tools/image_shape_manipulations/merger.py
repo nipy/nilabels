@@ -85,13 +85,10 @@ def from_segmentations_stack_to_probabilistic_segmentation(arr_labels_stack):
     :param arr_labels_stack: stack of 1D arrays (segmentations x num_voxels) containing a different discrete segmentation.
     Values of labels needs to be consecutive, or there will be empty images in the result.
     :return:
+    N number of voxels, J number of segmentations, K number of labels.
     """
-    J, N = arr_labels_stack.shape  # N number of voxels, J number of segmentations
-    K = np.max(arr_labels_stack) + 1
-    prob = np.zeros([K, N]).astype(np.float64)
-    for k in range(K):
-        prob[k, :] = np.sum(arr_labels_stack == k, axis=0)
-    return 1/float(J) * prob
+    J, K = arr_labels_stack.shape[0], np.max(arr_labels_stack) + 1
+    return 1/float(J) * np.stack([np.sum(arr_labels_stack == k, axis=0).astype(np.float64) for k in range(K)], axis=0)
 
 
 def substitute_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):

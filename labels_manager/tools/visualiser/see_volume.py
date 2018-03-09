@@ -1,162 +1,46 @@
+import os
+from os.path import join as jph
 import numpy as np
 import nibabel as nib
 from matplotlib import rc
 
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
+
+from labels_manager.tools.aux_methods.utils import print_and_run
 
 
-def see_array(in_array, shape=None, num_fig=1, block=False,
-              title='Image in matrix coordinates, C convention.'):
-
-    fig = plt.figure(num_fig, figsize=(6, 7.5), dpi=100)
-    ax = fig.add_subplot(111)
-    ax.set_position([0.1, 0.29, 0.8, 0.7])
-
-    fig.canvas.set_window_title(title)
-
-    if shape is not None:
-        assert in_array.ndim == 1, 'only 1dim allowed if shape is defined'
-        assert np.prod(shape) == in_array.shape
-        in_array = in_array.reshape(shape)
-
-    dims = in_array.shape  # (i,j,k,t,d)
-    dims_mean = [int(d / 2) for d in dims]
-
-    init_ax = 0
-    axcolor = '#ababab'
-
-    global l
-    l = ax.imshow(in_array.take(dims_mean[init_ax], axis=init_ax), aspect='equal', origin='lower', interpolation='nearest', cmap='gray')
-    #dot = ax.plot(dims_mean[1], dims_mean[2], 'r+')
-
-    global cursor_on
-    global cursor_coord
-
-    cursor_on = True
-    cursor_coord = dims_mean[:]
-
-    i_slider_plot = plt.axes([0.25, 0.2, 0.65, 0.03], axisbg='r')
-    i_slider = Slider(i_slider_plot, 'i', 0, dims[0] - 1, valinit=dims_mean[0], valfmt='%1i')
-
-    j_slider_plot = plt.axes([0.25, 0.15, 0.65, 0.03], axisbg='g')
-    j_slider = Slider(j_slider_plot, 'j', 0, dims[1] - 1, valinit=dims_mean[1], valfmt='%1i')
-
-    k_slider_plot = plt.axes([0.25, 0.1, 0.65, 0.03], axisbg='b')
-    k_slider = Slider(k_slider_plot, 'k', 0, dims[2] - 1, valinit=dims_mean[2], valfmt='%1i')
-
-    axis_selector_plot = plt.axes([0.02, 0.1, 0.15, 0.13], axisbg=axcolor)
-    axis_selector = RadioButtons(axis_selector_plot, ('jk', 'ik', 'ij'), active=0)
-
-    center_image_button_plot = plt.axes([0.02, 0.04, 0.15, 0.04])
-    center_image_button = Button(center_image_button_plot, 'Center', color=axcolor, hovercolor='0.975')
-
-    def update_plane(label):
-
-        global l
-
-        if label == 'jk':
-            new_i = int(i_slider.val)
-            l = ax.imshow(in_array.take(new_i, axis=0), aspect='equal', origin='lower', interpolation='nearest', cmap='gray')
-            ax.set_xlim([0, dims[2]])
-            ax.set_ylim([0, dims[1]])
-            #l.set_array(in_array.take(new_i, axis=0))
-
-        if label == 'ik':
-            new_j = int(j_slider.val)
-            l = ax.imshow(in_array.take(new_j, axis=1), aspect='equal', origin='lower', interpolation='nearest', cmap='gray')
-
-            ax.set_xlim([0, dims[2]])
-            ax.set_ylim([0, dims[0]])
-            #l.set_array(in_array.take(new_j, axis=1))
-
-        if label == 'ij':
-            new_k = int(k_slider.val)
-            l = ax.imshow(in_array.take(new_k, axis=2), aspect='equal', origin='lower', interpolation='nearest', cmap='gray')
-            ax.set_xlim([0, dims[1]])
-            ax.set_ylim([0, dims[0]])
-            #l.set_array(in_array.take(new_k, axis=2))
-
-        fig.canvas.draw()
-
-    def update_slides(val):
-
-        global l
-        global cursor_coord
-
-        new_i = int(i_slider.val)
-        new_j = int(j_slider.val)
-        new_k = int(k_slider.val)
-
-        cursor_coord = [new_i, new_j, new_k]
-
-        if axis_selector.value_selected == 'jk':
-            l.set_array(in_array.take(new_i, axis=0))
-
-        if axis_selector.value_selected == 'ik':
-            l.set_array(in_array.take(new_j, axis=1))
-
-        if axis_selector.value_selected == 'ij':
-            l.set_array(in_array.take(new_k, axis=2))
-
-        fig.canvas.draw_idle()
-
-    def reset_slides(event):
-        i_slider.reset()
-        j_slider.reset()
-        k_slider.reset()
-
-    axis_selector.on_clicked(update_plane)
-
-    i_slider.on_changed(update_slides)
-    j_slider.on_changed(update_slides)
-    k_slider.on_changed(update_slides)
-
-    center_image_button.on_clicked(reset_slides)
-
-
-
-    axis_select_cursor = plt.axes([0.05, 0.4, 0.1, 0.15])
-    check = CheckButtons(axis_select_cursor, ('Cursor', ), (cursor_on, ))
-
-    def func(label):
-        global cursor_on
-        global cursor_coord
-
-        if label == 'Cursor':
-            cursor_on = bool((cursor_on + 1) % 2)
-            print cursor_on
-            print cursor_coord
-
-        plt.draw()
-    check.on_clicked(func)
-
-
-    '''
-    def onclick(event):
-        ix, iy = event.xdata, event.ydata
-        print 'vx = %d, vy = %d' % (ix, iy)
-
-    cid = fig.canvas.mpl_connect('button_press_event', onclick)
-    '''
-
-    if len(dims) >= 4:
-
-        t_slider_plot = plt.axes([0.25, 0.1, 0.65, 0.03], axisbg='b')
-        t_slider = Slider(t_slider_plot, 'k', 0, dims[3], valinit=dims_mean[init_ax], valfmt='%1i')
-
-        def update_t(val):
-            new_t = int(t_slider.val)
-            l.set_array(in_array.take(new_t, axis=3))
-            fig.canvas.draw_idle()
-
-        t_slider.on_changed(update_t)
-
-    plt.show(block=block)
-
-
-def stack_3dimage_to_gif():
-    pass
+def see_array(in_array, pfo_tmp='./z_tmp'):
+    """
+    Itk-snap based quick array visualiser.
+    :param in_array: numpy array or list of numpy array same dimension (GIGO).
+    :param pfo_tmp: path to file temporary folder.
+    :return:
+    """
+    if isinstance(in_array, list):
+        assert len(in_array) > 0
+        sh = in_array[0].shape
+        for arr in in_array[1:]:
+            assert sh == arr.shape
+        print_and_run('mkdir {}'.format(pfo_tmp))
+        cmd = 'itksnap -g '
+        for arr_id, arr in enumerate(in_array):
+            im = nib.Nifti1Image(arr, affine=np.eye(4))
+            pfi_im = jph(pfo_tmp,  'im_{}.nii.gz'.format(arr_id))
+            nib.save(im, pfi_im)
+            if arr_id == 1:
+                cmd += ' -o {} '.format(pfi_im)
+            else:
+                cmd += ' {} '.format(pfi_im)
+    elif isinstance(in_array, np.ndarray):
+        print_and_run('mkdir {}'.format(pfo_tmp))
+        im = nib.Nifti1Image(in_array, affine=np.eye(4))
+        pfi_im = jph(pfo_tmp, 'im_0.nii.gz')
+        nib.save(im, pfi_im)
+        cmd = 'itksnap -g {}'.format(pfi_im)
+    else:
+        raise IOError
+    print cmd
+    os.system(cmd)
 
 
 def see_image_slice_with_a_grid(pfi_image, fig_num=1, axis_quote=('y', 230), vmin=None, vmax=None, cmap='gray',

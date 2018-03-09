@@ -5,7 +5,7 @@ from labels_manager.tools.aux_methods.utils_nib import set_new_data
 
 def exploded_segmentation(im_segm, direction, intercepts, offset, dtype=np.int):
     """
-    Damien Hirst like sectioning of an anatomical segmentation.
+    Damien Hirst-like sectioning of an anatomical segmentation.
     :param im_segm: nibabel image segmentation
     :param direction: sectioning direction, can be sagittal, axial or coronal
     (conventional names for images oriented to standard (diagonal affine transformation))
