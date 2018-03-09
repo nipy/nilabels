@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from labels_manager.__init__ import __version__
+from LABelsToolkit.__init__ import __version__
 from setuptools import setup, find_packages
 # from distutils.core import setup
 

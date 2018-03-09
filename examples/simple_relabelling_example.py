@@ -1,8 +1,8 @@
 import os
 from os.path import join as jph
 
-from labels_manager.main import LabelsManager
-from labels_manager.tools.defs import root_dir
+from LABelsToolkit.main import LabelsManager
+from LABelsToolkit.tools.defs import root_dir
 
 if __name__ == '__main__':
 

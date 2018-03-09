@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
 ''' From manipulations.merger.py'''
-from labels_manager.tools.image_shape_manipulations.merger import stack_images, merge_labels_from_4d, grafting, from_segmentations_stack_to_probabilistic_segmentation
+from LABelsToolkit.tools.image_shape_manipulations.merger import stack_images, merge_labels_from_4d, grafting, from_segmentations_stack_to_probabilistic_segmentation
 
 
 def test_merge_labels_from_4d_fake_input():

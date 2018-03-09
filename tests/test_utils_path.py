@@ -2,10 +2,10 @@ from os.path import join as jph
 
 from nose.tools import assert_equals
 from numpy.testing import assert_array_equal
-from labels_manager.tools.defs import root_dir
+from LABelsToolkit.tools.defs import root_dir
 
 ''' Test aux_methods.sanity_checks.py - NOTE - this is the core of the manager design '''
-from labels_manager.tools.aux_methods.utils_path import connect_path_tail_head, get_pfi_in_pfi_out
+from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head, get_pfi_in_pfi_out
 
 
 def test_connect_tail_head_path():

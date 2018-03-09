@@ -5,10 +5,10 @@ import numpy as np
 from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
-from labels_manager.tools.defs import root_dir
+from LABelsToolkit.tools.defs import root_dir
 
 ''' Test aux_methods.morphological.py'''
-from labels_manager.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
+from LABelsToolkit.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
     get_circle_shell_for_given_radius
 
 
@@ -50,7 +50,7 @@ def test_get_shell_for_given_radius():
     assert len(expected_ans) == len(computed_ans)
     assert set(tuple(expected_ans)) == set(tuple(computed_ans))
 
-from labels_manager.tools.aux_methods.sanity_checks import check_pfi_io
+from LABelsToolkit.tools.aux_methods.sanity_checks import check_pfi_io
 
 def test_check_pfi_io():
 
@@ -67,8 +67,8 @@ def test_check_pfi_io():
 
 
 ''' Test aux_methods.utils.py '''
-from labels_manager.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
-from labels_manager.tools.aux_methods.utils import binarise_a_matrix
+from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
+from LABelsToolkit.tools.aux_methods.utils import binarise_a_matrix
 # eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
 
 

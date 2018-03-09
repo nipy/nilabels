@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 
 
 ''' From  manipulations.relabeller.py'''
-from labels_manager.tools.image_colors_manipulations.relabeller import relabeller, permute_labels, erase_labels, \
+from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller, permute_labels, erase_labels, \
     assign_all_other_labels_the_same_value, keep_only_one_label
 
 
@@ -53,7 +53,7 @@ def test_keep_only_one_label_label_not_present():
 
 
 ''' From manipulations.splitter.py '''
-from labels_manager.tools.image_shape_manipulations.splitter import split_labels_to_4d
+from LABelsToolkit.tools.image_shape_manipulations.splitter import split_labels_to_4d
 
 
 def test_split_labels_to_4d():
@@ -66,7 +66,7 @@ def test_split_labels_to_4d():
 
 
 ''' From manipulations.symmetriser.py '''
-from labels_manager.tools.aux_methods.utils_rotations import basic_90_rot_ax, axial_90_rotations, flip_data, symmetrise_data
+from LABelsToolkit.tools.aux_methods.utils_rotations import basic_90_rot_ax, axial_90_rotations, flip_data, symmetrise_data
 
 
 def test_basic_rotation_ax_simple_and_visual():
@@ -220,7 +220,7 @@ def test_symmetrise_data_():
 
 
 ''' From manipulations.cutter.py '''
-from labels_manager.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask
+from LABelsToolkit.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask
 
 
 def test_cut_4d_volume_with_a_1_slice_mask():

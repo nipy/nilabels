@@ -5,9 +5,9 @@ import nibabel as nib
 import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-from labels_manager.tools.defs import root_dir
-from labels_manager.tools.phantoms_generator.generate_simple_phantoms import generate_figures
-from labels_manager.tools.aux_methods.utils_nib import replace_translational_part, remove_nan, \
+from LABelsToolkit.tools.defs import root_dir
+from LABelsToolkit.tools.phantoms_generator.generate_simple_phantoms import generate_figures
+from LABelsToolkit.tools.aux_methods.utils_nib import replace_translational_part, remove_nan, \
     set_new_header_description
 
 
