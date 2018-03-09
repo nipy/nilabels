@@ -6,7 +6,7 @@ import numpy as np
 
 import LABelsToolkit.tools.image_colors_manipulations.relabeller as rel
 import LABelsToolkit.tools.image_shape_manipulations.splitter as sp
-from LABelsToolkit.main import LabelsManager
+from LABelsToolkit.main import LABelsToolkit
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.defs import root_dir
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     os.system(cmd)
 
     # Instantiate a manager from the class LabelsManager
-    lm = LabelsManager(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
+    lm = LABelsToolkit(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
     print('Input folder: ' + lm._pfo_in)
     print('Output folder: ' + lm._pfo_out)
 

@@ -1,8 +1,8 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LabelsManager as LM
-from LABelsToolkit.tools.caliber.distances import dice_score, dispersion, covariance_distance, hausdorff_distance
+from LABelsToolkit.main import LABelsToolkit as LM
+from LABelsToolkit.tools.caliber.distances import dice_score, covariance_distance, hausdorff_distance
 from LABelsToolkit.tools.defs import root_dir
 
 if __name__ == '__main__':
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # get the measure
     d = m.measure.dist(pfi_seg1, pfi_seg2,
-                       metrics=(dice_score, dispersion, hausdorff_distance, covariance_distance),
+                       metrics=(dice_score, hausdorff_distance, covariance_distance),
                        where_to_save=where_to_save)
 
     print d

@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LabelsManager as LM
+from LABelsToolkit.main import LABelsToolkit as LT
 from LABelsToolkit.tools.defs import root_dir
 
 
@@ -16,7 +16,7 @@ if __name__ == '__main__':
         if not os.path.exists(p):
             raise IOError('Run lm.tools.benchmarking.generate_images_examples.py to create the images examples before this, please.')
 
-    m = LM()
+    m = LT()
 
     # total volume:
     print('The image contains 4 cubes of sides 11, 17, 19 and 9:\n')

@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LabelsManager
+from LABelsToolkit.main import LABelsToolkit
 from LABelsToolkit.tools.defs import root_dir
 
 if __name__ == '__main__':
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     if run_steps['Fuse seg_LabFusion']:
 
         # instantiate a label manager:
-        lm = LabelsManager(jph(root_dir, 'data_examples', 'ellipsoids_family'), jph(root_dir, 'data_output'))
+        lm = LABelsToolkit(jph(root_dir, 'data_examples', 'ellipsoids_family'), jph(root_dir, 'data_output'))
 
         # With majority voting
         options_seg = '-MV'

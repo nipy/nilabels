@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LabelsManager
+from LABelsToolkit.main import LABelsToolkit
 from LABelsToolkit.tools.defs import root_dir
 
 if __name__ == '__main__':
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     os.system(cmd)
 
     # instantiate a label manager:
-    lm = LabelsManager(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
+    lt = LABelsToolkit(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
 
     # data:
     fin_punt_seg_original = 'mes_seg.nii.gz'
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     list_new_labels = [2, 3, 4, 5, 6, 7]
 
     # Using the manager to relabel the data:
-    lm.manipulate_labels.relabel(fin_punt_seg_original, fin_punt_seg_new,
+    lt.manipulate_labels.relabel(fin_punt_seg_original, fin_punt_seg_new,
                           list_old_labels, list_new_labels)
 
     # figure before:

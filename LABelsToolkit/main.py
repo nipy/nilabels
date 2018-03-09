@@ -10,7 +10,7 @@ from LABelsToolkit.agents.checker import LabelsManagerChecker
 from LABelsToolkit.agents.header_controller import LabelsManagerHeaderController
 
 
-class LabelsManager(object):
+class LABelsToolkit(object):
 
     def __init__(self, input_data_folder=None, output_data_folder=None):
         """
