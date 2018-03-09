@@ -1,7 +1,7 @@
-# LabelsManager
+# LABelsToolkit
 Python 2.7
 
-LabelsManager is a set of tools to automatise simple manipulations and measurements of medical images and images 
+LABelsToolkit is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
 
 Each tool provided can have as input 
