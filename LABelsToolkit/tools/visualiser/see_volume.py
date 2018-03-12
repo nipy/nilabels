@@ -9,11 +9,15 @@ import matplotlib.pyplot as plt
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 
 
-def see_array(in_array, pfo_tmp='./z_tmp'):
+def see_array(in_array, pfo_tmp='./z_tmp', in_array_segm=None, pfi_label_descriptor=None, block=False):
     """
     Itk-snap based quick array visualiser.
     :param in_array: numpy array or list of numpy array same dimension (GIGO).
     :param pfo_tmp: path to file temporary folder.
+    :param in_array_segm: if there is a single array representing a segmentation (in this case all images must
+    have the same shape).
+    :param pfi_label_descriptor: path to file to a label descriptor in ITK-snap standard format.
+    :param block: if want to stop after each show.
     :return:
     """
     if isinstance(in_array, list):
@@ -39,8 +43,18 @@ def see_array(in_array, pfo_tmp='./z_tmp'):
         cmd = 'itksnap -g {}'.format(pfi_im)
     else:
         raise IOError
-    print cmd
-    os.system(cmd)
+    if in_array_segm is not None:
+        im_segm = nib.Nifti1Image(in_array_segm, affine=np.eye(4))
+        pfi_im_segm = jph(pfo_tmp, 'im_segm_0.nii.gz')
+        nib.save(im_segm, pfi_im_segm)
+        cmd += ' -s {} '.format(pfi_im_segm)
+    if pfi_label_descriptor:
+        if os.path.exists(pfi_label_descriptor):
+            cmd += ' -l {} '.format(pfi_im_segm)
+
+    print_and_run(cmd)
+    if block:
+        _ = raw_input("Press any key to continue.")
 
 
 def see_image_slice_with_a_grid(pfi_image, fig_num=1, axis_quote=('y', 230), vmin=None, vmax=None, cmap='gray',

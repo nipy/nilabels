@@ -7,7 +7,7 @@ from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import oval_shap
 from LABelsToolkit.tools.visualiser.see_volume import see_array
 
 
-def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), random_perturbation=0):
+def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), random_perturbation=.0):
     """
     :param omega: grid domain.
     :param intensities: list of four with instensities of [skull, wm, gm, csf]
@@ -17,7 +17,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     print('Creating headlike phantom')
 
     for d in omega:
-        assert d > 50, 'Omega must be at least (50, 50, 50) to contain a head'
+        assert d > 69, 'Omega must be at least (70, 70, 70) to contain a head-like phantom'
 
     # Parameters
     skull_thickness = 3
@@ -29,8 +29,8 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     dd_sk = 2 * np.sqrt(omega[1] + skull_thickness ** 2)
 
     if random_perturbation > 0:
-        alpha = (0.1 * random_perturbation * np.random.randn() + alpha[0], 0.1 * random_perturbation * np.random.randn() + alpha[1])
-        epsilon = 0.3 * random_perturbation * np.random.randn()
+        alpha = (0.05 * random_perturbation * np.random.randn() + alpha[0],  0.05 * random_perturbation * np.random.randn() + alpha[1])
+        epsilon = 0.01 * random_perturbation * np.random.randn()
         dd_gm = epsilon + 2 * np.sqrt(omega[1])
         dd_sk = epsilon + 2 * np.sqrt(omega[1] + skull_thickness ** 2)
 
@@ -49,7 +49,8 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     sh_wm = ndimage.morphology.binary_erosion(sh_gm, structure=struct, iterations=wm_spacing)
 
     # smoothing and then re-take the smoothed as binary.
-    sc = sulci_structure(omega, omega_c, foreground_intensity=1, a_b_c=None, dd=None, random_perturbation=random_perturbation)
+    sc = sulci_structure(omega, omega_c, foreground_intensity=1, a_b_c=None, dd=None, alpha=alpha,
+                         random_perturbation=0.1 * random_perturbation)
 
     sh_wm = sh_wm.astype(np.bool) ^ sc.astype(np.bool) * sh_wm.astype(np.bool)
 
@@ -68,7 +69,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
 
     # ground truth intensities:
     anatomy = segm.astype(np.float64)
-    for i, l in zip(intensities, [1,2,3,4]):
+    for i, l in zip(intensities, [1, 2, 3, 4]):
         places = segm == l
         if np.any(places):
             np.place(anatomy, places, i)
@@ -78,22 +79,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
 
 if __name__ == '__main__':
 
-    # pfo_tmp = '/Users/sebastiano/a_code/LabelsManager/z_tmp/'
-    #
-    # pfi_mask_tmp = '/Users/sebastiano/a_code/LabelsManager/z_tmp/mask.nii.gz'
-    # mask = nib.load(pfi_mask_tmp)
-    #
-    # sh = headlike_phantom(omega=(80, 81, 82))
-    #
-    # see_array(sh)
-    #
-    # struct = ndimage.morphology.generate_binary_structure(3, 2)
-    # sh_inner_eroded_masked = ndimage.morphology.binary_erosion(sh, mask=mask.get_data(),
-    #                                                            iterations=5, structure=struct)
-    #
-    omega = (80, 81, 82)
+    omega = (70, 70, 70)
     omega_c = [int(omega[k] / 2) for k in range(3)]
-    # sh = sulci_structure(omega, omega_c, random_perturbation=True).astype(np.float64)
-
-    sh, sh_segm = headlike_phantom(omega=(80, 81, 82), random_perturbation=0)
-    see_array([sh, sh_segm])
+    anatomy, segm = headlike_phantom(omega)
+    see_array(anatomy)

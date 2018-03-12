@@ -24,28 +24,6 @@ def eliminates_consecutive_duplicates(input_list):
     return output_list
 
 
-# ---- Matrices and Arrays utils ----
-
-def binarise_a_matrix(in_matrix, labels=None, dtype=np.bool):
-    """
-    All the values above zeros will be ones.
-    :param in_matrix: any matrix
-    :param labels: input labels.
-    :param dtype: the output matrix is forced to this data type (bool by default).
-    :return: The same matrix, where all the non-zero elements are equals to 1.
-    """
-    out_matrix = np.zeros_like(in_matrix)
-    if labels is None:
-        non_zero_places = in_matrix != 0
-    else:
-        non_zero_places = np.zeros_like(in_matrix, dtype=np.bool)
-        for l in labels:
-            non_zero_places += in_matrix == l
-
-    np.place(out_matrix, non_zero_places, 1)
-    return out_matrix.astype(dtype)
-
-
 # ---- Command executions utils ----
 
 

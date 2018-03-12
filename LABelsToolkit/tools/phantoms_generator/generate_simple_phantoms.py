@@ -5,7 +5,6 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
-from LABelsToolkit.tools.aux_methods.utils import binarise_a_matrix
 from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.detections.get_segmentation import intensity_segmentation
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import ellipsoid_shape, o_shape, c_shape, \
@@ -110,7 +109,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         ellipsoid_left  = ellipsoid_shape(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left, foreground_intensity=foreground)
         ellipsoid_right = ellipsoid_shape(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right, foreground_intensity=foreground)
 
-        two_ellipsoids = foreground * binarise_a_matrix(ellipsoid_left + ellipsoid_right, dtype=np.float64)
+        two_ellipsoids = foreground * (ellipsoid_left + ellipsoid_right).astype(np.bool).astype(np.float64)
 
         two_ellipsoids = fil.gaussian_filter(two_ellipsoids, sigma=sigma_smoothing)
 

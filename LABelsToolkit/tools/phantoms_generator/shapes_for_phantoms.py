@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import ndimage
 
 
 # ---------- Simple shapes generators ---------------
@@ -88,7 +87,8 @@ def cube_shape(omega, center, side_length, background_intensity=0, foreground_in
                 sky[center[0] + lx, center[1] + ly, center[2] + lz] = foreground_intensity
     return sky
 
-def circle_shape(omega, centre, radius, foreground_intensity=100, dtype=np.uint8):
+
+def sphere_shape(omega, centre, radius, foreground_intensity=100, dtype=np.uint8):
     sky = np.zeros(omega, dtype=dtype)
     for xi in xrange(omega[0]):
         for yi in xrange(omega[1]):
@@ -150,9 +150,10 @@ def sulci_structure(omega, centre, foreground_intensity=1, a_b_c=None, dd=None, 
         for phi in phis:
             p = np.array([np.cos(theta) * np.sin(phi), np.sin(theta) * np.sin(phi), np.cos(phi)])
             # deform according to ovoidal shape
-            p = p * np.array([1 , 1 + np.sqrt(alpha[0]),  1 + np.sqrt(alpha[1])])
-            internal_foci.append(radius_internal_foci * p + np.array(centre))
-            external_foci.append(radius_external_foci * p + np.array(centre))
+            A, B, C, D = np.sum([(p[j]/float(a_b_c[j])) ** 2 for j in range(3)]), (p[0]/float(a_b_c[0])) ** 2 * alpha[0] * p[2] + (p[2]/float(a_b_c[2])) ** 2 * alpha[1] * p[1], 0, -1
+            t = [np.real(j) for j in np.roots([A, B, C, D]) if np.abs(np.imag(j)) < 10e-6][0]
+            internal_foci.append((radius_internal_foci + t) * p + np.array(centre))
+            external_foci.append((radius_external_foci + t) * p + np.array(centre))
 
     # add north and south pole:
     internal_foci.append(radius_internal_foci * np.array([0, 0, 1]) + np.array(centre))
@@ -163,8 +164,9 @@ def sulci_structure(omega, centre, foreground_intensity=1, a_b_c=None, dd=None, 
 
     # generate ellipses:
     for inte, exte in zip(internal_foci, external_foci):
-        d = 1.1 * np.linalg.norm(inte - exte)
+        d = 1.3 * np.linalg.norm(inte - exte)
         if random_perturbation > 0:
+            random_perturbation = 0.1* random_perturbation
             epsilon_radius = random_perturbation * np.random.randn() * d
             epsilon_direction = np.linalg.norm(inte - exte) * 0.5 * random_perturbation * np.random.randn(3)
             sky += ellipsoid_shape(omega, inte, exte + epsilon_direction, d + epsilon_radius, background_intensity=0, foreground_intensity=foreground_intensity)
@@ -174,40 +176,9 @@ def sulci_structure(omega, centre, foreground_intensity=1, a_b_c=None, dd=None, 
     return sky
 
 
-def artifactor(omega, kind='bias field', strengths=0.5):
-    """
-    Add random artefact to a domain. Different kinds of artefacts and strengths can be selected.
-    :param omega: a domain of a 3d volume image.
-    :param kind: 'bias field', 'salt and pepper', 'salt pepper and curry', 'gaussian field'
-    :param strengths: Value in the interval [0, 1]. 0 nothing happen. 1 strongest artefact.
-    :return: All the artefacts are normalised between 0 and 1. This is not related with strengths.
-    """
-    if kind == 'bias field':
-        pass
-
-    if kind == 'change modality':
-        pass
-
-    if kind == 'gaussian noise':
-        pass
-
-    if kind == 'black holes':
-        pass
-
-    if kind == 'white holes':
-        pass
-
-    assert len(omega) == 3
-
-
-
-
-
-
 if __name__ == '__main__':
-    import nibabel as nib
-    sky = oval_shape(omega=(81,101,71), centre=(40,50,35))
-    im = nib.Nifti1Image(sky, np.eye(4))
-    nib.save(im, '/Users/sebastiano/Desktop/zzz_test.nii.gz')
-
-    pass
+    omega = (80, 81, 82)
+    omega_c = [int(omega[k] / 2) for k in range(3)]
+    arr = sulci_structure(omega=omega, centre=omega_c)
+    from LABelsToolkit.tools.visualiser.see_volume import see_array
+    see_array(arr)

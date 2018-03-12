@@ -9,12 +9,12 @@ Each tool provided can have as input
 * Paths to the corresponding objects trough the facades called **agents**.
 
 
-## How to install 
+## How to "install" 
 
 Being a work in progress at this stage of development, this software is not packaged with wheel. 
 To install it in a local python distribution (ideally in a virtual environment) please execute the following instructions:
 ```
-cd <folder where to save the code>
+cd <folder where to clone the code>
 git clone https://github.com/SebastianoF/LABelsToolkit.git
 cd LABelsToolkit
 pip install -e .
