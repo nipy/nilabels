@@ -98,9 +98,8 @@ class LabelsManagerMeasure(object):
             labels_list1, labels_names1 = labels_query('all', im_segm1.get_data())
             labels_list2, labels_names2 = labels_query('all', im_segm2.get_data())
             labels_list  = list(set(labels_list1) & set(labels_list2))
-            labels_names = list(set(labels_names1) & set(labels_names2))
             labels_list.sort(key=int)
-            labels_names.sort(key=int)
+            labels_names = None
 
         if labels_names is None:
             labels_names = labels_list

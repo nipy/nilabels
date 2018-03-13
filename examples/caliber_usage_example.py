@@ -1,5 +1,6 @@
 import os
 from os.path import join as jph
+import numpy as np
 
 from LABelsToolkit.main import LABelsToolkit as LT
 from LABelsToolkit.tools.defs import root_dir
@@ -25,43 +26,35 @@ if __name__ == '__main__':
 
     # Get volumes per label:
     print('The 4 cubes of sides 11, 17, 19 and 9 are labelled 1, 2, 3 and 4 resp.:')
-    print('Volume measured label 1        = {}'.format( m.measure.volume(pfi_im, labels=1)['Volume'].values) )
+    print('Volume measured label 1        = {}'.format(m.measure.volume(pfi_im, labels=1)['Volume'].values))
     print('11**3                          = {}'.format(11 ** 3))
-    print('Volume measured label 2        = {}'.format( m.measure.volume(pfi_im, labels=2)['Volume'].values) )
+    print('Volume measured label 2        = {}'.format(m.measure.volume(pfi_im, labels=2)['Volume'].values))
     print('17**3                          = {}'.format(17 ** 3))
-    print('Volume measured label 3        = {}'.format( m.measure.volume(pfi_im, labels=3)['Volume'].values) )
+    print('Volume measured label 3        = {}'.format(m.measure.volume(pfi_im, labels=3)['Volume'].values))
     print('19**3                          = {}'.format(19 ** 3))
-    print('Volume measured label 4        = {}'.format( m.measure.volume(pfi_im, labels=4)['Volume'].values) )
+    print('Volume measured label 4        = {}'.format(m.measure.volume(pfi_im, labels=4)['Volume'].values))
     print('9**3                           = {}'.format(9 ** 3))
-    print('Volume measured labels ([1, 3]) = {}'.format( m.measure.volume(pfi_im,
-                                                                          labels=[[1, 3]])['Volume'].values) )
-    print('11* 3 +  19**3                  = {}'.format(11**3 + 19**3))
+    print('Volume measured labels ([1, 3]) = {}'.format(m.measure.volume(pfi_im, labels=[[1, 3]])['Volume'].values))
+    print('11**3 +  19**3                  = {}'.format(11**3 + 19**3))
     print('\nTo sum up: \n')
     print('Volume measured labels ([1, 2, 3, 4, [1, 3]]) = \n{}\n'.format(
-        m.measure.volume(pfi_im, labels=[1,2, 3, 4, [1, 3]])
-        ))
+        m.measure.volume(pfi_im, labels=[1, 2, 3, 4, [1, 3], [1, 2, 3, 4]])))
+    print('Total volume = {} \n'.format(m.measure.get_total_volume(pfi_im)))
+
 
     print('------------')
 
     # Get volumes under each label, given the image weight, corresponding to the label itself:
-    print('average below label 1 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=1)['Average below label'].values) )
-    print('11**3 * 1  / 11**3    = {}'.format(11 ** 3 * 1/ float(11**3) ))
-    print('average below label 2 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=2)['Average below label'].values) )
-    print('17**3  * 2 / 17 ** 3  = {}'.format(17 ** 3 * 2 / float(17 ** 3)))
-    print('average below label 3 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=3)['Average below label'].values) )
-    print('19**3 * 3/ 19 ** 3    = {}'.format(19 ** 3 * 3 / float(19 ** 3)))
-    print('average below label 4 = {}'.format( m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=4)['Average below label'].values) )
-    print('9**3 * 4 / 9 ** 3     = {}'.format(9 ** 3 * 4 / float(9 ** 3)))
-    print('average below labels [1,3]                = {}'.format(
-        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[1,3])['Average below label'].values)
-    )
-    print('11**3 * 1  / 11**3,  19**3 * 3/ 19 ** 3   = {}'.format([11 ** 3 * 1 / float(11 ** 3),
-                                                                    19 ** 3 * 3 / float(19 ** 3)]))
-    print('average below labels [[1, 3]]   = {}'.format(
-        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[[1,3]])['Average below label'].values)
-    )
-    print('( 11**3 * 1 +19**3 * 3 ) / (11**3 + 19 ** 3) = {0}'.format( (11**3 * 1 +19**3 * 3) / float(11**3 + 19 ** 3)))
-    print('\n\nTo sum up: \n')
-    print('average below labels [1, 2, 3, 4, [1, 3]] = \n{}'.format(
-        m.measure.volume(pfi_im, anatomy_filename=pfi_im, labels=[1, 2, 3, 4, [1, 3]] ))
-    )
+    vals_below_labels = m.measure.values_below_labels(pfi_im, pfi_im, labels=[1, 2, 3, 4, 5, [1, 3]])
+
+    print('average below labels [1, 2, 3, 4, [1, 3]] = \n{}'.format(vals_below_labels))
+
+    print('mu, std below label 1 = {} {}'.format(np.mean(vals_below_labels['1']), np.std(vals_below_labels['1'])))
+    print('mu, std below label 2 = {} {}'.format(np.mean(vals_below_labels['2']), np.std(vals_below_labels['2'])))
+    print('mu, std below label 3 = {} {}'.format(np.mean(vals_below_labels['3']), np.std(vals_below_labels['3'])))
+    print('mu, std below label 4 = {} {}'.format(np.mean(vals_below_labels['4']), np.std(vals_below_labels['4'])))
+    # print('mu, std below label 5 = {} {}'.format(np.mean(vals_below_labels['5']), np.std(vals_below_labels['5'])))
+    print('mu, std below label [1, 3] = {} {}'.format(np.mean(vals_below_labels['[1, 3]']), np.std(vals_below_labels['[1, 3]'])))
+
+    print('\nValues as they are reported: {}'.format(vals_below_labels))
+

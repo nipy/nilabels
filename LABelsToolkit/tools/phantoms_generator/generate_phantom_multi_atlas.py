@@ -7,8 +7,9 @@ import scipy.ndimage.filters as fil
 
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
-from LABelsToolkit.tools.visualiser.see_volume import see_array
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
+
+from LABelsToolkit.tools.visualiser.see_volume import see_array
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomness_shape=0.3, randomness_noise=0.4):
@@ -49,14 +50,14 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     mod_inv_noise = mod_inv + noise_array
 
     # -- add hypo-intensities artefacts:
-    num_artefacts_per_type = int(10 * randomness_noise / 2)
+    num_spots = int(10 * randomness_noise / 2)
     noise_hypo = np.zeros_like(noise_array).astype(np.int32)
-    for j in range(num_artefacts_per_type):
-        random_radius = 0.05 * randomness_noise * np.min(omega) *np.random.randn()  # 5% of the min direction
+    for j in range(num_spots):
+        radius_centre = 0.05 * randomness_noise * np.min(omega)
+        random_radius = np.random.uniform(radius_centre - radius_centre/2, radius_centre + radius_centre/2)  # 5% of the min direction
         random_centre = [np.random.uniform(0 + random_radius, j - random_radius) for j in omega]
 
         noise_hypo = noise_hypo + sphere_shape(omega, random_centre, random_radius, foreground_intensity=1, dtype=np.int32)
-    see_array(noise_hypo, block=True)
 
     noise_hypo = 1 - 1 * (noise_hypo.astype(np.bool))
     # filter the results:
@@ -65,8 +66,6 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
 
     # D) Get the Registration Mask (based on):
     reg_mask = noise_hypo * roi_mask
-
-    see_array([mod_gt, segm_gt, roi_mask.astype(np.int32), reg_mask.astype(np.int32), mod_gt_noise, mod_inv_noise])
 
     # E) save all in the data structure
     im_segm_gt  = nib.Nifti1Image(segm_gt, affine=np.eye(4))
@@ -97,30 +96,15 @@ def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_o
     :param randomness_noise: randomness in the simulated noise signal and artefacts. Must be between 0 and 1.
     :return:
     """
-    print_and_run('mkdir -p {}'.format(pfo_where_to_create_the_multi_atlas))
-
+    print_and_run('mkdir {}'.format(pfo_where_to_create_the_multi_atlas))
     for sj in range(number_of_subjects):
-
-        # A) Generate folder structure
-        sj_name = multi_atlas_root_name + str(sj).zfill(len(str(number_of_subjects)) + 1)
-
+        sj_name = multi_atlas_root_name + str(sj + 1).zfill(len(str(number_of_subjects)) + 1)
         print('Creating atlas {0} ({1}/{2})'.format(sj_name, sj+1, number_of_subjects))
+        print_and_run('mkdir {}'.format(jph(pfo_where_to_create_the_multi_atlas, sj_name)))
         generate_atlas_at_folder(jph(pfo_where_to_create_the_multi_atlas, sj_name), atlas_name=sj_name,
                                  randomness_shape=randomness_shape, randomness_noise=randomness_noise)
 
-
-
 if __name__ == '__main__':
-    omega = (80, 90, 80)
-    # noise1 = np.random.choice(range(10), size=omega).astype(np.float64)
-    # noise2 = fil.gaussian_filter(noise1, 5)
-    # print np.mean(noise2)
-    # print np.std(noise2)
-    # noise3 = noise2 / (np.mean(noise2) + 2 * np.std(noise2))
-    # see_array([noise1, noise2, noise3])
-
-    # noise_array = np.random.uniform(-10, 10, size=omega).astype(np.float64)
-    # noise_array = 0.2 * 0.4 * fil.gaussian_filter(noise_array, 3)
-    # see_array(noise_array)
-    #
-    generate_atlas_at_folder('/Users/sebastiano/Desktop/z_test_phantom_atlas', randomness_noise=1)
+    # test
+    generate_multi_atlas_at_folder('/Users/sebastiano/Desktop/z_test_phantom_atlas', number_of_subjects=3,
+                                   randomness_noise=1, randomness_shape=1)

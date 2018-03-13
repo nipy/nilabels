@@ -54,7 +54,6 @@ if __name__ == '__main__':
             )
             os.system(cmd_resample_nrig)
 
-
     if run_steps['Fuse seg_LabFusion']:
 
         # instantiate a label manager:

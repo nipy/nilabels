@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LABelsToolkit as LM
+from LABelsToolkit.main import LABelsToolkit as LT
 from LABelsToolkit.tools.caliber.distances import dice_score, covariance_distance, hausdorff_distance
 from LABelsToolkit.tools.defs import root_dir
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     where_to_save = None
 
     # Instantiate a Labels Manager class
-    m = LM()
+    m = LT()
     m.measure.return_mm3 = False
 
     # get the measure
