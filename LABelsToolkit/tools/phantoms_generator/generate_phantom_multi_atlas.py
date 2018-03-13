@@ -75,7 +75,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     im_roi_mask = nib.Nifti1Image(roi_mask.astype(np.int32), affine=np.eye(4))
     im_reg_mask = nib.Nifti1Image(reg_mask.astype(np.int32), affine=np.eye(4))
 
-    nib.save(im_segm_gt, jph(pfo_segm, '{}_segmGT.nii.gz'.format(atlas_name)))
+    nib.save(im_segm_gt, jph(pfo_segm, '{}_segm_GT.nii.gz'.format(atlas_name)))
     nib.save(im_mod_gt, jph(pfo_mod, '{}_modGT.nii.gz'.format(atlas_name)))
     nib.save(im_mod1, jph(pfo_mod, '{}_mod1.nii.gz'.format(atlas_name)))
     nib.save(im_mod2, jph(pfo_mod, '{}_mod2.nii.gz'.format(atlas_name)))
