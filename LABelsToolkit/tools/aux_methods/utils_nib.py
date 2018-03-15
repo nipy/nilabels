@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import nibabel as nib
 
@@ -35,10 +36,16 @@ def set_new_data(image, new_data, new_dtype=None, remove_nan=True):
 
 def compare_two_nib(im1, im2):
     """
-    :param im1: one nibabel image
-    :param im2: another nibabel image
+    :param im1: one nibabel image (or str with path to a nifti image)
+    :param im2: another nibabel image (or another str with path to a nifti image)
     :return: true false and plot to console if the images are the same or not (up to a tollerance in the data)
     """
+    if isinstance(im1, str):
+        assert os.path.exists(im1), im1
+        im1 = nib.load(im1)
+    if isinstance(im2, str):
+        assert os.path.exists(im2), im2
+        im2 = nib.load(im2)
 
     im1_name = 'First argument'
     im2_name = 'Second argument'

@@ -94,7 +94,6 @@ def global_dice_score(im_segm1, im_segm2):
     Global dice score as in Munoz-Moreno et al. 2013
     :param im_segm1:
     :param im_segm2:
-    :param labels_list:
     :return:
     """
     all_labels1 = set(im_segm1.get_data().astype(np.int).flat) - {0}

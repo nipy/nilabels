@@ -137,7 +137,6 @@ def test_adjust_nifti_translation_path_T_F():
         assert_array_almost_equal(new_transformation_expected, final_qform)
         assert_array_almost_equal(initial_sform, final_sform)
 
-
     # check all of the original image is still the same
     im_a_cee_reloaded = nib.load(pfi_input)
     reloaded_affine = im_a_cee_reloaded.affine  # sform
