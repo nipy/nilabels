@@ -98,19 +98,6 @@ def compare_two_nib(im1, im2):
     return images_are_equals
 
 
-def compare_two_nifti(path_img_1, path_img_2):
-    """
-    ... assuming nibabel take into account all the information in the nifty header properly!
-    :param path_img_1:
-    :param path_img_2:
-    :return:
-    """
-    im1 = nib.load(path_img_1)
-    im2 = nib.load(path_img_2)
-
-    return compare_two_nib(im1, im2)
-
-
 def one_voxel_volume(im):
     return np.round(np.abs(np.prod(np.diag(im.get_affine()))), decimals=6)
 
