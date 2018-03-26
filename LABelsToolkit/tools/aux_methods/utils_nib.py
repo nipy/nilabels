@@ -54,7 +54,7 @@ def compare_two_nib(im1, im2):
     hd1 = im1.header
     hd2 = im2.header
 
-    images_are_equals = True
+    images_are_equal = True
 
     # compare nifty version:
     if not hd1['sizeof_hdr'] == hd2['sizeof_hdr']:
@@ -64,7 +64,7 @@ def compare_two_nib(im1, im2):
         else:
             msg += '{0} is nifti2\n{1} is nifti1.'.format(im1_name, im2_name)
 
-        images_are_equals = False
+        images_are_equal = False
 
     # Compare headers:
     else:
@@ -76,26 +76,29 @@ def compare_two_nib(im1, im2):
                     are_different = are_different.any()
 
                 if are_different:
-                    images_are_equals = False
+                    images_are_equal = False
                     msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name , hd1[k], im2_name, hd2[k])
 
             elif not np.isnan(hd1[k]) and np.isnan(hd2[k]):
-                images_are_equals = False
+                images_are_equal = False
                 msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name, hd1[k], im2_name, hd2[k])
 
     # Compare values and type:
     if not im1.get_data_dtype() == im2.get_data_dtype():
         msg += 'Dtype are different consistent {0} {1} - {2} {3} \n'.format(im1_name, im1.get_data_dtype(), im2_name, im2.get_data_dtype())
-        images_are_equals = False
+        images_are_equal = False
     if not np.array_equal(im1.get_data(), im2.get_data()):
         msg += 'Data are different. \n'
-        images_are_equals = False
+        images_are_equal = False
+        if np.array_equal(np.nan_to_num(im1.get_data()), np.nan_to_num(im2.get_data())):
+            msg += '(data are different only up to nans)'  # np.argwhere(np.isnan(im2.get_data())).shape[0]
     if not np.array_equal(im1.get_affine(), im2.get_affine()):
         msg += 'Affine transformations are different. \n'
-        images_are_equals = False
+        images_are_equal = False
 
     print(msg)
-    return images_are_equals
+    print('\n -- Is it {} that images are equal!'.format(images_are_equal))
+    return images_are_equal
 
 
 def one_voxel_volume(im):
@@ -211,3 +214,10 @@ def set_new_header_description(im_input, new_header_description=''):
     im_input_header = im_input.header
     im_input_header['descrip'] = new_header_description
     return im_input
+
+
+
+if __name__ == '__main__':
+    im1 = '/Volumes/sebastianof/rabbits/C_atlas_validation_leave_one_out_/1201/z_tmp/z_propagationMulti/1203_over_1201_warped.nii.gz'
+    im2 = '/Volumes/sebastianof/rabbits/C_atlas_validation_leave_one_out/1201/z_SPOT_CrossValidation/moving_aff_warp_1203_on_target_1201_mod.nii.gz'
+    compare_two_nib(im1, im2)

@@ -208,6 +208,8 @@ def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=
     if top_adjust is not None:
         plt.subplots_adjust(top=top_adjust)
 
+    fig.tight_layout()
+
     if pfi_where_to_save is not None:
         plt.savefig(pfi_where_to_save, format='pdf', dpi=200)
     if show_fig:

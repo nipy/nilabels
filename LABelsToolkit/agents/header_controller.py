@@ -51,7 +51,8 @@ class LabelsManagerHeaderController(object):
         nib.save(new_im, pfi_out)
 
     def apply_small_rotation(self, filename_in, filename_out, angle=np.pi/6, principal_axis='pitch'):
-
+        # Warning: this works only for hisotropic spaces. If the space is not isotropic, need to
+        # do make it isotropic first.
         if isinstance(angle, list):
             assert isinstance(principal_axis, list)
             assert len(principal_axis) == len(angle)
