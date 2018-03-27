@@ -23,7 +23,7 @@ The code is installed in development mode and every modification to the code wil
 
 ## Documentations
 
-+ [Wiki-pages documentation](https://github.com/SebastianoF/LabelsManager/wiki)
++ [Wiki-pages documentation](https://github.com/SebastianoF/LABelsToolkit/wiki)
 
 
 ## Code testing
@@ -32,6 +32,6 @@ To run the test, type `nosetests` in the root directory of the project.
 
 ## Licence
 
-Copyright (c) 2017, Sebastiano Ferraris. LabelsManager is available as free open-source software under 
-[MIT License](https://github.com/SebastianoF/LabelsManager/blob/master/LICENCE.txt)
+Copyright (c) 2017, Sebastiano Ferraris. LABelsToolkit (ex. LabelsManager) is available as free open-source software under 
+[MIT License](https://github.com/SebastianoF/LABelsToolkit/blob/master/LICENCE.txt)
 
