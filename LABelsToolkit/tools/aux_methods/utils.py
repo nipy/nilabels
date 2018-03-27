@@ -17,7 +17,7 @@ def eliminates_consecutive_duplicates(input_list):
     :return: the same list with no consecutive duplicates.
     """
     output_list = [input_list[0],]
-    for i in xrange(1, len(input_list)):
+    for i in range(1, len(input_list)):
         if not input_list[i] == input_list[i-1]:
             output_list.append(input_list[i])
 

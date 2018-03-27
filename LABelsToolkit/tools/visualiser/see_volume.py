@@ -86,7 +86,7 @@ def see_image_slice_with_a_grid(pfi_image, fig_num=1, axis_quote=('y', 230), vmi
         vertical_max = pt_y[2]
 
         extent = [horizontal_min, horizontal_max, vertical_min, vertical_max]
-        print extent
+        print(extent)
 
     elif axis_quote[0] == 'y':
         data = im.get_data()[:, axis_quote[1], :].T
@@ -134,13 +134,13 @@ def see_image_slice_with_a_grid(pfi_image, fig_num=1, axis_quote=('y', 230), vmi
     else:
         raise IOError
 
-    print voxel_origin
-    print voxel_x
-    print voxel_y
-    print pt_origin
-    print pt_x
-    print pt_y
-    print extent
+    print(voxel_origin)
+    print(voxel_x)
+    print(voxel_y)
+    print(pt_origin)
+    print(pt_x)
+    print(pt_y)
+    print(extent)
     res = ax.imshow(data,
                     extent=extent,
                     origin='lower',

@@ -22,4 +22,4 @@ if __name__ == '__main__':
                        metrics=(dice_score, hausdorff_distance, covariance_distance),
                        where_to_save=where_to_save)
 
-    print d
+    print(d)

@@ -108,7 +108,6 @@ def global_outline_error(im_segm1, im_segm2):
     Volume of the binarised image differences over the average binarised volume of the two images.
     :param im_segm1:
     :param im_segm2:
-    :param labels_list:
     :return:
     """
     num_voxels_1, num_voxels_2 = np.count_nonzero(im_segm1.get_data()), np.count_nonzero(im_segm2.get_data())
@@ -133,8 +132,8 @@ def dice_score_l(im_segm1, im_segm2, lab):
 def d_H(im1, im2, lab, return_mm3):
     """
     Asymmetric component of the Hausdorff distance.
-    :param im1: first image
-    :param im2: second image
+    :param im1: first image (nibabel format)
+    :param im2: second image (nibabel format)
     :param lab: label in the image
     :param return_mm3: final unit of measures of the result.
     :return: max(d(x, contourY)), x: point belonging to the first contour,
@@ -192,13 +191,13 @@ def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'
     dist_border2_array1 = arr1_contour * dtb2
 
     if formula == 'normalised':
-        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / (np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
+        return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / float(np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
     elif formula == 'averaged':
         return .5 * (np.mean(dist_border1_array2) + np.mean(dist_border2_array1))
     elif formula == 'median':
         return .5 * (np.median(dist_border1_array2) + np.median(dist_border2_array1))
     elif formula == 'std':
-        return np.sqrt( .5 * (np.std(dist_border1_array2)**2 + np.std(dist_border2_array1)**2))
+        return np.sqrt(.5 * (np.std(dist_border1_array2)**2 + np.std(dist_border2_array1)**2))
     elif formula == 'average_std':
         return .5 * (np.mean(dist_border1_array2) + np.mean(dist_border2_array1)), \
                np.sqrt(.5 * (np.std(dist_border1_array2) ** 2 + np.std(dist_border2_array1) ** 2))
@@ -341,14 +340,12 @@ def mahalanobis_distance(im, im_mask=None, trim=False):
         np.testing.assert_array_equal(im.affine, im_mask.affine)
         np.testing.assert_array_equal(im.shape, im_mask.shape)
         mu = np.mean(im.get_data().flatten() * im_mask.get_data().flatten())
-        print mu
+        print(mu)
         sigma2 = np.std(im.get_data().flatten() * im_mask.get_data().flatten())
         new_data = np.sqrt((im.get_data() - mu) * sigma2**(-1) * (im.get_data() - mu))
         if trim:
             new_data = new_data * im_mask.get_data().astype(np.bool)
         return set_new_data(im, new_data)
-
-
 
 
 def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
@@ -375,7 +372,7 @@ def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True)
         cs2 = [im_segm1.affine[:3, :3].dot(c.astype(np.float64)) for c in cs2]
 
     np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
-    return pa.Series(np.array([np.sqrt( sum((c1 - c2)**2) ) for c1, c2 in zip(cs1, cs2)]), index=labels_names)
+    return pa.Series(np.array([np.sqrt( sum((c1 - c2)**2)) for c1, c2 in zip(cs1, cs2)]), index=labels_names)
 
 
 def s_precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):

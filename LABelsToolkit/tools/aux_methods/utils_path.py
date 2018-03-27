@@ -1,5 +1,5 @@
 import os
-from sanity_checks import check_pfi_io
+from .sanity_checks import check_pfi_io
 
 
 def connect_path_tail_head(tail, head):

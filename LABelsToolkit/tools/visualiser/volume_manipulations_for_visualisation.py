@@ -34,7 +34,7 @@ def exploded_segmentation(im_segm, direction, intercepts, offset, dtype=np.int):
         for j in range(1, len(intercepts)):
             stack += [im_segm.get_data()[:, intercepts[j - 1]:intercepts[j], :].astype(dtype)] + [block]
         for st in stack:
-            print st.shape
+            print(st.shape)
         return set_new_data(im_segm, np.concatenate(stack, axis=1))
 
     else:

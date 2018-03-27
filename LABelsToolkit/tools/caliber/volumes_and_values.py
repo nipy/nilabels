@@ -25,7 +25,7 @@ def get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=None):
             seg = seg * places
         num_voxels = np.count_nonzero(seg)
     else:
-        num_voxels = np.count_nonzero(im_segm.get_data())
+        num_voxels = int(np.count_nonzero(im_segm.get_data()))
     return num_voxels
 
 

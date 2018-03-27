@@ -7,8 +7,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.phantoms_generator.generate_simple_phantoms import generate_figures
-from LABelsToolkit.tools.aux_methods.utils_nib import replace_translational_part, remove_nan, \
-    set_new_header_description
+from LABelsToolkit.tools.aux_methods.utils_nib import replace_translational_part, remove_nan
 
 
 def test_adjust_nifti_replace_translational_part_F_F():
@@ -206,16 +205,3 @@ def test_remove_nan():
                          [20, 21, 22, 23]]])
 
     assert_array_equal(im_no_nan.get_data(), data_no)
-
-
-def test_set_new_header_description():
-    arr_data = np.zeros([10,10,10])
-    im = nib.Nifti1Image(arr_data, np.eye(4))
-
-    hd = im.header
-    hd['descrip'] = 'Old Spam'
-
-    im_new_header = set_new_header_description(im, new_header_description='New Spam')
-
-    new_hd = im_new_header.header
-    assert new_hd['descrip'] == 'New Spam'

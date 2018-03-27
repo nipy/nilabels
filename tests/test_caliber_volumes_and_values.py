@@ -26,10 +26,10 @@ def test_volumes_and_values_total_num_voxels():
     im_segm = nib.Nifti1Image(sky, affine=np.eye(4))
 
     num_voxels = get_total_num_nonzero_voxels(im_segm)
-    assert_equal(num_voxels, 11 ** 3 + 17 **3 + 19 ** 3 + 9 **3)
+    assert_equal(num_voxels, 11 ** 3 + 17 ** 3 + 19 ** 3 + 9 **3)
 
     num_voxels = get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=[2, 4])
-    assert_equal(num_voxels, 11 ** 3 +  19 ** 3)
+    assert_equal(num_voxels, 11 ** 3 + 19 ** 3)
 
 
 def test_volumes_and_values_total_num_voxels_empthy():
@@ -38,7 +38,7 @@ def test_volumes_and_values_total_num_voxels_empthy():
     im_segm = nib.Nifti1Image(np.zeros(omega), affine=np.eye(4))
 
     num_voxels = get_total_num_nonzero_voxels(im_segm)
-    print num_voxels
+    print(num_voxels)
     assert_equal(num_voxels, 0)
 
 
@@ -48,7 +48,7 @@ def test_volumes_and_values_total_num_voxels_full():
     im_segm = nib.Nifti1Image(np.ones(omega), affine=np.eye(4))
 
     num_voxels = get_total_num_nonzero_voxels(im_segm)
-    print num_voxels
+    print(num_voxels)
     assert_equal(num_voxels, 80 ** 3)
 
 
@@ -67,19 +67,19 @@ def test_get_num_voxels_from_labels_list():
     im_segm = nib.Nifti1Image(sky, affine=np.eye(4))
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[1, 2, 3, 4])
-    print num_voxels, [11 **3, 15 **3, 13 **3, 7 ** 3]
+    print(num_voxels, [11 **3, 15 **3, 13 **3, 7 ** 3])
     assert_array_equal(num_voxels, [11 **3, 15 **3, 13 **3, 7 ** 3])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[1, [2, 3], 4])
-    print num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3]
+    print(num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3])
     assert_array_equal(num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[[1, 2, 3], 4])
-    print num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3]
+    print(num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3])
     assert_array_equal(num_voxels, [11 ** 3 + 15 ** 3 + 13 ** 3, 7 ** 3])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[[1, 2, 3, 4]])
-    print num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3]
+    print(num_voxels, [11 ** 3, 15 ** 3 + 13 ** 3, 7 ** 3])
     assert_array_equal(num_voxels, [11 ** 3 + 15 ** 3 + 13 ** 3 + 7 ** 3])
 
 
@@ -98,19 +98,19 @@ def test_get_num_voxels_from_labels_list_unexisting_labels():
     im_segm = nib.Nifti1Image(sky, affine=np.eye(4))
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[1, 2, 3, 5])
-    print num_voxels, [11 ** 3, 15 ** 3, 13 ** 3, 0]
+    print(num_voxels, [11 ** 3, 15 ** 3, 13 ** 3, 0])
     assert_array_equal(num_voxels, [11 ** 3, 15 ** 3, 13 ** 3, 0])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[1, 2, [3, 5]])
-    print num_voxels, [11 ** 3, 15 ** 3, 13 ** 3 + 0]
+    print(num_voxels, [11 ** 3, 15 ** 3, 13 ** 3 + 0])
     assert_array_equal(num_voxels, [11 ** 3, 15 ** 3, 13 ** 3 + 0])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[[1, 2], [7, 8]])
-    print num_voxels, [11 ** 3 + 15 ** 3,  0]
+    print(num_voxels, [11 ** 3 + 15 ** 3,  0])
     assert_array_equal(num_voxels, [11 ** 3 + 15 ** 3, 0])
 
     num_voxels = get_num_voxels_from_labels_list(im_segm, labels_list=[[1, 2], [7, -8]])
-    print num_voxels, [11 ** 3 + 15 ** 3, 0]
+    print(num_voxels, [11 ** 3 + 15 ** 3, 0])
     assert_array_equal(num_voxels, [11 ** 3 + 15 ** 3, 0])
 
 
@@ -126,7 +126,6 @@ def test_get_values_below_labels_list():
     cube_b_anat = [[50, 55, 42], 15, 2.5]
     cube_c_anat = [[25, 20, 20], 13, 3.5]
     cube_d_anat = [[55, 16, 9], 7, 4.5]
-
 
     sky_s = cube_shape(omega, center=cube_a_seg[0], side_length=cube_a_seg[1], foreground_intensity=cube_a_seg[2])
     sky_s += cube_shape(omega, center=cube_b_seg[0], side_length=cube_b_seg[1], foreground_intensity=cube_b_seg[2])

@@ -21,7 +21,7 @@ def check_path_validity(pfi, interval=1, timeout=100):
                 try:
                     subprocess.check_output('gunzip -t {}'.format(pfi), shell=True)
                 except subprocess.CalledProcessError:
-                    print "Caught CalledProcessError"
+                    print("Caught CalledProcessError")
                 else:
                     return True
                 time.sleep(interval)

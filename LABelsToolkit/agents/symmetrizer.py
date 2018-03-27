@@ -181,9 +181,9 @@ class LabelsManagerSymmetrize(object):
 
         print('Pointwise symmetrisation started!')
 
-        for z in xrange(dims[0]):
-            for x in xrange(dims[1]):
-                for y in xrange(dims[2]):
+        for z in range(dims[0]):
+            for x in range(dims[1]):
+                for y in range(dims[2]):
                     if (data_side_A[z, x, y] == 0 and data_side_B[z, x, y] != 0) or \
                             (data_side_A[z, x, y] != 0 and data_side_B[z, x, y] == 0):
                         symmetrised_data[z, x, y] = np.max([data_side_A[z, x, y], data_side_B[z, x, y]])

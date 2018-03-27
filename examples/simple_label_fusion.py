@@ -73,4 +73,4 @@ if __name__ == '__main__':
         list_paths = lm.fuse.seg_LabFusion('target.nii.gz', jph('results_label_fusion', 'output' + options_seg + '.nii.gz'),
                               list_pfi_segmentations, list_pfi_warped, options=options_seg, prepare_data_only=True)
 
-        print list_paths
+        print(list_paths)

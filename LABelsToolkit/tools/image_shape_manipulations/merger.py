@@ -17,7 +17,7 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
     in_data_shape = in_data.shape
     out_data = np.zeros(in_data_shape[:3], dtype=in_data.dtype)
 
-    for t in xrange(in_data.shape[3]):
+    for t in range(in_data.shape[3]):
         slice_t = in_data[...,t]
         if keep_original_values:
             out_data = out_data + slice_t

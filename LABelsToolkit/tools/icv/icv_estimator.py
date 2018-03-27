@@ -34,7 +34,7 @@ class ICV_estimator(object):
         self.alpha = alpha
         self.beta = beta
         # graph connection is complete by default. Have to edit this directly.
-        self.graph_connections = [[i, j] for i in xrange(self.num_subjects) for j in xrange(i+1, self.num_subjects)]
+        self.graph_connections = [[i, j] for i in range(self.num_subjects) for j in range(i+1, self.num_subjects)]
         # folder structure
         self.pfo_warped = jph(self.pfo_output, 'warped')
         self.pfo_transformations = jph(self.pfo_output, 'transformations')
@@ -81,8 +81,8 @@ class ICV_estimator(object):
 
         S = np.zeros(2, 2)
 
-        for i in xrange(self.num_subjects):
-            for j in xrange(i+1, self.num_subjects):
+        for i in range(self.num_subjects):
+            for j in range(i+1, self.num_subjects):
 
                 pfi_aff_i_j = jph(self.pfo_transformations,
                                   self.subjects_id[i] + '_' + self.subjects_id[j] + '.txt')
@@ -116,8 +116,8 @@ class ICV_estimator(object):
         def cost(v, S, m, n, a, b, alpha, beta):
 
             sum_abs_log_diff = 0
-            for i in xrange(len(v)):
-                for j in xrange(i+1, len(v)):
+            for i in range(len(v)):
+                for j in range(i+1, len(v)):
                     sum_abs_log_diff += np.abs(S[i, j] - v[i] + v[j])
             mean_v = np.mean(v)
             N = S.shape[0]

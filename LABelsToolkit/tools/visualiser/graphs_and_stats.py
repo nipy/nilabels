@@ -181,8 +181,8 @@ def confusion_matrix(confusion_data_frame, annotation_data_frame=None, fig_size=
 
     rows, cols = confusion_data_frame.shape
     if annotation_data_frame is not None:
-        for x in xrange(rows):
-            for y in xrange(cols):
+        for x in range(rows):
+            for y in range(cols):
                 ax.annotate(str(annotation_data_frame.as_matrix()[x, y]), xy=(y, x),
                             horizontalalignment='center',
                             verticalalignment='center')
@@ -285,13 +285,13 @@ if __name__ == '__main__':
     if False:
 
         # multi_data = [data for _ in range(3)]
-        # print multi_data
+        # print(multi_data)
         # multi_bull_eyes(multi_data)
         #
         # plt.show(block=False)
 
         multi_data = [range(1,17), list( 0.000000001 * np.array(range(1,17))), list( 0.001 * np.array(range(1,17)))]
-        print multi_data
+        print(multi_data)
         multi_bull_eyes(multi_data, raidal_subdivisions=(3,3,4,6),
                   centered=(True, True, True, True), add_nomenclatures=[True]*3)
 

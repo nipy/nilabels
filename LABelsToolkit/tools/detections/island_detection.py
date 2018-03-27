@@ -1,1 +1,3 @@
 # TODO
+
+# Use morphological operations.

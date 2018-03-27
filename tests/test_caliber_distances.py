@@ -466,9 +466,6 @@ def test_covariance_distance_range():
         m2 = np.random.randint(3, size=[20, 20, 20])
         im2 = nib.Nifti1Image(m2, np.eye(4))
         cd = covariance_distance(im1, im2, [1, 2], ['label1', 'label2'], factor=factor)
-        print m1
-        print m2
-        print cd
         assert 0 <= cd['label1'] <= factor
         assert 0 <= cd['label2'] <= factor
 
@@ -602,16 +599,16 @@ def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/D
     ascd_1_void    = normalised_symmetric_contour_distance(im1, im_void, [1, 2], ['label1', 'label2'])
 
     if verbose:
-        print '\n 1 1'
-        print ascd_1_1
-        print '\n 1 2'
-        print ascd_1_2
-        print '\n 1 3'
-        print ascd_1_3
-        print '\n 1 2 extra'
-        print ascd_1_2_extra
-        print '\n 1 void'
-        print ascd_1_void
+        print('\n 1 1')
+        print(ascd_1_1)
+        print('\n 1 2')
+        print(ascd_1_2)
+        print('\n 1 3')
+        print(ascd_1_3)
+        print('\n 1 2 extra')
+        print(ascd_1_2_extra)
+        print('\n 1 void')
+        print(ascd_1_void)
 
     assert_almost_equal(ascd_1_1['label1'], 0)
     assert_almost_equal(ascd_1_1['label2'], 0)
@@ -626,6 +623,9 @@ def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/D
 
     assert_almost_equal(ascd_1_void['label1'], np.nan)
     assert_almost_equal(ascd_1_void['label2'], np.nan)
+
+
+test_normalised_symetric_contour_distance()
 
 
 def test_average_symmetric_contour_distance():

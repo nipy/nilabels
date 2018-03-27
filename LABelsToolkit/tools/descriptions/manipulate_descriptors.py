@@ -255,7 +255,7 @@ if __name__ == '__main__':
     #
     # for d in dict.keys():
     #     if len(dict[d]) == 4:
-    #         print "{0} : '{1}',".format(d, dict[d][3])
+    #         print("{0} : '{1}',".format(d, dict[d][3]))
 
     #
     #

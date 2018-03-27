@@ -204,20 +204,13 @@ def remove_nan(im_input):
     return set_new_data(im_input, np.nan_to_num(im_input.get_data()))
 
 
-def set_new_header_description(im_input, new_header_description=''):
-    """
-    Update header description with the input new_header description
-    :param im_input: nibabel image
-    :param new_header_description: new intended header description. The current one is replaced.
-    :return: nibabel image as the input with the header description updated.
-    """
-    im_input_header = im_input.header
-    im_input_header['descrip'] = new_header_description
-    return im_input
-
-
-
-if __name__ == '__main__':
-    im1 = '/Volumes/sebastianof/rabbits/C_atlas_validation_leave_one_out_/1201/z_tmp/z_propagationMulti/1203_over_1201_warped.nii.gz'
-    im2 = '/Volumes/sebastianof/rabbits/C_atlas_validation_leave_one_out/1201/z_SPOT_CrossValidation/moving_aff_warp_1203_on_target_1201_mod.nii.gz'
-    compare_two_nib(im1, im2)
+# def set_new_header_description(im_input, new_header_description=''):
+#     """
+#     Update header description with the input new_header description
+#     :param im_input: nibabel image
+#     :param new_header_description: new intended header description. The current one is replaced.
+#     :return: nibabel image as the input with the header description updated.
+#     """
+#     im_input_header = im_input.header
+#     im_input_header['descrip'] = new_header_description
+#     return im_input

@@ -35,7 +35,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
 
         del data_o_punt_segmentation, nib_o_punt, nib_o_punt_seg
 
-        print 'punt generated'
+        print('punt generated')
 
         data_o_mes = np.zeros_like(data_o_punt)
         data_o_mes[:,:128, :] = data_o_punt[:,:128, :]  # R, A ,S
@@ -50,7 +50,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
 
         del data_o_punt, data_o_mes, data_o_mes_segmentation, nib_o_mes, nib_o_mes_seg
 
-        print 'mes generated'
+        print('mes generated')
 
     if creation_list['C']:
 
@@ -70,7 +70,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
 
         del data_c_, data_c, data_c_segmentation, nib_c, nib_c_seg
 
-        print 'C generated'
+        print('C generated')
 
     if creation_list['Planetaruim']:
 
@@ -83,9 +83,9 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         sky = np.zeros(omega, dtype=np.uint8)
 
         for center, radius, intensity in zip(centers, radii, intensities):
-            for x in xrange(center[0] - radius - 1, center[0] + radius + 1):
-                for y in xrange(center[1] - radius - 1, center[1] + radius + 1):
-                    for z in xrange(center[2] - radius - 1, center[2] + radius + 1):
+            for x in range(center[0] - radius - 1, center[0] + radius + 1):
+                for y in range(center[1] - radius - 1, center[1] + radius + 1):
+                    for z in range(center[2] - radius - 1, center[2] + radius + 1):
                         if (center[0] - x) ** 2 + (center[1] - y) ** 2 + (center[2] - z) ** 2 <= radius ** 2:
                             sky[x, y, z] = intensity
 
@@ -94,7 +94,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         nib_planetarium = nib.Nifti1Image(planetarium, affine=np.eye(4))
         nib.save(nib_planetarium, filename=jph(pfo_examples, 'planetarium.nii.gz'))
 
-        print 'Planetarium generated'
+        print('Planetarium generated')
 
     if creation_list['Buckle ellipsoids']:
         # Toy example for symmetrisation with registration test
@@ -127,7 +127,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         nib_ellipsoids_seg_half = nib.Nifti1Image(two_ellipsoids_half_segmentation, affine=np.eye(4))
         nib.save(nib_ellipsoids_seg_half, filename=jph(pfo_examples, 'ellipsoids_seg_half.nii.gz'))
 
-        print 'Buckle ellipsoids half segmented and whole segmented generated'
+        print('Buckle ellipsoids half segmented and whole segmented generated')
 
     if creation_list['Ellipsoids family']:
         # Toy example for registration propagation tests
@@ -187,7 +187,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
             nib_ellipsoids_seg = nib.Nifti1Image(ellips_data_seg, affine=np.eye(4))
             nib.save(nib_ellipsoids_seg, filename=jph(pfo_ellipsoids_family, 'ellipsoid' + str(k) + '_seg.nii.gz'))
 
-        print 'Data ellipsoids generated'
+        print('Data ellipsoids generated')
 
         # open target and ellipsoids
         str_pfi_ellipsoids = ''

@@ -89,7 +89,7 @@ def keep_only_one_label(in_data, label_to_keep):
     list_labels = sorted(list(set(in_data.flat)))
 
     if label_to_keep not in list_labels:
-        print 'the label {} you want to keep is not present in the segmentation'.format(label_to_keep)
+        print('the label {} you want to keep is not present in the segmentation'.format(label_to_keep))
         return in_data
 
     labels_not_to_keep = list(set(list_labels) - {label_to_keep})

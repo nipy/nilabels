@@ -56,14 +56,14 @@ def get_patch_values(point, target_image, radius=5, shape='circle', morfo_mask=N
 def get_circle_shell_for_given_radius(radius, d=3):
     circle = []
     if d == 3:
-        for xi in xrange(-radius, radius + 1):
-            for yi in xrange(-radius, radius + 1):
-                for zi in xrange(-radius, radius + 1):
+        for xi in range(-radius, radius + 1):
+            for yi in range(-radius, radius + 1):
+                for zi in range(-radius, radius + 1):
                     if (radius - 1) ** 2 < xi ** 2 + yi ** 2 + zi ** 2 <= radius ** 2:
                         circle.append((xi, yi, zi))
     if d == 2:
-        for xi in xrange(-radius, radius + 1):
-            for yi in xrange(-radius, radius + 1):
+        for xi in range(-radius, radius + 1):
+            for yi in range(-radius, radius + 1):
                 if (radius - 1) ** 2 < xi ** 2 + yi ** 2 <= radius ** 2:
                     circle.append((xi, yi))
 

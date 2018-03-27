@@ -90,10 +90,10 @@ def get_range_lab_color_space():
     max_l, max_a, max_b = [-np.inf] * 3
     min_l, min_a, min_b = [np.inf] * 3
 
-    for r in xrange(255):
-        for g in xrange(255):
-            for b in xrange(255):
-                #print r, g, b
+    for r in range(255):
+        for g in range(255):
+            for b in range(255):
+                # print([r, g, b])
                 l, a, b = rgb_to_lab([r, g, b])
                 max_l, max_a, max_b = max(max_l, l), max(max_a, a), max(max_b, b)
                 min_l, min_a, min_b = min(min_l, l), min(min_a, a), min(min_b, b)
