@@ -1,13 +1,14 @@
 import os
 
-from LABelsToolkit.agents.labels_manipulator import LabelsManagerLabelsManipulate
-from LABelsToolkit.agents.intensities_manipulator import LabelsManagerIntensitiesManipulate
-from LABelsToolkit.agents.measurer import LabelsManagerMeasure
-from LABelsToolkit.agents.fuser import LabelsManagerFuse
-from LABelsToolkit.agents.propagator import LabelsManagerPropagate
-from LABelsToolkit.agents.symmetrizer import LabelsManagerSymmetrize
-from LABelsToolkit.agents.checker import LabelsManagerChecker
-from LABelsToolkit.agents.header_controller import LabelsManagerHeaderController
+from LABelsToolkit.agents.labels_manipulator import LABelsToolkitLabelsManipulate
+from LABelsToolkit.agents.shape_manipulator import LABelsToolkitShapeManipulate
+from LABelsToolkit.agents.intensities_manipulator import LABelsToolkitIntensitiesManipulate
+from LABelsToolkit.agents.measurer import LABelsToolkitMeasure
+from LABelsToolkit.agents.fuser import LABelsToolkitFuse
+from LABelsToolkit.agents.propagator import LABelsToolkitPropagate
+from LABelsToolkit.agents.symmetrizer import LABelsToolkitSymmetrize
+from LABelsToolkit.agents.checker import LABelsToolkitChecker
+from LABelsToolkit.agents.header_controller import LABelsToolkitHeaderController
 
 
 class LABelsToolkit(object):
@@ -41,11 +42,12 @@ class LABelsToolkit(object):
         self._set_attribute_agents()
 
     def _set_attribute_agents(self):
-        self.manipulate_labels      = LabelsManagerLabelsManipulate(self._pfo_in, self._pfo_out)
-        self.manipulate_intensities = LabelsManagerIntensitiesManipulate(self._pfo_in, self._pfo_out)
-        self.measure                = LabelsManagerMeasure(self._pfo_in, self._pfo_out)
-        self.fuse                   = LabelsManagerFuse(self._pfo_in, self._pfo_out)
-        self.propagate              = LabelsManagerPropagate(self._pfo_in, self._pfo_out)
-        self.symmetrize             = LabelsManagerSymmetrize(self._pfo_in, self._pfo_out)
-        self.check                  = LabelsManagerChecker(self._pfo_in, self._pfo_out)
-        self.header                 = LabelsManagerHeaderController(self._pfo_in, self._pfo_out)
+        self.manipulate_labels      = LABelsToolkitLabelsManipulate(self._pfo_in, self._pfo_out)
+        self.manipulate_intensities = LABelsToolkitIntensitiesManipulate(self._pfo_in, self._pfo_out)
+        self.manipulate_shape       = LABelsToolkitShapeManipulate(self._pfo_in, self._pfo_out)
+        self.measure                = LABelsToolkitMeasure(self._pfo_in, self._pfo_out)
+        self.fuse                   = LABelsToolkitFuse(self._pfo_in, self._pfo_out)
+        self.propagate              = LABelsToolkitPropagate(self._pfo_in, self._pfo_out)
+        self.symmetrize             = LABelsToolkitSymmetrize(self._pfo_in, self._pfo_out)
+        self.check                  = LABelsToolkitChecker(self._pfo_in, self._pfo_out)
+        self.header                 = LABelsToolkitHeaderController(self._pfo_in, self._pfo_out)

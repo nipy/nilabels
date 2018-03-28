@@ -7,7 +7,7 @@ from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 
 
-class LabelsManagerLabelsManipulate(object):
+class LABelsToolkitLabelsManipulate(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general

@@ -9,7 +9,7 @@ from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller
 from LABelsToolkit.tools.aux_methods.utils_rotations import flip_data, symmetrise_data
 
 
-class LabelsManagerSymmetrize(object):
+class LABelsToolkitSymmetrize(object):
     """
     Facade of the methods in tools. symmetrizer, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general

@@ -8,7 +8,7 @@ from LABelsToolkit.tools.detections.check_imperfections import check_missing_lab
 from LABelsToolkit.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
 
 
-class LabelsManagerChecker(object):
+class LABelsToolkitChecker(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerFuse access label fusion methods.

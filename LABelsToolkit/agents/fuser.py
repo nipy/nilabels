@@ -6,10 +6,10 @@ from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 
-class LabelsManagerFuse(object):
+class LABelsToolkitFuse(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
-    with data. Methods under LabelsManagerFuse access label fusion methods.
+    with data.
     """
     def __init__(self, input_data_folder=None, output_data_folder=None):
         self.pfo_in = input_data_folder

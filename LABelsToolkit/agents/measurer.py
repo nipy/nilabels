@@ -12,7 +12,7 @@ from LABelsToolkit.tools.defs import definition_label
 from LABelsToolkit.tools.caliber import distances as dist
 
 
-class LabelsManagerMeasure(object):
+class LABelsToolkitMeasure(object):
     """
     Facade of the methods in tools.detections and tools.caliber, where methods are accessed through
     paths to images rather than with data.
