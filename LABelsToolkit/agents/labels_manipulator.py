@@ -1,10 +1,12 @@
 import nibabel as nib
+import numpy as np
 
-from LABelsToolkit.tools.aux_methods.utils_path import get_pfi_in_pfi_out
+from LABelsToolkit.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
+from LABelsToolkit.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
 
 
 class LABelsToolkitLabelsManipulate(object):
@@ -90,4 +92,21 @@ class LABelsToolkitLabelsManipulate(object):
         im_one_label = set_new_data(im_labels, data_one_label)
         nib.save(im_one_label, pfi_out)
         print('Label {0} kept from image {1} and saved in {2}.'.format(label_to_keep, pfi_in, pfi_out))
+        return pfi_out
+
+    def get_probabilistic_prior_from_stack_segmentations(self, pfi_stack_crisp_segm, pfi_fuzzy_output):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_stack_crisp_segm, pfi_fuzzy_output, self.pfo_in, self.pfo_out)
+
+        im_stack_crisp = nib.load(pfi_stack_crisp_segm)
+
+        dims = im_stack_crisp.shape
+
+        vec = [np.prod(im_stack_crisp.shape[:3])] + [dims[3]]
+
+        array_output = from_segmentations_stack_to_probabilistic_segmentation(im_stack_crisp.get_data().reshape(vec))
+        data_output = array_output.reshape(im_stack_crisp.shape[:3])
+
+        new_im = set_new_data(im_stack_crisp, data_output, new_dtype=np.float64)
+        nib.save(new_im, pfi_out)
+
         return pfi_out
