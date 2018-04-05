@@ -204,6 +204,30 @@ def remove_nan(im_input):
     return set_new_data(im_input, np.nan_to_num(im_input.get_data()))
 
 
+def get_xyz_borders_of_a_label(segm_data, label):
+    """
+
+    :param segm_data:
+    :param label:
+    :return:
+    """
+    assert segm_data.ndim == 3
+
+    if label not in segm_data:
+        return None
+
+    X, Y, Z = np.where(segm_data == label)
+    return [np.min(X), np.max(X), np.min(Y), np.max(Y), np.min(Z), np.max(Z)]
+
+
+def images_are_overlapping(im1, im2):
+    ans = True
+    if np.array_equal(im1.shape, im2.shape):
+        ans = False
+    if np.array_equal(im1.affine, im2.affine):
+        ans = False
+    return ans
+
 # def set_new_header_description(im_input, new_header_description=''):
 #     """
 #     Update header description with the input new_header description

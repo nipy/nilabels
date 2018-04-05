@@ -102,7 +102,7 @@ def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, a
     :param in_data:
     :param label_old:
     :param label_new:
-    :param side_to_copy:
+    :param side_to_modify:
     :param axis:
     :param plane_intercept:
     :return:
@@ -126,12 +126,12 @@ def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, a
             halfed_positions[:plane_intercept, :, :] = positions[:plane_intercept, :, :]
     if axis == 'y':
         if side_to_modify == 'above':
-            halfed_positions[: ,plane_intercept:, :] = positions[:, plane_intercept:, :]
+            halfed_positions[:, plane_intercept:, :] = positions[:, plane_intercept:, :]
         if side_to_modify == 'below':
             halfed_positions[:, plane_intercept, :, :] = positions[:, plane_intercept, :]
     if axis == 'z':
         if side_to_modify == 'above':
-            halfed_positions[ :, :, plane_intercept:] = positions[ :, :, plane_intercept:]
+            halfed_positions[:, :, plane_intercept:] = positions[ :, :, plane_intercept:]
         if side_to_modify == 'below':
             halfed_positions[:, :, :plane_intercept] = positions[:, :, :plane_intercept]
 

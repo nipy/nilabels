@@ -103,8 +103,9 @@ class LABelsToolkitLabelsManipulate(object):
 
         vec = [np.prod(im_stack_crisp.shape[:3])] + [dims[3]]
 
-        array_output = from_segmentations_stack_to_probabilistic_segmentation(im_stack_crisp.get_data().reshape(vec))
-        data_output = array_output.reshape(im_stack_crisp.shape[:3])
+        array_output = from_segmentations_stack_to_probabilistic_segmentation(im_stack_crisp.get_data().reshape(vec).T).T
+
+        data_output = array_output.reshape(list(im_stack_crisp.shape[:3]) + [array_output.shape[1]])
 
         new_im = set_new_data(im_stack_crisp, data_output, new_dtype=np.float64)
         nib.save(new_im, pfi_out)
