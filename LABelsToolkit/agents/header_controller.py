@@ -50,24 +50,41 @@ class LABelsToolkitHeaderController(object):
                                               multiplication_side=multiplication_side)
         nib.save(new_im, pfi_out)
 
-    def apply_small_rotation(self, filename_in, filename_out, angle=np.pi/6, principal_axis='pitch'):
-        # Warning: this works only for hisotropic spaces. If the space is not isotropic, need to
-        # do make it isotropic first.
+    def apply_small_rotation(self, filename_in, filename_out, angle=np.pi/6, principal_axis='pitch',
+                             respect_to_centre=True):
+
         if isinstance(angle, list):
             assert isinstance(principal_axis, list)
             assert len(principal_axis) == len(angle)
-            new_aff = np.identity(4)
+            rot = np.identity(4)
             for pa, an in zip(principal_axis, angle):
                 aff = get_small_orthogonal_rotation(theta=an, principal_axis=pa)
-                new_aff = new_aff.dot(aff)
+                rot = rot.dot(aff)
         else:
-            new_aff = get_small_orthogonal_rotation(theta=angle, principal_axis=principal_axis)
-
+            rot = get_small_orthogonal_rotation(theta=angle, principal_axis=principal_axis)
+        
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
         im = nib.load(pfi_in)
 
+        if respect_to_centre:
+            fov_centre = im.affine.dot(np.array(list(np.array(im.shape) / float(2)) + [1]))
+
+            transl = np.eye(4)
+            transl[:3, 3] = fov_centre[:3]
+
+            transl_inv = np.eye(4)
+            transl_inv[:3, 3] = -1 * fov_centre[:3]
+
+            rt = transl.dot(rot.dot(transl_inv))
+
+            new_aff = rt.dot(im.affine)
+        else:
+            new_aff = im.get_affine()[:]
+            new_aff[:3, :3] = rot[:3, :3].dot(new_aff[:3, :3])
+
         new_im = modify_affine_transformation(im_input=im, new_aff=new_aff, q_form=True, s_form=True,
-                                              multiplication_side='right')
+                                              multiplication_side='replace')
+
         nib.save(new_im, pfi_out)
 
     def modify_translational_part(self, filename_in, filename_out, new_translation):

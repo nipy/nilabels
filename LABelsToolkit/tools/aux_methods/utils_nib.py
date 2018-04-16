@@ -126,7 +126,7 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
     """
     Change q_form or s_form or both translational part and rotational part.
     :param im_input: nibabel input image
-    :param new_aff: new affine transformation to be multiplied of replaced
+    :param new_aff: new affine transformation to be multiplied or replaced
     :param q_form: [True] affect q_form
     :param s_form: [True] affect s_form
     :param multiplication_side: can be lef, right, or replace.

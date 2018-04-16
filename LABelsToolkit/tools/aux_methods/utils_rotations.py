@@ -4,9 +4,9 @@ import numpy as np
 def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
     if principal_axis == 'yaw':
         rot = np.array([[np.cos(theta), -np.sin(theta), 0, 0],
-                        [np.sin(theta), np.cos(theta), 0, 0],
-                        [0, 0, 1, 0],
-                        [0, 0, 0, 1]])
+                        [np.sin(theta), np.cos(theta),  0, 0],
+                        [0,             0,              1, 0],
+                        [0,             0,              0, 1]])
     elif principal_axis == 'pitch':
         rot = np.array([[1,            0,           0,       0],
                         [0,  np.cos(theta),  -np.sin(theta), 0],
@@ -23,7 +23,7 @@ def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
     return rot  # to be multiplied on the right side as im_input.get_affine().dot(rot)
 
 
-def get_roto_translation_matrix(theta, rotation_axis=np.array([1,0,0]),  translation=np.array([0, 0, 0])):
+def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  translation=np.array([0, 0, 0])):
 
     n = np.linalg.norm(rotation_axis)
     assert not np.abs(n) < 0.001, 'rotation axis too close to zero.'
