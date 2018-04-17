@@ -18,7 +18,7 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
     out_data = np.zeros(in_data_shape[:3], dtype=in_data.dtype)
 
     for t in range(in_data.shape[3]):
-        slice_t = in_data[...,t]
+        slice_t = in_data[..., t]
         if keep_original_values:
             out_data = out_data + slice_t
         else:
@@ -28,7 +28,7 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
 
 def stack_images(list_images):
     """
-    From a list of image of the same shape, the stack of these images in the new dimension.
+    From a list of images of the same shape, the stack of these images in the new dimension.
     :param list_images:
     :return: stack image of the input list
     """

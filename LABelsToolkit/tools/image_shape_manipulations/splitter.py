@@ -23,6 +23,6 @@ def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
         if keep_original_values:
             out_data[..., l_index] = l * places_l.astype(in_data.dtype)
         else:
-            out_data[..., l_index] =  places_l.astype(in_data.dtype)
+            out_data[..., l_index] = places_l.astype(in_data.dtype)
 
     return out_data

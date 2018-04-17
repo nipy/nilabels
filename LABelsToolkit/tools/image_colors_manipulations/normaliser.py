@@ -72,12 +72,3 @@ def intensities_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
         im_mask_foreground_data = im_mask_foreground.get_data()
 
     return set_new_data(im_input, im_mask_foreground_data * (a * im_input.get_data() + b))
-
-
-def otsu_threshold(im):
-    """
-    :param im:
-    :return:
-    """
-    val = filters.threshold_otsu(im.get_data())
-    return set_new_data(im, im.get_data() * (im.get_data() > val))
