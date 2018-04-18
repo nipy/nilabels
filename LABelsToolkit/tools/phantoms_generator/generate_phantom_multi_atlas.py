@@ -5,11 +5,10 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
+from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
-
-from LABelsToolkit.tools.visualiser.see_volume import see_array
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomness_shape=0.3, randomness_noise=0.4):
@@ -54,10 +53,11 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     noise_hypo = np.zeros_like(noise_array).astype(np.int32)
     for j in range(num_spots):
         radius_centre = 0.05 * randomness_noise * np.min(omega)
-        random_radius = np.random.uniform(radius_centre - radius_centre/2, radius_centre + radius_centre/2)  # 5% of the min direction
+        random_radius = np.random.uniform(radius_centre - radius_centre/2, radius_centre + radius_centre/2)
         random_centre = [np.random.uniform(0 + random_radius, j - random_radius) for j in omega]
 
-        noise_hypo = noise_hypo + sphere_shape(omega, random_centre, random_radius, foreground_intensity=1, dtype=np.int32)
+        noise_hypo = noise_hypo + sphere_shape(omega, random_centre, random_radius, foreground_intensity=1,
+                                               dtype=np.int32)
 
     noise_hypo = 1 - 1 * (noise_hypo.astype(np.bool))
     # filter the results:
@@ -105,6 +105,7 @@ def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_o
                                  randomness_shape=randomness_shape, randomness_noise=randomness_noise)
 
 if __name__ == '__main__':
-    # test
-    generate_multi_atlas_at_folder('/Users/sebastiano/Desktop/z_test_phantom_atlas', number_of_subjects=3,
+
+    pfo_atlas = jph(root_dir, 'data_examples', 'multi_atlas_phantom')
+    generate_multi_atlas_at_folder(pfo_atlas, number_of_subjects=3,
                                    randomness_noise=1, randomness_shape=1)

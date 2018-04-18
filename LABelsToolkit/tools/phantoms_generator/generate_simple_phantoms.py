@@ -38,7 +38,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         print('punt generated')
 
         data_o_mes = np.zeros_like(data_o_punt)
-        data_o_mes[:,:128, :] = data_o_punt[:,:128, :]  # R, A ,S
+        data_o_mes[:, :128, :] = data_o_punt[:, :128, :]  # R, A ,S
 
         data_o_mes_segmentation = intensity_segmentation(data_o_mes, num_levels=segmentation_levels)
 
@@ -106,8 +106,10 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         d_left = 95
         d_right = 95
 
-        ellipsoid_left  = ellipsoid_shape(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left, foreground_intensity=foreground)
-        ellipsoid_right = ellipsoid_shape(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right, foreground_intensity=foreground)
+        ellipsoid_left  = ellipsoid_shape(omega, foci_ellipses_left[0], foci_ellipses_left[1], d_left,
+                                          foreground_intensity=foreground)
+        ellipsoid_right = ellipsoid_shape(omega, foci_ellipses_right[0], foci_ellipses_right[1], d_right,
+                                          foreground_intensity=foreground)
 
         two_ellipsoids = foreground * (ellipsoid_left + ellipsoid_right).astype(np.bool).astype(np.float64)
 
@@ -162,21 +164,24 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
             phi = np.arccos(2*v - 1)
             first_focus = np.array([radius_first_focus * np.cos(theta) * np.sin(phi) + center_first_focus[0],
                                     radius_first_focus * np.sin(theta) * np.sin(phi) + center_first_focus[1],
-                                    radius_first_focus * np.cos(phi) +  center_first_focus[2]])
+                                    radius_first_focus * np.cos(phi) + center_first_focus[2]])
 
             # get the second focus as symmetric of the fist focus respect to the midpoint
             second_focus = np.array([2 * mid_point[0] - first_focus[0],
                                      2 * mid_point[1] - first_focus[1],
                                      2 * mid_point[2] - first_focus[2]])
 
-            np.testing.assert_almost_equal(mid_point, (first_focus + second_focus) / float(2) )
+            np.testing.assert_almost_equal(mid_point, (first_focus + second_focus) / float(2))
 
             # get the twice_aance from the 2 focus as a random value, having as min the twice_aance between
             twice_a_2_focus = np.linalg.norm(first_focus - second_focus)
             epsilon = 3
-            twice_a = np.random.uniform(low=twice_a_2_focus + epsilon, high=twice_a_2_focus + epsilon + np.linalg.norm(first_focus - np.array([25, 25, 50])))
+            twice_a = np.random.uniform(low=twice_a_2_focus + epsilon,
+                                        high=twice_a_2_focus + epsilon +
+                                             np.linalg.norm(first_focus - np.array([25, 25, 50])))
             # get the ellipsoid
-            ellips_data = ellipsoid_shape(omega, first_focus, second_focus, twice_a, foreground_intensity=foreground, dtype=np.float64)
+            ellips_data = ellipsoid_shape(omega, first_focus, second_focus, twice_a,
+                                          foreground_intensity=foreground, dtype=np.float64)
             ellips_data = fil.gaussian_filter(ellips_data, sigma=sigma_smoothing)
 
             nib_ellipsoids = nib.Nifti1Image(ellips_data, affine=np.eye(4))
@@ -245,15 +250,15 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         foreground = 1
 
         # A) center 75,75,25
-        first_focus_11 = [79,79,25]
-        second_focus_11 = [72,72,23]
+        first_focus_11 = [79, 79, 25]
+        second_focus_11 = [72, 72, 23]
         twice_a_11 = 20
 
         elli_11 = ellipsoid_shape(omega, first_focus_11, second_focus_11, twice_a_11,
                                   foreground_intensity=foreground, dtype=np.float64)
 
-        first_focus_21 = [79,79,25]
-        second_focus_21 = [72,72,23]
+        first_focus_21 = [79, 79, 25]
+        second_focus_21 = [72, 72, 23]
         twice_a_21 = 20
 
         elli_21 = ellipsoid_shape(omega, first_focus_21, second_focus_21, twice_a_21,
@@ -286,7 +291,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         # f = 15
         # a = np.sqrt( (f ** 2 + np.sqrt(f**4 + 4*r**4)) / 2. )
         a = 22
-        f = np.sqrt( (a**4 - r ** 4) / float(a**2))
+        f = np.sqrt((a**4 - r ** 4) / float(a**2))
         assert f < a, [f, a]
         first_focus_23 = [75 - f, 25, 25]  # ellipsoid
         second_focus_23 = [75 + f, 25, 25]

@@ -65,7 +65,7 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
         print('Pre-process with a median filter.')
         data = medfilt(data)
 
-    data = data.flatten().reshape(-1,1)
+    data = data.flatten().reshape(-1, 1)
 
     if K is None:
         print('Estimating numbers of components with BIC criterion... may take some minutes')
