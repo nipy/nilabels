@@ -89,10 +89,6 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
             old_labels = list(range(K))
             new_labels = [p.index(l) for l in old_labels]  # the inverse of p
 
-            print(old_labels)
-            print(p)
-            print(new_labels)
-
             crisp = np.copy(relabeller(crisp, old_labels, new_labels))
             prob = np.stack([prob[..., t] for t in new_labels], axis=3)
 
@@ -115,15 +111,3 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
                 plt.show()
 
         return im_crisp, im_prob
-
-
-if __name__ == '__main__':
-    import nibabel as nib
-    from os.path import join as jph
-    root = '/Users/sebastiano/Desktop/z_test'
-    im_gt = nib.load(jph(root, 'sj01_modGT.nii.gz'))
-    im_1 = nib.load(jph(root, 'sj01_mod1.nii.gz'))
-
-    c, p = MoG(im_1, K=5, )
-
-    nib.save(c, jph(root, 'im1_reordered2.nii.gz'))
