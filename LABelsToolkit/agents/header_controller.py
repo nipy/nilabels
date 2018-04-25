@@ -67,7 +67,7 @@ class LABelsToolkitHeaderController(object):
         im = nib.load(pfi_in)
 
         if respect_to_centre:
-            fov_centre = im.affine.dot(np.array(list(np.array(im.shape) / float(2)) + [1]))
+            fov_centre = im.affine.dot(np.array(list(np.array(im.shape[:3]) / float(2)) + [1]))
 
             transl = np.eye(4)
             transl[:3, 3] = fov_centre[:3]

@@ -45,27 +45,41 @@ def otsu_threshold(im):
     return set_new_data(im, im.get_data() * (im.get_data() > val))
 
 
-def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=False,
-        see_histogram=None, reorder_mus=True):
+def MoG_array(in_array, K=None, mask_array=None, pre_process_median_filter=False,
+              output_gmm_class=False, pre_process_only_interquartile=False,
+              see_histogram=None, reorder_mus=True):
     """
     Mixture of gaussians for medical images. A simple wrap of
     sklearn.mixture.GaussianMixture to get a mog-based segmentation of an input
     nibabel image.
     -----
-    :param input_im: nibabel input image format to be segmented with a MOG method.
-    :param K: number of classes, if None, it is estimated with a BIC criterion (takes a lot of time!!)
+    :param in_array: input array format to be segmented with a MOG method.
+    :param K: number of classes, if None, it is estimated with a BIC criterion (may take a while)
+    :param mask_array: nibabel mask if you want to consider only a subset of the masked data.
     :param pre_process_median_filter: apply a median filter before pre-processing (reduce salt and pepper noise).
+    :param pre_process_only_interquartile: set to zero above and below interquartile (below mask if any) in the data.
     :param output_gmm_class: return only the gmm sklearn class instance.
     :param see_histogram: can be True, False (or None) or a string (with a path where to save the plotted histogram).
     :param reorder_mus: only if output_gmm_class=False, reorder labels from smallest to bigger means.
     :return: [c, p] crisp and probabilistic segmentation OR gmm, instance of the class sklearn.mixture.GaussianMixture.
     """
-    data = input_im.get_data()
     if pre_process_median_filter:
         print('Pre-process with a median filter.')
-        data = medfilt(data)
-
+        data = medfilt(in_array)
+    else:
+        data = in_array
     data = np.copy(data.flatten().reshape(-1, 1))
+
+    if mask_array is not None:
+        mask_data = np.copy(mask_array.flatten().astype(np.bool_).reshape(-1, 1))
+        data = mask_data * data
+
+    if pre_process_only_interquartile:
+        print('Get only interquartile data.')
+        non_zero_data = data[np.where(np.nan_to_num(data) > 1e-6)]
+        low_p = np.percentile(non_zero_data, 25)
+        high_p = np.percentile(non_zero_data, 75)
+        data = (data > low_p) * (data < high_p) * data
 
     if K is None:
         print('Estimating numbers of components with BIC criterion... may take some minutes')
@@ -79,8 +93,8 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
     if output_gmm_class:
         return gmm
     else:
-        crisp = gmm.predict(data).reshape(input_im.shape)
-        prob = gmm.predict_proba(data).reshape(list(input_im.shape) + [K])
+        crisp = gmm.predict(data).reshape(in_array.shape)
+        prob = gmm.predict_proba(data).reshape(list(in_array.shape) + [K])
 
         if reorder_mus:
             mu = gmm.means_.reshape(-1)
@@ -91,9 +105,6 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
 
             crisp = np.copy(relabeller(crisp, old_labels, new_labels))
             prob = np.stack([prob[..., t] for t in new_labels], axis=3)
-
-        im_crisp = set_new_data(input_im, crisp, new_dtype=np.uint8)
-        im_prob = set_new_data(input_im, prob, new_dtype=np.float64)
 
         if see_histogram is not None and see_histogram is not False:
             fig = plt.figure()
@@ -110,4 +121,40 @@ def MoG(input_im, K=None, pre_process_median_filter=False, output_gmm_class=Fals
             else:
                 plt.show()
 
-        return im_crisp, im_prob
+        return crisp, prob
+
+
+def MoG(input_im, K=None, mask_im=None, pre_process_median_filter=False, pre_process_only_interquartile=False,
+        output_gmm_class=False, see_histogram=None, reorder_mus=True):
+    """
+    Wrap of MoG_array for nibabel images. - Work in progress, will be exposed in facade.
+    -----
+    :param input_im: nibabel input image format to be segmented with a MOG method.
+    :param K: number of classes, if None, it is estimated with a BIC criterion (may take a while)
+    :param mask_im: nibabel mask if you want to consider only a subset of the masked data.
+    :param pre_process_median_filter: apply a median filter before pre-processing (reduce salt and pepper noise).
+    :param pre_process_only_interquartile: set to zero above and below interquartile in the data.
+    :param output_gmm_class: return only the gmm sklearn class instance.
+    :param see_histogram: can be True, False (or None) or a string (with a path where to save the plotted histogram).
+    :param reorder_mus: only if output_gmm_class=False, reorder labels from smallest to bigger means.
+    :return: [c, p] crisp and probabilistic segmentation OR gmm, instance of the class sklearn.mixture.GaussianMixture.
+    """
+    if mask_im is not None:
+        mask_array = mask_im.get_data()
+    else:
+        mask_array = None
+
+    ans = MoG_array(input_im.get_data(), K=K, mask_array=mask_array,
+                    pre_process_median_filter=pre_process_median_filter,
+                    pre_process_only_interquartile=pre_process_only_interquartile,
+                    output_gmm_class=output_gmm_class, see_histogram=see_histogram, reorder_mus=reorder_mus)
+
+    if output_gmm_class:
+        return ans
+    else:
+        crisp, prob = ans[0], ans[1]
+
+    im_crisp = set_new_data(input_im, crisp, new_dtype=np.uint8)
+    im_prob = set_new_data(input_im, prob, new_dtype=np.float64)
+
+    return im_crisp, im_prob
