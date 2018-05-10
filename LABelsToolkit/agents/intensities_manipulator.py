@@ -41,7 +41,7 @@ class LABelsToolkitIntensitiesManipulate(object):
 
         nib.save(im_contour, pfi_output_contour)
 
-    def grafting(self, pfi_input_hosting_mould, pfi_input_patch, pfi_output_grafted, pfi_input_patch_mask=None, verbose=0):
+    def get_grafting(self, pfi_input_hosting_mould, pfi_input_patch, pfi_output_grafted, pfi_input_patch_mask=None):
         pfi_hosting = connect_path_tail_head(self.pfo_in, pfi_input_hosting_mould)
         pfi_patch = connect_path_tail_head(self.pfo_in, pfi_input_patch)
 
