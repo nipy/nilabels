@@ -51,7 +51,7 @@ def reproduce_slice_fourth_dimension(nib_image, num_slices=10, repetition_axis=3
 
 def grafting(im_hosting, im_patch, im_patch_mask=None):
     """
-    Take an hosting image, an image patch and a patch mask (optional) of the same dimension and in the same real space.
+    Takes an hosting image, an image patch and a patch mask (optional) of the same dimension and in the same real space.
     It crops the patch (or patch mask if present) on the hosting image, and substitute the value from the patch.
     :param im_hosting:
     :param im_patch:

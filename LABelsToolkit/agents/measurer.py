@@ -17,7 +17,7 @@ class LABelsToolkitMeasure(object):
     Facade of the methods in tools.detections and tools.caliber, where methods are accessed through
     paths to images rather than with data.
     Methods under LabelsManagerDetect are taking in general one or more input
-    and return some feature of the segmentations {}.
+    and return some feature of the segmentations \n {}.
     """.format(definition_label)
 
     def __init__(self, input_data_folder=None, output_data_folder=None, return_mm3=True, verbose=0):

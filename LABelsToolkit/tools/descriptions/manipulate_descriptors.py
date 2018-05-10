@@ -248,14 +248,14 @@ if __name__ == '__main__':
     # pfi_descriptor = '/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_atlas/labels_descriptor_abbrev.txt'
     #
     # ldm = LabelsDescriptorManager(pfi_descriptor)
-    # dict = ldm.get_dict()
+    # dict_ld = ldm.get_dict()
     # pfi_hwere_to_save = '/Users/sebastiano/Desktop/zzz_lab_abbrev.txt'
     #
     # ldm.save_labels_and_abbreviations(pfi_hwere_to_save)
     #
     # for d in dict.keys():
-    #     if len(dict[d]) == 4:
-    #         print("{0} : '{1}',".format(d, dict[d][3]))
+    #     if len(dict_ld[d]) == 4:
+    #         print("{0} : '{1}',".format(d, dict_ld[d][3]))
 
     #
     #

@@ -27,7 +27,5 @@ def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
 
     return out_data
 
-
-
 if __name__ == '__main__':
     pass

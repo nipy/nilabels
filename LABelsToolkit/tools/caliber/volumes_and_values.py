@@ -130,10 +130,14 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
             volumes_list.append(volumes)
             vol_over_tot_list.append(vol_over_tot)
 
-        data_frame = pa.DataFrame({'Labels': pa.Series(labels, index=labels_names),
-                                   'Num voxels': pa.Series(non_zero_voxels_list, index=labels_names),
-                                   'Volume': pa.Series(volumes_list, index=labels_names),
-                                   'Vol over Tot': pa.Series(vol_over_tot_list, index=labels_names)})
+        data_frame = pa.DataFrame({'Labels'       : pa.Series(labels,               index=labels_names),
+                                   'Num voxels'   : pa.Series(non_zero_voxels_list, index=labels_names),
+                                   'Volume'       : pa.Series(volumes_list,         index=labels_names),
+                                   'Vol over Tot' : pa.Series(vol_over_tot_list,    index=labels_names)})
+
+    data_frame = data_frame.rename_axis('Regions')
+    data_frame = data_frame.reset_index()
+
     if verbose > 0:
         print(data_frame)
 
