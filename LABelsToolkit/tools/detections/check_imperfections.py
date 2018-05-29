@@ -63,7 +63,6 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
         print('Log status saved in {}'.format(pfi_where_log))
 
 
-
 if __name__ == "__main__":
     # TODO move to examples:
     import nibabel as nib

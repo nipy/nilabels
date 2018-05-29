@@ -111,3 +111,6 @@ class LABelsToolkitLabelsManipulate(object):
         nib.save(new_im, pfi_out)
 
         return pfi_out
+
+    def clean_segmentation(self, pfi_input, pfi_output):
+        pass
