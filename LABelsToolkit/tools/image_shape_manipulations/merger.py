@@ -53,26 +53,28 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
     """
     Takes an hosting image, an image patch and a patch mask (optional) of the same dimension and in the same real space.
     It crops the patch (or patch mask if present) on the hosting image, and substitute the value from the patch.
-    :param im_hosting:
-    :param im_patch:
-    :param im_patch_mask:
+    :param im_hosting: Mould or holder of the patch
+    :param im_patch: patch to add.
+    :param im_patch_mask: mask in case the mould is not zero in the region where the patch goes.
     :return:
     """
     np.testing.assert_array_equal(im_hosting.affine, im_patch.affine)
-    if im_patch_mask is not None:
-        np.testing.assert_array_equal(im_hosting.affine, im_patch_mask.affine)
 
     if im_patch_mask is None:
         patch_region = im_patch.get_data().astype(np.bool)
     else:
+        np.testing.assert_array_equal(im_hosting.affine, im_patch_mask.affine)
+        np.testing.assert_array_equal(im_hosting.shape, im_patch_mask.shape)
+
         patch_region = im_patch_mask.get_data().astype(np.bool)
     # new_data = np.copy(im_hosting.get_data())
     # new_data[patch_region] = im_patch.get_data()[patch_region]
     # np.place(new_data, patch_region, im_patch.get_data())
     # np.putmask(new_data, patch_region, im_patch.get_data())
 
-    background_only = np.invert(patch_region)
-    new_data = im_hosting.get_data() * background_only / np.max(im_hosting.get_data()) + im_patch.get_data()
+    patch_inverted = np.invert(patch_region)
+    new_data = im_hosting.get_data() * patch_inverted + im_patch.get_data() * patch_region
+    # new_data = im_hosting.get_data() * patch_inverted / np.max(im_hosting.get_data()) + im_patch.get_data()
 
     return set_new_data(im_hosting, new_data)
 

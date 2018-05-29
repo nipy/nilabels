@@ -20,13 +20,13 @@ def test_merge_labels_from_4d_shape_output():
     data000 = np.zeros([3, 3, 3])
     data111 = np.zeros([3, 3, 3])
     data222 = np.zeros([3, 3, 3])
-    data000[0,0,0] = 1
-    data111[1,1,1] = 2
-    data222[2,2,2] = 4
+    data000[0, 0, 0] = 1
+    data111[1, 1, 1] = 2
+    data222[2, 2, 2] = 4
     data = np.stack([data000, data111, data222], axis=3)
 
     out = merge_labels_from_4d(data)
-    assert_array_equal([out[0,0,0], out[1,1,1], out[2,2,2]], [1, 2, 4])
+    assert_array_equal([out[0, 0, 0], out[1, 1, 1], out[2, 2, 2]], [1, 2, 4])
 
     out = merge_labels_from_4d(data, keep_original_values=False)
     assert_array_equal([out[0,0,0], out[1,1,1], out[2,2,2]], [1, 2, 3])
@@ -49,6 +49,7 @@ def test_stack_images_cascade():
     list_images3 = [im3] * d
     im4 = stack_images(list_images3)
     assert_array_equal(im4.shape, (d, d, d, d, d))
+
 
 def test_grafting_ok_input_output():
 
