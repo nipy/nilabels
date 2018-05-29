@@ -8,6 +8,11 @@ pfo_raw_in_root   = os.path.join(pfo_root, '0_raw')  # Folder where the 20 x 14 
 pfo_nifti_in_root = os.path.join(pfo_root, 'A_nifti')  # Folder where to create the converted data
 pfo_tmp_in_root   = os.path.join(pfo_root, 'z_tmp')  # Temporary folder
 
+if not os.path.exists(pfo_nifti_in_root):
+    os.makedirs(pfo_nifti_in_root)
+if not os.path.exists(pfo_tmp_in_root):
+    os.makedirs(pfo_tmp_in_root)
+
 pfo_data = os.path.join(pfo_root, 'B_data')
 
 # Params
@@ -26,20 +31,20 @@ suffix_crisp = 'v'
 
 lab_desc = '''################################################
 # ITK-SnAP Label Description File for Brain web dataset
-# File format: 
+# File format:
 # IDX   -R-  -G-  -B-  -A--  VIS MSH  LABEL
-# Fields: 
-#    IDX:   Zero-based index 
+# Fields:
+#    IDX:   Zero-based index
 #    -R-:   Red color component (0..255)
 #    -G-:   Green color component (0..255)
 #    -B-:   Blue color component (0..255)
 #    -A-:   Label transparency (0.00 .. 1.00)
 #    VIS:   Label visibility (0 or 1)
 #    IDX:   Label mesh visibility (0 or 1)
-#  LABEL:   Label description 
+#  LABEL:   Label description
 ################################################
     0     0    0    0        0  0  0   "Background"
-    1   255    0    0        1  1  1    "CSF"  
+    1   255    0    0        1  1  1    "CSF"
     2     0  255    0        1  1  1    "GM"
     3     0    0  255        1  1  1    "WM"
     4   255  255    0        1  1  1    "Fat"

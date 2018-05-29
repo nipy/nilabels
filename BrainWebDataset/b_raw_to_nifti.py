@@ -9,6 +9,15 @@ import numpy as np
 import nibabel as nib
 import os
 
+import sys
+# adding 'LABelsToolkit/' folder to the system path
+# so that we can use command: `python BrainWebDataset/b_raw_to_nifti.py`
+# (assuming 'LABelsToolkit' folder is located at '../../[this_file]'
+current_file = os.path.realpath(__file__)
+toolkit_home = os.path.dirname(os.path.dirname(current_file))
+sys.path.append(toolkit_home)
+
+
 import BrainWebDataset.a_params as bw
 from LABelsToolkit.tools.aux_methods.utils_rotations import basic_90_rot_ax, axial_90_rotations
 
