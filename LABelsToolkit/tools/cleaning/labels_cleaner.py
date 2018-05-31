@@ -26,17 +26,6 @@ b = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
 
-c = np.array([[0,   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-              [0,   0,  0,  0,  0,  0, -1, -1,  2,  2,  2,  0],
-              [0,   0,  0,  1,  1,  1, -1, -1,  2,  2,  2,  0],
-              [0,   0,  0,  1, -1,  1, -1,  2,  2,  2,  2,  0],
-              [0,   0,  0,  1,  1,  1,  0,  0,  2,  2,  2,  0],
-              [0,   0,  0,  1,  1,  1,  1,  0,  2, -1,  2,  0],
-              [-1, -1,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0],
-              [-1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-              [ 0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]])
-
-
 def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_label=-1, labels_to_dilate=None):
     """
     The orders of labels to dilate counts.
@@ -46,7 +35,8 @@ def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_labe
     :return:
     """
     answer = np.copy(arr_segm)
-    selected_labels_mask = arr_segm[arr_segm == selected_label]
+    selected_labels_mask = np.zeros_like(arr_segm, dtype=np.bool)
+    selected_labels_mask[arr_segm == selected_label] = 1
     if labels_to_dilate is None:
         labels_to_dilate = sorted(list(set(arr_segm.flat)))
 
@@ -90,8 +80,20 @@ def clean_semgentation(arr_segm):
     return segm_no_holes_lab
 
 
+if __name__ == '__main__':
 
+    c = np.array([[0,   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+                   [0,   0,  0,  0,  0,  0, -1, -1,  2,  2,  2,  0],
+                   [0,   0,  0,  1,  1,  1, -1, -1,  2,  2,  2,  0],
+                   [0,   0,  0,  1, -1,  1, -1,  2,  2,  2,  2,  0],
+                   [0,   0,  0,  1,  1,  1,  0,  0,  2,  2,  2,  0],
+                   [0,   0,  0,  1,  1,  1,  1,  0,  2, -1,  2,  0],
+                   [-1, -1,  0,  0,  0,  0,  0,  0,  0, -1,  0,  0],
+                   [-1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+                   [ 0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]])
 
+    b = multi_lab_segmentation_dilate_1_above_selected_label(c, selected_label=-1, labels_to_dilate=None)
 
-
-
+    print c
+    print
+    print b
