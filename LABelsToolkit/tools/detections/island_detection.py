@@ -26,3 +26,13 @@ def island_for_label(array_segm, label, emphasis_max=False):
         binary_segm_components_sorted[binary_segm_components_sorted > 1] = -1
 
     return binary_segm_components_sorted
+
+
+def get_num_connected_components_for_label_l(array_segm, l):
+    """
+    :param array_segm: segmentation
+    :param l: label
+    :return: number of connected component per label.
+    """
+    # TODO suppress this waste of space!
+    return ndimage.label(array_segm == l)[1]

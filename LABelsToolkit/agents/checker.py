@@ -21,3 +21,6 @@ class LABelsToolkitChecker(object):
         ldm = LabelsDescriptorManager(pfi_labels_descriptor)
         im_se = nib.load(pfi_segmentation)
         check_missing_labels(im_se, ldm, pfi_where_log=pfi_where_to_save_the_log_file)
+
+    def number_connected_components_per_label(self):
+        pass

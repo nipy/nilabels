@@ -1,4 +1,4 @@
-.......................................................
+..............................................................
 Name                                                                 Stmts   Miss  Cover
 ----------------------------------------------------------------------------------------
 LABelsToolkit/__init__.py                                                1      0   100%
@@ -15,6 +15,7 @@ LABelsToolkit/tools/caliber/__init__.py                                  0      
 LABelsToolkit/tools/caliber/distances.py                               198     71    64%
 LABelsToolkit/tools/caliber/volumes_and_values.py                       69     30    57%
 LABelsToolkit/tools/cleaning/__init__.py                                 0      0   100%
+LABelsToolkit/tools/cleaning/labels_cleaner.py                          32      8    75%
 LABelsToolkit/tools/defs.py                                              7      0   100%
 LABelsToolkit/tools/descriptions/__init__.py                             0      0   100%
 LABelsToolkit/tools/descriptions/colours_rgb_lab.py                     45     34    24%
@@ -35,8 +36,8 @@ LABelsToolkit/tools/phantoms_generator/generate_simple_phantoms.py     187    17
 LABelsToolkit/tools/phantoms_generator/shapes_for_phantoms.py          119     92    23%
 LABelsToolkit/tools/visualiser/__init__.py                               0      0   100%
 ----------------------------------------------------------------------------------------
-TOTAL                                                                 1420    870    39%
+TOTAL                                                                 1452    878    40%
 ----------------------------------------------------------------------
-Ran 55 tests in 2.584s
+Ran 62 tests in 2.646s
 
 OK
