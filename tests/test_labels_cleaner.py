@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_array_equal
-
+from scipy import ndimage
 
 from LABelsToolkit.tools.cleaning.labels_cleaner import multi_lab_segmentation_dilate_1_above_selected_label, \
     holes_filler, clean_semgentation
@@ -178,12 +178,8 @@ def test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_3():
     assert_array_equal(ball, expected_ball)
 
 
-test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_1()
-test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_2()
-test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_3()
-
-
 # TESTING holes_filler
+
 
 def test_hole_filler_bypass_expected():
     # segm with no holes
@@ -275,28 +271,21 @@ def test_hole_filler_example_2():
     assert_array_equal(a, expected_a)
 
 
-# TESTING clean_semgentation
+# TESTING clean segmentation
 
 def test_clean_segmentation_simple_example():
 
     c = np.array([[0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
                   [1,  0,  1,  1,  1,  1,  1,  2,  2,  4,  2,  2],
-                  [0,  0,  1,  1,  2,  1,  1,  2,  4,  4,  4,  4],
+                  [0,  0,  1,  3,  2,  1,  1,  2,  4,  3,  4,  4],
                   [0,  0,  1,  1,  2,  2,  1,  2,  4,  4,  4,  2],
                   [3,  3,  1,  1,  2,  2,  1,  2,  4,  4,  4,  4],
                   [3,  3,  1,  1,  2,  2,  1,  2,  4,  4,  4,  4],
                   [3,  3,  1,  1,  2,  2,  2,  2,  2,  2,  4,  2],
-                  [3,  4,  3,  3,  0,  0,  0,  0,  0,  0,  0,  0],
-                  [3,  3,  3,  3,  0,  0,  0,  0,  0,  0,  0,  0]])
+                  [3,  4,  3,  3,  0,  0,  0,  4,  0,  0,  0,  0],
+                  [3,  3,  3,  3,  0,  0,  0,  0,  0,  1,  0,  1]])
 
     b = clean_semgentation(c)
 
-    print c
-    print
-    print b
-
-test_clean_segmentation_simple_example()
-
-
-
-
+    for l in sorted(list(set(c.flat))):
+        assert ndimage.label(b == l)[1] == 1

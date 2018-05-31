@@ -1,9 +1,7 @@
-import os
-import numpy as np
 import nibabel as nib
+from scipy import ndimage
 
 from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.detections.check_imperfections import check_missing_labels
 from LABelsToolkit.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
 
@@ -22,5 +20,14 @@ class LABelsToolkitChecker(object):
         im_se = nib.load(pfi_segmentation)
         check_missing_labels(im_se, ldm, pfi_where_log=pfi_where_to_save_the_log_file)
 
-    def number_connected_components_per_label(self):
-        pass
+    def number_connected_components_per_label(self, input_segmentation, where_to_save_the_log_file=None):
+        pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)
+        im = nib.load(pfi_segm)
+        msg = 'Labels check number of connected components for segmentation {}'.format(pfi_segm)
+        for l in sorted(list(set(im.get_data().flat))):
+            msg += 'Label {} has {} connected components \n'.format(l, ndimage.label(im.get_data() == l)[1])
+
+        if where_to_save_the_log_file is not None:
+            f = open(where_to_save_the_log_file, 'w')
+            f.write(msg)
+            f.close()

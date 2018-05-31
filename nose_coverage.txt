@@ -15,7 +15,7 @@ LABelsToolkit/tools/caliber/__init__.py                                  0      
 LABelsToolkit/tools/caliber/distances.py                               198     71    64%
 LABelsToolkit/tools/caliber/volumes_and_values.py                       69     30    57%
 LABelsToolkit/tools/cleaning/__init__.py                                 0      0   100%
-LABelsToolkit/tools/cleaning/labels_cleaner.py                          32      8    75%
+LABelsToolkit/tools/cleaning/labels_cleaner.py                          29      0   100%
 LABelsToolkit/tools/defs.py                                              7      0   100%
 LABelsToolkit/tools/descriptions/__init__.py                             0      0   100%
 LABelsToolkit/tools/descriptions/colours_rgb_lab.py                     45     34    24%
@@ -23,7 +23,7 @@ LABelsToolkit/tools/descriptions/manipulate_descriptors.py             123    10
 LABelsToolkit/tools/detections/__init__.py                               0      0   100%
 LABelsToolkit/tools/detections/contours.py                              24     13    46%
 LABelsToolkit/tools/detections/get_segmentation.py                      82     69    16%
-LABelsToolkit/tools/detections/island_detection.py                      15      0   100%
+LABelsToolkit/tools/detections/island_detection.py                      17      1    94%
 LABelsToolkit/tools/icv/__init__.py                                      0      0   100%
 LABelsToolkit/tools/image_colors_manipulations/__init__.py               0      0   100%
 LABelsToolkit/tools/image_colors_manipulations/cutter.py                28     17    39%
@@ -36,8 +36,8 @@ LABelsToolkit/tools/phantoms_generator/generate_simple_phantoms.py     187    17
 LABelsToolkit/tools/phantoms_generator/shapes_for_phantoms.py          119     92    23%
 LABelsToolkit/tools/visualiser/__init__.py                               0      0   100%
 ----------------------------------------------------------------------------------------
-TOTAL                                                                 1452    878    40%
+TOTAL                                                                 1451    871    40%
 ----------------------------------------------------------------------
-Ran 62 tests in 2.646s
+Ran 62 tests in 4.123s
 
 OK
