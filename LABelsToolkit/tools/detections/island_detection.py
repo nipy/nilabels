@@ -12,6 +12,7 @@ def island_for_label(array_segm, label, emphasis_max=False):
     """
     if label not in array_segm:
         print('Label {} not in the provided array.'.format(label))
+        return array_segm
 
     binary_segm_components, num_components = ndimage.label(array_segm == label)
     voxels_per_components = np.array([np.count_nonzero(binary_segm_components == l + 1) for l in range(num_components)])
@@ -25,20 +26,3 @@ def island_for_label(array_segm, label, emphasis_max=False):
         binary_segm_components_sorted[binary_segm_components_sorted > 1] = -1
 
     return binary_segm_components_sorted
-
-if __name__ == '__main__':
-
-    # TODO move in examples/test
-
-    a = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                  [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-                  [0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0],
-                  [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-                  [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                  [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-
-    print(island_for_label(a, 1, emphasis_max=False))
-    print(island_for_label(a, 1, emphasis_max=True))

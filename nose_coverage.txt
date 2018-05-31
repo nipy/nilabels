@@ -1,0 +1,42 @@
+.......................................................
+Name                                                                 Stmts   Miss  Cover
+----------------------------------------------------------------------------------------
+LABelsToolkit/__init__.py                                                1      0   100%
+LABelsToolkit/agents/__init__.py                                         0      0   100%
+LABelsToolkit/tools/__init__.py                                          0      0   100%
+LABelsToolkit/tools/aux_methods/__init__.py                              0      0   100%
+LABelsToolkit/tools/aux_methods/morpological_operations.py              37     14    62%
+LABelsToolkit/tools/aux_methods/sanity_checks.py                        38     20    47%
+LABelsToolkit/tools/aux_methods/utils.py                                82     73    11%
+LABelsToolkit/tools/aux_methods/utils_nib.py                           126     50    60%
+LABelsToolkit/tools/aux_methods/utils_path.py                           16      1    94%
+LABelsToolkit/tools/aux_methods/utils_rotations.py                      98     49    50%
+LABelsToolkit/tools/caliber/__init__.py                                  0      0   100%
+LABelsToolkit/tools/caliber/distances.py                               198     71    64%
+LABelsToolkit/tools/caliber/volumes_and_values.py                       69     30    57%
+LABelsToolkit/tools/cleaning/__init__.py                                 0      0   100%
+LABelsToolkit/tools/defs.py                                              7      0   100%
+LABelsToolkit/tools/descriptions/__init__.py                             0      0   100%
+LABelsToolkit/tools/descriptions/colours_rgb_lab.py                     45     34    24%
+LABelsToolkit/tools/descriptions/manipulate_descriptors.py             123    105    15%
+LABelsToolkit/tools/detections/__init__.py                               0      0   100%
+LABelsToolkit/tools/detections/contours.py                              24     13    46%
+LABelsToolkit/tools/detections/get_segmentation.py                      82     69    16%
+LABelsToolkit/tools/detections/island_detection.py                      15      0   100%
+LABelsToolkit/tools/icv/__init__.py                                      0      0   100%
+LABelsToolkit/tools/image_colors_manipulations/__init__.py               0      0   100%
+LABelsToolkit/tools/image_colors_manipulations/cutter.py                28     17    39%
+LABelsToolkit/tools/image_colors_manipulations/relabeller.py            65     31    52%
+LABelsToolkit/tools/image_shape_manipulations/__init__.py                0      0   100%
+LABelsToolkit/tools/image_shape_manipulations/merger.py                 47     22    53%
+LABelsToolkit/tools/image_shape_manipulations/splitter.py               13      2    85%
+LABelsToolkit/tools/phantoms_generator/__init__.py                       0      0   100%
+LABelsToolkit/tools/phantoms_generator/generate_simple_phantoms.py     187    177     5%
+LABelsToolkit/tools/phantoms_generator/shapes_for_phantoms.py          119     92    23%
+LABelsToolkit/tools/visualiser/__init__.py                               0      0   100%
+----------------------------------------------------------------------------------------
+TOTAL                                                                 1420    870    39%
+----------------------------------------------------------------------
+Ran 55 tests in 2.584s
+
+OK
