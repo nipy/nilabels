@@ -7,6 +7,7 @@ from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from LABelsToolkit.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
+from LABelsToolkit.tools.cleaning. labels_cleaner import clean_semgentation
 
 
 class LABelsToolkitLabelsManipulate(object):
@@ -112,5 +113,15 @@ class LABelsToolkitLabelsManipulate(object):
 
         return pfi_out
 
-    def clean_segmentation(self, pfi_input, pfi_output):
-        pass
+    def clean_segmentation(self, input_segmentation, output_cleaned_segmentation, labels_to_clean=(), verbose=1):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(input_segmentation, output_cleaned_segmentation, self.pfo_in, self.pfo_out)
+        if pfi_in == pfi_out:
+            raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))
+        im_segm = nib.load(pfi_in)
+
+        new_segm_data = clean_semgentation(im_segm.get_data(), labels_to_clean=labels_to_clean)
+
+        im_segm_cleaned = set_new_data(im_segm, new_segm_data)
+        nib.save(im_segm_cleaned, pfi_out)
+        if verbose:
+            print('Segmentation {} cleaned saved to {}'.format(pfi_in, pfi_out))

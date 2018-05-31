@@ -47,7 +47,7 @@ def holes_filler(arr_segm_with_holes, holes_label=-1, labels_sequence=()):
     return arr_segm_no_holes
 
 
-def clean_semgentation(arr_segm, labels_to_clean=()):
+def clean_semgentation(arr_segm, labels_to_clean=(), verbose=1):
     """
     Given an array representing a binary segmentation, the connected components of the segmentations.
     If an hole could be filled by 2 different labels, wins the label with lower value.
@@ -55,13 +55,16 @@ def clean_semgentation(arr_segm, labels_to_clean=()):
     Only the largest connected component of each label will remain in the final
     segmentation. The smaller components will be filled by the surrounding labels.
     :param arr_segm: an array of a segmentation.
-    :param labels_to_clean: can clean only few of the
+    :param labels_to_clean: select the labels you want to consider for the cleaning.
+    :param verbose:
     :return:
     """
     if labels_to_clean == ():
         labels_to_clean = sorted(list(set(arr_segm.flat)))
     segm_with_holes   = np.copy(arr_segm)
     for lab in labels_to_clean:
+        if verbose:
+            print('Cleaning label {}'.format(lab))
         islands = island_for_label(arr_segm, lab, emphasis_max=True)
         segm_with_holes[islands == -1] = -1
 
