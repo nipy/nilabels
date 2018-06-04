@@ -89,8 +89,4 @@ def clean_semgentation(arr_segm, labels_to_clean=(), label_for_holes=-1, return_
         islands = island_for_label(arr_segm, lab, emphasis_max=True, special_label=label_for_holes)
         segm_with_holes[islands == label_for_holes] = label_for_holes
 
-        np.save('/Users/sebastiano/Desktop/segm_islands_lab{}.npy'.format(lab), islands)
-
-    np.save('/Users/sebastiano/Desktop/segm_with_all_holes.npy', segm_with_holes)
-
     return holes_filler(segm_with_holes, holes_label=label_for_holes, return_filled_holes=return_filled_holes)
