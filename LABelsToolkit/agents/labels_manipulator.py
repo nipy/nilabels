@@ -1,3 +1,4 @@
+import os
 import nibabel as nib
 import numpy as np
 
@@ -113,13 +114,19 @@ class LABelsToolkitLabelsManipulate(object):
 
         return pfi_out
 
-    def clean_segmentation(self, input_segmentation, output_cleaned_segmentation, labels_to_clean=(), verbose=1):
+    def clean_segmentation(self, input_segmentation, output_cleaned_segmentation, labels_to_clean=(), verbose=1,
+                           special_label=None):
         pfi_in, pfi_out = get_pfi_in_pfi_out(input_segmentation, output_cleaned_segmentation, self.pfo_in, self.pfo_out)
-        if pfi_in == pfi_out:
+        if os.path.exists(pfi_out):
             raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))
+
         im_segm = nib.load(pfi_in)
 
-        new_segm_data = clean_semgentation(im_segm.get_data(), labels_to_clean=labels_to_clean)
+        if special_label is None:
+            special_label = np.max(im_segm.get_data()) + 1
+
+        new_segm_data = clean_semgentation(im_segm.get_data(), labels_to_clean=labels_to_clean,
+                                           label_for_holes=special_label)
 
         im_segm_cleaned = set_new_data(im_segm, new_segm_data)
         nib.save(im_segm_cleaned, pfi_out)

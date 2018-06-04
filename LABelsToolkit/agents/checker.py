@@ -25,7 +25,9 @@ class LABelsToolkitChecker(object):
         im = nib.load(pfi_segm)
         msg = 'Labels check number of connected components for segmentation {}'.format(pfi_segm)
         for l in sorted(list(set(im.get_data().flat))):
-            msg += 'Label {} has {} connected components \n'.format(l, ndimage.label(im.get_data() == l)[1])
+            msg_l = 'Label {} has {} connected components'.format(l, ndimage.label(im.get_data() == l)[1])
+            print(msg_l)
+            msg += msg_l + '\n'
 
         if where_to_save_the_log_file is not None:
             f = open(where_to_save_the_log_file, 'w')

@@ -31,7 +31,8 @@ def relabeller(in_data, list_old_labels, list_new_labels, verbose=True):
             if verbose:
                 print('Label {0} substituted with label {1}'.format(list_old_labels[k], list_new_labels[k]))
         else:
-            print('Label {0} not present in the array'.format(list_old_labels[k]))
+            if verbose:
+                print('Label {0} not present in the array'.format(list_old_labels[k]))
 
     return new_data
 

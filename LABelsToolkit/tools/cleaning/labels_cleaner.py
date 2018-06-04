@@ -4,19 +4,23 @@ from scipy import ndimage
 from LABelsToolkit.tools.detections.island_detection import island_for_label
 
 
-def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_label=-1, labels_to_dilate=()):
+def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_label=-1, labels_to_dilate=(), verbose=2):
     """
     The orders of labels to dilate counts.
     :param arr_segm:
     :param selected_label:
     :param labels_to_dilate: if None all labels are dilated, in ascending order (algorithm is NOT order invariant).
+    :param verbose:
     :return:
     """
     answer = np.copy(arr_segm)
     if labels_to_dilate is ():
         labels_to_dilate = sorted(list(set(arr_segm.flat) - {selected_label}))
 
+    num_dilation = 0
     for l in labels_to_dilate:
+        if verbose > 1:
+            print('Dilating label {} over hole-label {}'.format(l, selected_label))
         selected_labels_mask = np.zeros_like(answer, dtype=np.bool)
         selected_labels_mask[answer == selected_label] = 1
         bin_label_l = np.zeros_like(answer, dtype=np.bool)
@@ -24,11 +28,14 @@ def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_labe
         dilated_bin_label_l = ndimage.morphology.binary_dilation(bin_label_l)
         dilation_l_over_selected_label = dilated_bin_label_l * selected_labels_mask
         answer[dilation_l_over_selected_label > 0] = l
+        num_dilation += 1
+    if verbose > 0:
+        print('Number of dilations {}'.format(num_dilation))
 
     return answer
 
 
-def holes_filler(arr_segm_with_holes, holes_label=-1, labels_sequence=()):
+def holes_filler(arr_segm_with_holes, holes_label=-1, labels_sequence=(), verbose=1, return_filled_holes=False):
     """
     Given a segmentation with holes (holes are specified by a special labels called holes_label)
     the holes are filled with the closest labels around.
@@ -38,16 +45,27 @@ def holes_filler(arr_segm_with_holes, holes_label=-1, labels_sequence=()):
     :param holes_label:
     :param labels_sequence: As multi_lab_segmentation_dilate_1_above_selected_label is not invariant
     for the selected sequence, this iterative version is not invariant too.
+    :param verbose:
+    :param return_filled_holes: if True returns two arrayw, one with the holes filled, and the other with the
+    binarised holes that had been filled.
     :return:
     """
     arr_segm_no_holes = np.copy(arr_segm_with_holes)
+    if verbose:
+        print('Filling holes in the segmentation')
     while holes_label in arr_segm_no_holes:
         arr_segm_no_holes = multi_lab_segmentation_dilate_1_above_selected_label(arr_segm_no_holes,
                                 selected_label=holes_label, labels_to_dilate=labels_sequence)
-    return arr_segm_no_holes
+
+    if return_filled_holes:
+        binarised_holes = np.zeros_like(arr_segm_with_holes)
+        binarised_holes[arr_segm_with_holes == holes_label] = 1
+        return arr_segm_no_holes, binarised_holes
+    else:
+        return arr_segm_no_holes
 
 
-def clean_semgentation(arr_segm, labels_to_clean=(), verbose=1):
+def clean_semgentation(arr_segm, labels_to_clean=(), label_for_holes=-1, return_filled_holes=False, verbose=1):
     """
     Given an array representing a binary segmentation, the connected components of the segmentations.
     If an hole could be filled by 2 different labels, wins the label with lower value.
@@ -56,16 +74,23 @@ def clean_semgentation(arr_segm, labels_to_clean=(), verbose=1):
     segmentation. The smaller components will be filled by the surrounding labels.
     :param arr_segm: an array of a segmentation.
     :param labels_to_clean: select the labels you want to consider for the cleaning.
+    :prarm return_filled_holes: if True returns two arrayw, one with the holes filled, and the other with the
+    binarised holes that had been filled.
     :param verbose:
     :return:
     """
     if labels_to_clean == ():
         labels_to_clean = sorted(list(set(arr_segm.flat)))
-    segm_with_holes   = np.copy(arr_segm)
+
+    segm_with_holes   = np.copy(arr_segm).astype(np.int64)
     for lab in labels_to_clean:
         if verbose:
             print('Cleaning label {}'.format(lab))
-        islands = island_for_label(arr_segm, lab, emphasis_max=True)
-        segm_with_holes[islands == -1] = -1
+        islands = island_for_label(arr_segm, lab, emphasis_max=True, special_label=label_for_holes)
+        segm_with_holes[islands == label_for_holes] = label_for_holes
 
-    return holes_filler(segm_with_holes)
+        np.save('/Users/sebastiano/Desktop/segm_islands_lab{}.npy'.format(lab), islands)
+
+    np.save('/Users/sebastiano/Desktop/segm_with_all_holes.npy', segm_with_holes)
+
+    return holes_filler(segm_with_holes, holes_label=label_for_holes, return_filled_holes=return_filled_holes)
