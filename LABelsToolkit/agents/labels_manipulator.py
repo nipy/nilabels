@@ -116,6 +116,21 @@ class LABelsToolkitLabelsManipulate(object):
 
     def clean_segmentation(self, input_segmentation, output_cleaned_segmentation, labels_to_clean=(), verbose=1,
                            special_label=None):
+        """
+        Clean the segmentation merging the small connected components with the surrounding tissue.
+        :param input_segmentation: path to the input segmentation
+        :param output_cleaned_segmentation: path to the output cleaned segmentation. For safety this file can not exist
+        before calling this method.
+        :param labels_to_clean: list of binaries lists. [[z_1, zc_1], ... , [z_J, zc_J]] where z_j is the label you want
+        to clean and zc_1 is the number of components you want to keep. If empty tuple, by default cleans all the labels
+        keeping only one component.
+        :param special_label: internal variable for the dummy labels that will be used for the 'holes'. This must
+        not be a label already present in the segmentation. If None, it is the max label + 1.
+        :param verbose:
+        :return: it saves the cleaned segmentation at the specified output path.
+        Note: as a feature (really!) after the holes identification, all labels, and not only the ones indicated in the
+        input dilate iteratively over the 'holes'.
+        """
         pfi_in, pfi_out = get_pfi_in_pfi_out(input_segmentation, output_cleaned_segmentation, self.pfo_in, self.pfo_out)
         if os.path.exists(pfi_out):
             raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))

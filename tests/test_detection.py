@@ -35,9 +35,9 @@ def test_island_for_label_ok_input():
                          [0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
                          [0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0]]
 
-    ans_False = island_for_label(in_data, 1, emphasis_max=False)
+    ans_False = island_for_label(in_data, 1)
 
-    ans_True = island_for_label(in_data, 1, emphasis_max=True)
+    ans_True = island_for_label(in_data, 1, m=1)
 
     assert_array_equal(expected_ans_False, ans_False)
     assert_array_equal(expected_ans_True, ans_True)
@@ -54,6 +54,6 @@ def test_island_for_label_no_label_in_input():
                         [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
-    bypassed_ans = island_for_label(in_data, 2, emphasis_max=False)
+    bypassed_ans = island_for_label(in_data, 2)
     assert_array_equal(bypassed_ans, in_data)
 
