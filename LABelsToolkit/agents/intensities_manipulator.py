@@ -21,8 +21,18 @@ class LABelsToolkitIntensitiesManipulate(object):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
 
-    def normalise_below_label(self, pfi_input, pfi_output, filename_segm, labels, stats=np.median):
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
+    def normalise_below_label(self, filename_image_in, filename_image_out, filename_segm, labels, stats=np.median):
+        """
+
+        :param filename_image_in: path to image input
+        :param filename_image_out: path to image output
+        :param filename_segm: path to segmentation
+        :param labels: list of labels below which the voxels are collected
+        :param stats: a statistics (by default the median).
+        :return: a new image with the intensites normalised according to the proposed statistics computed on the
+        intensities below the provided labels.
+        """
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_image_in, filename_image_out, self.pfo_in, self.pfo_out)
         pfi_segm = connect_path_tail_head(self.pfo_in, filename_segm)
 
         im_input = nib.load(pfi_in)
@@ -33,15 +43,32 @@ class LABelsToolkitIntensitiesManipulate(object):
 
         nib.save(im_out, pfi_out)
 
-    def get_contour_from_segmentation(self, pfi_input_segmentation, pfi_output_contour, omit_axis=None, verbose=0):
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input_segmentation, pfi_output_contour, self.pfo_in, self.pfo_out)
+    def get_contour_from_segmentation(self, filename_input_segmentation, filename_output_contour, omit_axis=None, verbose=0):
+        """
+        Get the contour from a segmentation
+        :param filename_input_segmentation:
+        :param filename_output_contour:
+        :param omit_axis: meant to avoid "walls" in the output segmentation
+        :param verbose:
+        :return:
+        """
+
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_input_segmentation, filename_output_contour, self.pfo_in, self.pfo_out)
         im_segm = nib.load(pfi_in)
 
         im_contour = contour_from_segmentation(im_segm, omit_axis=omit_axis, verbose=verbose)
 
-        nib.save(im_contour, pfi_output_contour)
+        nib.save(im_contour, filename_output_contour)
 
     def get_grafting(self, pfi_input_hosting_mould, pfi_input_patch, pfi_output_grafted, pfi_input_patch_mask=None):
+        """
+
+        :param pfi_input_hosting_mould:
+        :param pfi_input_patch:
+        :param pfi_output_grafted:
+        :param pfi_input_patch_mask:
+        :return:
+        """
         pfi_hosting = connect_path_tail_head(self.pfo_in, pfi_input_hosting_mould)
         pfi_patch = connect_path_tail_head(self.pfo_in, pfi_input_patch)
 

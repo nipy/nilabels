@@ -29,7 +29,7 @@ class LABelsToolkitFuse(object):
         :param seg_output_name:
         :param warp_output_name:
         :param output_tag: additional tag output.
-        :return: if prepare_data_only is True it returns the path to files prepared to be used externally in nifty seg,
+        :return: if prepare_data_only is True it returns the path to files prepared to be provided to nifty_seg,
                 in the following order
                     [pfi_target, pfi_result, pfi_4d_seg, pfi_4d_warp]
 

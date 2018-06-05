@@ -134,8 +134,8 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
 
     :return: None. It creates a new image in pfi_nifti_output with defined translational part.
 
-    NOTE: see the documentation http://nipy.org/nibabel/nifti_images.html#choosing-image-affine to
-    understand relationships between s_form affine, q_form affine and fall-back header affine.
+    NOTE: please see the documentation http://nipy.org/nibabel/nifti_images.html#choosing-image-affine for more on the
+    relationships between s_form affine, q_form affine and fall-back header affine.
     """
     if np.linalg.det(new_aff) < 0 :
         print('WARNING: affine matrix proposed has negative determinant.')
