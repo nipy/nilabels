@@ -5,11 +5,11 @@ LABelsToolkit is a set of tools to automatise simple manipulations and measureme
 segmentations in nifti format.
 
 
-+ [Motivations](https://github.com/SebastianoF/LABelsToolkit/wiki/Motivations)
+### [Motivations](https://github.com/SebastianoF/LABelsToolkit/wiki/Motivations)
 
-+ [What you can do with LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit/wiki/What-you-can-do-with-LABelsToolkit)
+### [What you can do with LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit/wiki/What-you-can-do-with-LABelsToolkit)
 
-+ [Design pattern](https://github.com/SebastianoF/LABelsToolkit/wiki/Design-Pattern)
+### [Design pattern](https://github.com/SebastianoF/LABelsToolkit/wiki/Design-Pattern)
 
 ## How to install (in development mode) 
 
