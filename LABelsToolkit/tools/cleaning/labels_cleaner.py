@@ -17,7 +17,7 @@ def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_labe
     if labels_to_dilate is ():
         labels_to_dilate = sorted(list(set(arr_segm.flat) - {selected_label}))
 
-    num_dilation = 0
+    num_labels_dilated = 0
     for l in labels_to_dilate:
         if verbose > 1:
             print('Dilating label {} over hole-label {}'.format(l, selected_label))
@@ -28,9 +28,9 @@ def multi_lab_segmentation_dilate_1_above_selected_label(arr_segm, selected_labe
         dilated_bin_label_l = ndimage.morphology.binary_dilation(bin_label_l)
         dilation_l_over_selected_label = dilated_bin_label_l * selected_labels_mask
         answer[dilation_l_over_selected_label > 0] = l
-        num_dilation += 1
+        num_labels_dilated += 1
     if verbose > 0:
-        print('Number of dilations {}'.format(num_dilation))
+        print('Number of labels_dilated: {}\n'.format(num_labels_dilated))
 
     return answer
 
@@ -48,12 +48,19 @@ def holes_filler(arr_segm_with_holes, holes_label=-1, labels_sequence=(), verbos
     :param verbose:
     :return:
     """
+    num_rounds = 0
     arr_segm_no_holes = np.copy(arr_segm_with_holes)
+
     if verbose:
-        print('Filling holes in the segmentation')
+        print('Filling holes in the segmentation:')
+
     while holes_label in arr_segm_no_holes:
         arr_segm_no_holes = multi_lab_segmentation_dilate_1_above_selected_label(arr_segm_no_holes,
                                 selected_label=holes_label, labels_to_dilate=labels_sequence)
+        num_rounds += 1
+
+    if verbose:
+        print('Number of dilations required to remove the holes: {}'.format(num_rounds))
 
     return arr_segm_no_holes
 

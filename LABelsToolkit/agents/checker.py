@@ -23,7 +23,7 @@ class LABelsToolkitChecker(object):
     def number_connected_components_per_label(self, input_segmentation, where_to_save_the_log_file=None):
         pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)
         im = nib.load(pfi_segm)
-        msg = 'Labels check number of connected components for segmentation {}'.format(pfi_segm)
+        msg = 'Labels check number of connected components for segmentation {} \n\n'.format(pfi_segm)
         for l in sorted(list(set(im.get_data().flat))):
             msg_l = 'Label {} has {} connected components'.format(l, ndimage.label(im.get_data() == l)[1])
             print(msg_l)
