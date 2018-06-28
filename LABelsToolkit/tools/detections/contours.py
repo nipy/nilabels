@@ -4,7 +4,7 @@ from ..aux_methods.utils_nib import set_new_data
 
 def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0):
     if verbose > 0:
-        print(l)
+        print('eroding label {}'.format(l))
     array_label_l = im_arr == l
     assert isinstance(array_label_l, np.ndarray)
     gra = np.gradient(array_label_l.astype(np.bool).astype(np.float64))

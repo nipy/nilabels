@@ -14,7 +14,7 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
     number of voxels, volume and number of connected components per label, all in a log file.
     """
     assert isinstance(labels_descriptor, LabelsDescriptorManager)
-    labels_dict = labels_descriptor.get_dict(as_string=False)
+    labels_dict = labels_descriptor.get_dict_itk_snap(as_string=False)
     labels_list = labels_dict.keys()
 
     labels_in_the_image = set(im_segm.get_data().astype(np.int).flatten())

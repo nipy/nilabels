@@ -53,45 +53,73 @@ descriptor_standard_header = \
 ################################################
 """
 
+
 class LabelsDescriptorManager(object):
 
-    def __init__(self, pfi_label_descriptor):
+    def __init__(self, pfi_label_descriptor, convention='itk-snap'):
         self.pfi_label_descriptor = pfi_label_descriptor
-        self._dict_label_descriptor = self.get_dict(as_string=True)
+        self._convention = convention
+        self._check_path()
+        if self._convention == 'itk-snap':
+            self._dict_label_descriptor = self.get_dict_itk_snap()
+        elif self._convention == 'fsl':
+            self._dict_label_descriptor = self.get_dict_fsl()
+        else:
+            raise IOError("Signature convention can be only 'itk-snap' or 'fsl'. ")
 
     def _check_path(self):
         if not os.path.exists(self.pfi_label_descriptor):
             msg = 'Label descriptor file {} does not exist'.format(self.pfi_label_descriptor)
             raise IOError(msg)
 
-    def get_dict(self, as_string=False):
+    def get_dict_itk_snap(self):
         """
-        Parse the ITK-Snap label descriptor into a dict.
+        Parse the ITK-Snap label descriptor into an ordered dict data structure.
+        Each element of the ordered dict is of the kind
+         (218, [[128, 0, 128], [1.0, 1.0, 1.0], 'Corpus callosum'])
+        key: 128
+        value: [[128, 0, 128], [1.0, 1.0, 1.0], 'Corpus callosum']
+                [RGB, others, label_name]
+
         :return: dict with information relative to the parsed label descriptor.
         id : ''
         """
-        self._check_path()
         label_descriptor_dict = collections.OrderedDict()
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
                 args = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
-                if '(' in args[2]:  # there is the abbreviation - it gets separated in a new args element:
-                    name = args[2].split('(')[0].strip()
-                    abbrev = args[2].split('(')[1].replace(')', '').strip()
-                    args[2] = name
-                    args += [abbrev]
-                if as_string:
-                    dd = {parsed_line[0]: args}
-                else:
-                    args[0] = [int(k) for k in args[0]]
-                    args[1] = [float(k) for k in args[1]]
-                    dd = {int(parsed_line[0]): args}
+
+                args[0] = [int(k) for k in args[0]]
+                args[1] = [float(k) for k in args[1]]
+                dd = {int(parsed_line[0]): args}
                 label_descriptor_dict.update(dd)
 
         return label_descriptor_dict
 
+    def get_dict_fsl(self):
+        """
+        Parse the fsl label descriptor into an ordered dict data structure.
+        """
+        label_descriptor_dict = collections.OrderedDict()
+        for l in open(self.pfi_label_descriptor, 'r'):
+            if not l.strip().startswith('#'):
+                parsed_line = [j.strip() for j in l.split(' ') if not j == '']
+                args = [list(parsed_line[2:5]), list(parsed_line[5]), parsed_line[1]]
+
+                args[0] = [int(k) for k in args[0]]
+                args[1] = [int(k) for k in args[1]]
+                dd = {int(parsed_line[0]): args}
+                label_descriptor_dict.update(dd)
+        return label_descriptor_dict
+
     def get_multi_label_dict(self, keep_duplicate=False, combine_right_left=True):
+        """
+        Different data structure to allow for multiple labels.
+        :param keep_duplicate:
+        :param combine_right_left:
+        :return:
+        """
         mld = collections.OrderedDict()
         mld_tmp = collections.OrderedDict()
         # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
@@ -105,7 +133,10 @@ class LabelsDescriptorManager(object):
                         mld.update({k: mld_tmp[k]})
                     if 'Right' in k:
                         left_key = k.replace('Right', 'Left')
-                        mld.update({k.replace('Right', '').strip() : mld_tmp[left_key] + mld_tmp[k]})
+                        key = k.replace('Right', '').strip()
+                        if key.startswith('-'):
+                            key = key[1:]
+                        mld.update({key : mld_tmp[left_key] + mld_tmp[k]})
                     elif 'Left' in k:
                         pass
                     else:
@@ -118,23 +149,32 @@ class LabelsDescriptorManager(object):
 
     def save_label_descriptor(self, pfi_where_to_save):
         f = open(pfi_where_to_save, 'w+')
-        f.write(descriptor_standard_header)
-        ld_dict = self.get_dict(as_string=False)
-        for j in ld_dict.keys():
-            if j.isdigit():
-                if len(ld_dict[j]) == 4:  # there is an abbreviation
-                    name = '{0} ({1})'.format(ld_dict[j][2], ld_dict[j][3])
-                else:
-                    name = ld_dict[j][2]
-                line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(j,
-                        ld_dict[j][0][0],
-                        ld_dict[j][0][1],
-                        ld_dict[j][0][2],
-                        ld_dict[j][1][0],
-                        ld_dict[j][1][1],
-                        ld_dict[j][1][2],
-                        name)
-                f.write(line)
+        if self._convention == 'itk-snap':
+            f.write(descriptor_standard_header)
+
+        for j in self._dict_label_descriptor.keys():
+            if self._convention == 'itk-snap':
+                line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(
+                        j,
+                        self._dict_label_descriptor[j][0][0],
+                        self._dict_label_descriptor[j][0][1],
+                        self._dict_label_descriptor[j][0][2],
+                        self._dict_label_descriptor[j][1][0],
+                        int(self._dict_label_descriptor[j][1][1]),
+                        int(self._dict_label_descriptor[j][1][2]),
+                        self._dict_label_descriptor[j][2])
+
+            elif self._convention == 'fsl':
+                line = '{0} {1} {2} {3} {4} {5}\n'.format(
+                        j,
+                        self._dict_label_descriptor[j][2].replace(' ', '-'),
+                        self._dict_label_descriptor[j][0][0],
+                        self._dict_label_descriptor[j][0][1],
+                        self._dict_label_descriptor[j][0][2],
+                        self._dict_label_descriptor[j][1][0])
+            else:
+                return
+            f.write(line)
         f.close()
 
     def save_as_multi_label_descriptor(self, pfi_destination):
@@ -160,19 +200,6 @@ class LabelsDescriptorManager(object):
             f.write('\n')
         f.close()
 
-    def save_labels_and_abbreviations(self, pfi_where_to_save):
-        f = open(pfi_where_to_save, 'w+')
-        f.write(descriptor_standard_header)
-        ld_dict = self.get_dict(as_string=False)
-        for j in ld_dict.keys():
-            if len(ld_dict[j]) == 4:  # there is an abbreviation
-                abbr =  ld_dict[j][3]
-            else:
-                abbr = ''
-            line = '{0: <10}{1: <10}\n'.format(j, abbr)
-            f.write(line)
-        f.close()
-
     def permute_labels(self, permutation):
         # permute the label
         # TODO
@@ -186,19 +213,18 @@ class LabelsDescriptorManager(object):
         :return: a 4d image, where at each voxel there is the [r, g, b] vector in the fourth dimension.
         """
         labels_in_image = list(np.sort(list(set(im_segm.get_data().flatten()))))
-        labels_dict = self.get_dict(as_string=False)
 
         assert len(im_segm.shape) == 3
 
         rgb_image_arr = np.ones(list(im_segm.shape) + [3])
 
-        for l in labels_dict.keys():
+        for l in self._dict_label_descriptor.keys():
             if l not in labels_in_image:
                 msg = 'get_corresponding_rgb_image: Label {} present in the label descriptor and not in ' \
                       'selected image'.format(l)
                 print(msg)
             pl = im_segm.get_data() == l
-            rgb_image_arr[pl, :] = labels_dict[l][0]
+            rgb_image_arr[pl, :] = self._dict_label_descriptor[l][0]
 
         if invert_black_white:
             pl = im_segm.get_data() == 0
@@ -208,7 +234,7 @@ class LabelsDescriptorManager(object):
 
 def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None):
     """
-    For testing purposes, it creates a dummy label descriptor.
+    For testing purposes, it creates a dummy label descriptor with the itk-snap convention
     :param pfi_output: where to save the eventual label descriptor
     :param list_labels: list of labels range, default 0:5
     :param list_roi_names: names of the regions of interests. If None, default names are assigned.
@@ -263,3 +289,31 @@ if __name__ == '__main__':
     #
     # im = ldm.get_corresponding_rgb_image(im_se)
     # nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')
+
+
+    pfi_descriptor = '/Users/sebastiano/Desktop/colour_label.txt'
+
+    ldm = LabelsDescriptorManager(pfi_descriptor, convention='fsl')
+
+    print ldm.get_dict_fsl()
+
+    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_fsl.txt')
+
+
+    pfi_descriptor = '/Users/sebastiano/Desktop/labels_descriptor.txt'
+
+    ldm = LabelsDescriptorManager(pfi_descriptor, convention='itk-snap')
+
+    print ldm._dict_label_descriptor
+
+    ldm._convention = 'fsl'
+
+    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_as_fsl.txt')
+
+'''
+# if '(' in args[2]:  # there is the abbreviation - it gets separated in a new args element:
+#     name = args[2].split('(')[0].strip()
+#     abbrev = args[2].split('(')[1].replace(')', '').strip()
+#     args[2] = name
+#     args += [abbrev]
+'''
