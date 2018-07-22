@@ -28,7 +28,7 @@ def cut_4d_volume_with_a_1_slice_mask_nib(input_4d_nib, input_mask_nib):
 
     data_4d  = input_4d_nib.get_data()
     data_mask = input_mask_nib.get_data()
-    ans = cut_4d_volume_with_a_1_slice_mask(data_4d.get_data(), data_mask.get_data())
+    ans = cut_4d_volume_with_a_1_slice_mask(data_4d, data_mask)
 
     return set_new_data(input_4d_nib, ans)
 

@@ -13,7 +13,7 @@ from LABelsToolkit.tools.defs import root_dir
 if __name__ == '__main__':
 
     if not os.path.exists(jph(root_dir, 'data_examples')):
-        print('Run generate_data_examples.py before this, please.')
+        print('Run generate_simple_phantoms.py before this, please.')
         raise IOError
 
     # Create output folder:
