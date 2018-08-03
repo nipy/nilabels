@@ -4,7 +4,7 @@ Use ITK-snap and fls to obtain the surfaces and overlay the surface to the main 
 
 import os
 from os.path import join as jph
-from LABelsToolkit.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
 
 
 def fsl_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, convention_descriptor='itk-snap',

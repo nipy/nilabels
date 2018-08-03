@@ -3,7 +3,7 @@ from scipy import ndimage
 
 from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 from LABelsToolkit.tools.detections.check_imperfections import check_missing_labels
-from LABelsToolkit.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
 
 
 class LABelsToolkitChecker(object):

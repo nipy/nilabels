@@ -282,7 +282,7 @@ def symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, re
     return pa.Series(np.array(nscd_dist), index=labels_names)
 
 
-# --- varaizioni over symmetric contour distance:
+# --- variants over symmetric contour distance:
 
 
 def normalised_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True, verbose=1):
@@ -347,6 +347,8 @@ def mahalanobis_distance(im, im_mask=None, trim=False):
             new_data = new_data * im_mask.get_data().astype(np.bool)
         return set_new_data(im, new_data)
 
+
+# --- Experiments new measures between segmentations:
 
 def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
     # definition of s_dispersion is not the conventional definition of precision

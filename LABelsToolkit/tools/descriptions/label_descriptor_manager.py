@@ -1,8 +1,7 @@
-import os
 import collections
+import os
 import numpy as np
 
-from LABelsToolkit.tools.descriptions.colours_rgb_lab import get_random_rgb
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 """
@@ -51,6 +50,18 @@ descriptor_standard_header = \
 #    IDX:   Label mesh visibility (0 or 1)
 #  LABEL:   Label description
 ################################################
+"""
+
+descriptor_data_examples = \
+"""    0     0    0    0        0  0  0    "background"
+    1   255    0    0        1  1  1    "label one (l1)"
+    2   204    0    0        1  1  1    "label two (l2)"
+    3    51   51  255        1  1  1    "label three"
+    4   102  102  255        1  1  1    "label four"
+    5     0  204   51        1  1  1    "label five (l5)"
+    6    51  255  102        1  1  1    "label six"
+    7   255  255    0        1  1  1    "label seven"
+    8   255  50    50        1  1  1    "label eight"
 """
 
 
@@ -200,12 +211,6 @@ class LabelsDescriptorManager(object):
             f.write('\n')
         f.close()
 
-    def permute_labels(self, permutation):
-        # permute the label
-        # TODO
-        # save on the same place: yes it is destructive!
-        self.save_label_descriptor(self.pfi_label_descriptor)
-
     def get_corresponding_rgb_image(self, im_segm, invert_black_white=False):
         """
         From the labels descriptor and a nibabel segmentation image.
@@ -230,90 +235,3 @@ class LabelsDescriptorManager(object):
             pl = im_segm.get_data() == 0
             rgb_image_arr[pl, :] = np.array([255, 255, 255])
         return set_new_data(im_segm, rgb_image_arr, new_dtype=np.int32)
-
-
-def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None):
-    """
-    For testing purposes, it creates a dummy label descriptor with the itk-snap convention
-    :param pfi_output: where to save the eventual label descriptor
-    :param list_labels: list of labels range, default 0:5
-    :param list_roi_names: names of the regions of interests. If None, default names are assigned.
-    :return: label descriptor as a dictionary.
-    """
-    d = collections.OrderedDict()
-    d.update({'type': 'Label descriptor parsed'})
-    num_labels = len(list_labels)
-    colors = [get_random_rgb() for _ in range(num_labels)]
-    visibility = [(1, 1, 1)] * num_labels
-    if list_roi_names is None:
-        list_roi_names = ["label {}".format(j) for j in list_labels]
-    else:
-        assert len(list_labels) == len(list_roi_names)
-    for j in range(num_labels):
-        up_d = {str(j): [colors[j], visibility[j], list_roi_names[j]]}
-        d.update(up_d)
-    f = open(pfi_output, 'w+')
-    f.write(descriptor_standard_header)
-    for j in d.keys():
-        if j.isdigit():
-            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(j,
-                d[j][0][0], d[j][0][1], d[j][0][2], d[j][1][0], d[j][1][1], d[j][1][2], d[j][2])
-            f.write(line)
-    f.close()
-    return d
-
-
-# temporary test
-if __name__ == '__main__':
-    pass
-    # TODO move this part in examples.
-
-    # # from labels_manager.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
-    # import nibabel as nib
-    #
-    # pfi_descriptor = '/Users/sebastiano/Dropbox/RabbitEOP-MRI/study/A_atlas/labels_descriptor_abbrev.txt'
-    #
-    # ldm = LabelsDescriptorManager(pfi_descriptor)
-    # dict_ld = ldm.get_dict()
-    # pfi_hwere_to_save = '/Users/sebastiano/Desktop/zzz_lab_abbrev.txt'
-    #
-    # ldm.save_labels_and_abbreviations(pfi_hwere_to_save)
-    #
-    # for d in dict.keys():
-    #     if len(dict_ld[d]) == 4:
-    #         print("{0} : '{1}',".format(d, dict_ld[d][3]))
-
-    #
-    #
-    # im_se = nib.load('/Users/sebastiano/Desktop/sphdec/1201/segm/automatic/1201_S0_segm_IN_TEMPLATE.nii.gz')
-    #
-    # im = ldm.get_corresponding_rgb_image(im_se)
-    # nib.save(im, '/Users/sebastiano/Desktop/zzz_rgb.nii.gz')
-
-
-    pfi_descriptor = '/Users/sebastiano/Desktop/colour_label.txt'
-
-    ldm = LabelsDescriptorManager(pfi_descriptor, convention='fsl')
-
-    print ldm.get_dict_fsl()
-
-    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_fsl.txt')
-
-
-    pfi_descriptor = '/Users/sebastiano/Desktop/labels_descriptor.txt'
-
-    ldm = LabelsDescriptorManager(pfi_descriptor, convention='itk-snap')
-
-    print ldm._dict_label_descriptor
-
-    ldm._convention = 'fsl'
-
-    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_as_fsl.txt')
-
-'''
-# if '(' in args[2]:  # there is the abbreviation - it gets separated in a new args element:
-#     name = args[2].split('(')[0].strip()
-#     abbrev = args[2].split('(')[1].replace(')', '').strip()
-#     args[2] = name
-#     args += [abbrev]
-'''

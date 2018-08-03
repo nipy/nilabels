@@ -66,7 +66,7 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
 if __name__ == "__main__":
     # TODO move to examples:
     import nibabel as nib
-    from LABelsToolkit.tools.descriptions.manipulate_descriptors import LabelsDescriptorManager
+    from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
 
     pfi_segm = '/Users/sebastiano/Desktop/test_segmentation.nii.gz'
     pfi_ld = '/Users/sebastiano/Desktop/labels_descriptor.txt'
