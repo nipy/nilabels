@@ -7,7 +7,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.phantoms_generator.generate_simple_phantoms import generate_figures
-from LABelsToolkit.tools.aux_methods.utils_nib import replace_translational_part, remove_nan
+from LABelsToolkit.tools.aux_methods.utils_nib import replace_translational_part, remove_nan_from_im
 
 
 def test_adjust_nifti_replace_translational_part_F_F():
@@ -194,7 +194,7 @@ def test_remove_nan():
                          [16, np.nan, 18, 19],
                          [20, 21, 22, 23]]])
     im = nib.Nifti1Image(data_ts, np.eye(4))
-    im_no_nan = remove_nan(im)
+    im_no_nan = remove_nan_from_im(im)
 
     data_no = np.array([[[0, 1, 2, 3],
                          [4, 5, 0, 7],

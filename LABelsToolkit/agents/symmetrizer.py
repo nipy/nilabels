@@ -29,7 +29,7 @@ class LABelsToolkitSymmetrize(object):
         im_segm = nib.load(pfi_in)
         data_labels = im_segm.get_data()
         data_symmetrised = symmetrise_data(data_labels,
-                                           axis=axis,
+                                           axis_direction=axis,
                                            plane_intercept=plane_intercept,
                                            side_to_copy=side_to_copy,
                                            keep_in_data_dimensions=keep_in_data_dimensions)
@@ -85,7 +85,7 @@ class LABelsToolkitSymmetrize(object):
 
             im_labels = nib.load(input_im_path)
             data_labels = im_labels.get_data()
-            data_flipped = flip_data(data_labels, axis=axis)
+            data_flipped = flip_data(data_labels, axis_direction=axis)
 
             im_relabelled = set_new_data(im_labels, data_flipped)
             nib.save(im_relabelled, output_im_path)

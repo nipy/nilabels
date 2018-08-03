@@ -16,7 +16,6 @@ class LABelsToolkitIntensitiesManipulate(object):
     one or more input manipulate them according to some rule and save the
     output in the output_data_folder or in the specified paths.
     """
-
     def __init__(self, input_data_folder=None, output_data_folder=None, path_label_descriptor=None):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
@@ -48,9 +47,9 @@ class LABelsToolkitIntensitiesManipulate(object):
     def get_contour_from_segmentation(self, filename_input_segmentation, filename_output_contour,
                                       omit_axis=None, verbose=0):
         """
-        Get the contour from a segmentation
-        :param filename_input_segmentation:
-        :param filename_output_contour:
+        Get the contour from a segmentation.
+        :param filename_input_segmentation: input segmentation
+        :param filename_output_contour: output contour
         :param omit_axis: meant to avoid "walls" in the output segmentation
         :param verbose:
         :return:
@@ -66,11 +65,10 @@ class LABelsToolkitIntensitiesManipulate(object):
 
     def get_grafting(self, pfi_input_hosting_mould, pfi_input_patch, pfi_output_grafted, pfi_input_patch_mask=None):
         """
-
-        :param pfi_input_hosting_mould:
-        :param pfi_input_patch:
-        :param pfi_output_grafted:
-        :param pfi_input_patch_mask:
+        :param pfi_input_hosting_mould: base image where the grafting should happen
+        :param pfi_input_patch: patch to be grafted in the hosting_mould
+        :param pfi_output_grafted: output image with the grafting
+        :param pfi_input_patch_mask: optional additional mask, where the grafting will take place.
         :return:
         """
         pfi_hosting = connect_path_tail_head(self.pfo_in, pfi_input_hosting_mould)

@@ -163,9 +163,9 @@ def test_flip_data():
                               [4, 5, 6, 7],
                               [8, 9, 10, 11]]])
 
-    assert_array_equal(flip_data(cube_id, axis='x'), cube_flip_x)
-    assert_array_equal(flip_data(cube_id, axis='y'), cube_flip_y)
-    assert_array_equal(flip_data(cube_id, axis='z'), cube_flip_z)
+    assert_array_equal(flip_data(cube_id, axis_direction='x'), cube_flip_x)
+    assert_array_equal(flip_data(cube_id, axis_direction='y'), cube_flip_y)
+    assert_array_equal(flip_data(cube_id, axis_direction='z'), cube_flip_z)
 
 
 def test_symmetrise_data_():
@@ -214,9 +214,9 @@ def test_symmetrise_data_():
                                   [24, 25, 26, 27],
                                   [24, 25, 26, 27]]])
 
-    assert_array_equal(symmetrise_data(cube_id, axis='x', plane_intercept=2, side_to_copy='below', keep_in_data_dimensions=True), cube_sym_x2_ab_T)
-    assert_array_equal(symmetrise_data(cube_id, axis='x', plane_intercept=3, side_to_copy='below', keep_in_data_dimensions=False), cube_sym_x3_ab_F)
-    assert_array_equal(symmetrise_data(cube_id, axis='x', plane_intercept=3, side_to_copy='below', keep_in_data_dimensions=True), cube_sym_x3_ab_T)
+    assert_array_equal(symmetrise_data(cube_id, axis_direction='x', plane_intercept=2, side_to_copy='below', keep_in_data_dimensions=True), cube_sym_x2_ab_T)
+    assert_array_equal(symmetrise_data(cube_id, axis_direction='x', plane_intercept=3, side_to_copy='below', keep_in_data_dimensions=False), cube_sym_x3_ab_F)
+    assert_array_equal(symmetrise_data(cube_id, axis_direction='x', plane_intercept=3, side_to_copy='below', keep_in_data_dimensions=True), cube_sym_x3_ab_T)
 
 
 ''' From manipulations.cutter.py '''

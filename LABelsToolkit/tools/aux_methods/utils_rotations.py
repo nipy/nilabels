@@ -24,7 +24,13 @@ def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
 
 
 def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  translation=np.array([0, 0, 0])):
-
+    """
+    Exploit the fact that every rotation is uniquely defined by an angle and a rotation direction.
+    :param theta: rotation parameter
+    :param rotation_axis: rotation axis (3d vector)
+    :param translation: tranlsational part.
+    :return: the conventional nifti header roto-translational matrix [R | T; 0; 1].
+    """
     n = np.linalg.norm(rotation_axis)
     assert not np.abs(n) < 0.001, 'rotation axis too close to zero.'
     rot = rotation_axis / n
@@ -101,18 +107,24 @@ def axial_90_rotations(m, rot=1, ax=2):
     return m
 
 
-def flip_data(in_data, axis='x'):
+def flip_data(in_data, axis_direction='x'):
+    """
+    Flip an array along one dimension and respect to one orthogonal axis
+    :param in_data: input array
+    :param axis_direction: axis for the flipping
+    :return: in_data flipped respect to the axis_direction.
+    """
     msg = 'Input array must be 3-dimensional.'
     assert in_data.ndim == 3, msg
 
     msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-    assert axis in ['x', 'y', 'z'], msg
+    assert axis_direction in ['x', 'y', 'z'], msg
 
-    if axis == 'x':
+    if axis_direction == 'x':
         out_data = in_data[:, ::-1, :]
-    elif axis == 'y':
+    elif axis_direction == 'y':
         out_data = in_data[:, :, ::-1]
-    elif axis == 'z':
+    elif axis_direction == 'z':
         out_data = in_data[::-1, :, :]
     else:
         raise IOError
@@ -120,14 +132,14 @@ def flip_data(in_data, axis='x'):
     return out_data
 
 
-def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below', keep_in_data_dimensions=True):
+def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_copy='below', keep_in_data_dimensions=True):
     """
     Symmetrise the input_array according to the axial plane
       axis = plane_intercept
     the copied part can be 'below' or 'above' the axes, following the ordering.
 
     :param in_data: (Z, X, Y) C convention input data
-    :param axis:
+    :param axis_direction:
     :param plane_intercept:
     :param side_to_copy:
     :param keep_in_data_dimensions:
@@ -143,7 +155,7 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
     assert side_to_copy in ['below', 'above'], msg
 
     msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-    assert axis in ['x', 'y', 'z'], msg
+    assert axis_direction in ['x', 'y', 'z'], msg
 
     # step 1: find the block to symmetrise.
     # step 2: create the symmetric and glue it to the block.
@@ -151,7 +163,7 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
 
     out_data = 0
 
-    if axis == 'x':
+    if axis_direction == 'x':
 
         if side_to_copy == 'below':
             s_block = in_data[:, :plane_intercept, :]
@@ -163,7 +175,7 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
             s_block_symmetric = s_block[:, ::-1, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=1)
 
-    if axis == 'y':
+    if axis_direction == 'y':
 
         if side_to_copy == 'below':
             s_block = in_data[:, :, :plane_intercept]
@@ -175,7 +187,7 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
             s_block_symmetric = s_block[:, :, ::-1]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=2)
 
-    if axis == 'z':
+    if axis_direction == 'z':
 
         if side_to_copy == 'below':
             s_block = in_data[:plane_intercept, :, :]
@@ -195,10 +207,10 @@ def symmetrise_data(in_data, axis='x', plane_intercept=10, side_to_copy='below',
 
 def reorient_b_vect(pfi_input, pfi_output, transform, fmt='%.14f'):
     """
-
-    :param pfi_input:
-    :param pfi_output:
-    :param transform:
+    Reorient b-vectors of a DWI scan.
+    :param pfi_input: input to txt data with b-vectors column convention 'x y z \\'.
+    :param pfi_output: output b-vectors after transformation in a new .txt file.
+    :param transform: trasnformation applied to the vectors.
     :param fmt:
     :return:
     """

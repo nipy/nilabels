@@ -1,5 +1,6 @@
 import numpy as np
-from ..aux_methods.utils_nib import set_new_data
+
+from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 
 def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0):

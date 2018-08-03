@@ -77,21 +77,24 @@ def compare_two_nib(im1, im2):
 
                 if are_different:
                     images_are_equal = False
-                    msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name , hd1[k], im2_name, hd2[k])
+                    msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(
+                        k, im1_name , hd1[k], im2_name, hd2[k])
 
             elif not np.isnan(hd1[k]) and np.isnan(hd2[k]):
                 images_are_equal = False
-                msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(k, im1_name, hd1[k], im2_name, hd2[k])
+                msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(
+                    k, im1_name, hd1[k], im2_name, hd2[k])
 
     # Compare values and type:
     if not im1.get_data_dtype() == im2.get_data_dtype():
-        msg += 'Dtype are different consistent {0} {1} - {2} {3} \n'.format(im1_name, im1.get_data_dtype(), im2_name, im2.get_data_dtype())
+        msg += 'Dtype are different consistent {0} {1} - {2} {3} \n'.format(
+            im1_name, im1.get_data_dtype(), im2_name, im2.get_data_dtype())
         images_are_equal = False
     if not np.array_equal(im1.get_data(), im2.get_data()):
         msg += 'Data are different. \n'
         images_are_equal = False
         if np.array_equal(np.nan_to_num(im1.get_data()), np.nan_to_num(im2.get_data())):
-            msg += '(data are different only up to nans)'  # np.argwhere(np.isnan(im2.get_data())).shape[0]
+            msg += '(data are different only up to nans)'
     if not np.array_equal(im1.get_affine(), im2.get_affine()):
         msg += 'Affine transformations are different. \n'
         images_are_equal = False
@@ -200,13 +203,12 @@ def replace_translational_part(im_input, new_translation, q_form=True, s_form=Tr
     return im_out
 
 
-def remove_nan(im_input):
+def remove_nan_from_im(im_input):
     return set_new_data(im_input, np.nan_to_num(im_input.get_data()))
 
 
 def get_xyz_borders_of_a_label(segm_data, label):
     """
-
     :param segm_data:
     :param label:
     :return:
@@ -227,14 +229,3 @@ def images_are_overlapping(im1, im2):
     if np.array_equal(im1.affine, im2.affine):
         ans = False
     return ans
-
-# def set_new_header_description(im_input, new_header_description=''):
-#     """
-#     Update header description with the input new_header description
-#     :param im_input: nibabel image
-#     :param new_header_description: new intended header description. The current one is replaced.
-#     :return: nibabel image as the input with the header description updated.
-#     """
-#     im_input_header = im_input.header
-#     im_input_header['descrip'] = new_header_description
-#     return im_input

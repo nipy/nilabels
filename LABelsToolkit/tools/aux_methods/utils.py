@@ -7,7 +7,14 @@ import subprocess
 
 
 def lift_list(input_list):
-    # return sum(input_list, [])
+    """
+    List of nested lists becomes a list with the element exposed in the main list.
+    :param input_list: a list of lists.
+    :return: eliminates the first nesting levels of lists.
+    E.G.
+    >> lift_list([[1,2,3], [1,2], [4,5, 6], [3,4]])
+    [1, 2, 3, 1, 2, 4, 5, 6, 3, 4]
+    """
     return [val for sublist in input_list for val in sublist]
 
 
@@ -142,8 +149,10 @@ def triangular_density_function(x, a, mu, b):
 # --------- Pandas Utils ----------------
 
 def custom_dataframe_to_csv(df, pfi_where_to_save):
+    """
+    Used in some projects and left here, waiting to be erased.
+    """
     with open(pfi_where_to_save, "w") as text_file:
-
         header = ' , '
         for hd in list(df.columns):
             header += hd + ', '
