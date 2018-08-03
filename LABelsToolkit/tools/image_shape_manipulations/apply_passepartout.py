@@ -1,6 +1,3 @@
-import numpy as np
-import nibabel as nib
-
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, get_xyz_borders_of_a_label, images_are_overlapping
 
 

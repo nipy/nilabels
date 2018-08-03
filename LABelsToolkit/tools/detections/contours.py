@@ -4,22 +4,32 @@ from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 
 def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0):
+    """
+    Get the contour of a single label
+    :param im_arr: input array with segmentation
+    :param l: considered label
+    :param thr: threshold (default 0.3) increase to increase the contour.
+    :param omit_axis: a directional axis preference for the contour creation, to avoid "walls" when scrolling
+    the 3d image in a particular direction. None if no preference axis is expected.
+    :param verbose:
+    :return:
+    """
     if verbose > 0:
         print('eroding label {}'.format(l))
     array_label_l = im_arr == l
     assert isinstance(array_label_l, np.ndarray)
     gra = np.gradient(array_label_l.astype(np.bool).astype(np.float64))
     if omit_axis is None:
-        norm_gra = np.sqrt(gra[0] ** 2 + gra[1] ** 2 + gra[2] ** 2) > thr
+        thresholded_gra = np.sqrt(gra[0] ** 2 + gra[1] ** 2 + gra[2] ** 2) > thr
     elif omit_axis == 'x':
-        norm_gra = np.sqrt(gra[1] ** 2 + gra[2] ** 2) > thr
+        thresholded_gra = np.sqrt(gra[1] ** 2 + gra[2] ** 2) > thr
     elif omit_axis == 'y':
-        norm_gra = np.sqrt(gra[0] ** 2 + gra[2] ** 2) > thr
+        thresholded_gra = np.sqrt(gra[0] ** 2 + gra[2] ** 2) > thr
     elif omit_axis == 'z':
-        norm_gra = np.sqrt(gra[0] ** 2 + gra[1] ** 2) > thr
+        thresholded_gra = np.sqrt(gra[0] ** 2 + gra[1] ** 2) > thr
     else:
         raise IOError
-    return norm_gra
+    return thresholded_gra
 
 
 def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
@@ -27,8 +37,8 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
     From an input nibabel image segmentation, returns the contour of each segmented region with the original
     label.
     :param im_segm:
-    :param omit_axis: a directional axis of the segmentation will be not considered. This to avoid to have "walls"
-    when scrolling in one particular direction. Default None, can be otherwise 'x', 'y', 'z'.
+    :param omit_axis: a directional axis preference for the contour creation, to avoid "walls" when scrolling
+    the 3d image in a particular direction. None if no preference axis is expected.
     :param verbose: 0 no, 1 yes.
     :return: return the contour of the provided segmentation
     """

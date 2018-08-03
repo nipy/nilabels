@@ -99,7 +99,6 @@ def keep_only_one_label(in_data, label_to_keep):
 
 def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, axis, plane_intercept):
     """
-
     :param in_data:
     :param label_old:
     :param label_new:
