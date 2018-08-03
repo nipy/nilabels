@@ -6,6 +6,7 @@ from LABelsToolkit.tools.aux_methods.utils import labels_query
 from LABelsToolkit.tools.image_colors_manipulations.normaliser import normalise_below_labels
 from LABelsToolkit.tools.detections.contours import contour_from_segmentation
 from LABelsToolkit.tools.image_shape_manipulations.merger import grafting
+from LABelsToolkit.tools.image_colors_manipulations.cutter import apply_a_mask_nib
 
 
 class LABelsToolkitIntensitiesManipulate(object):
@@ -15,12 +16,13 @@ class LABelsToolkitIntensitiesManipulate(object):
     one or more input manipulate them according to some rule and save the
     output in the output_data_folder or in the specified paths.
     """
-    # TODO add filename for labels descriptors and manipulations of labels descriptors.
 
-    def __init__(self, input_data_folder=None, output_data_folder=None):
+    def __init__(self, input_data_folder=None, output_data_folder=None, path_label_descriptor=None):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
+        self.path_label_descriptor = path_label_descriptor
 
+    # TODO embed path label descriptors.
     def normalise_below_label(self, filename_image_in, filename_image_out, filename_segm, labels, stats=np.median):
         """
 
@@ -43,7 +45,8 @@ class LABelsToolkitIntensitiesManipulate(object):
 
         nib.save(im_out, pfi_out)
 
-    def get_contour_from_segmentation(self, filename_input_segmentation, filename_output_contour, omit_axis=None, verbose=0):
+    def get_contour_from_segmentation(self, filename_input_segmentation, filename_output_contour,
+                                      omit_axis=None, verbose=0):
         """
         Get the contour from a segmentation
         :param filename_input_segmentation:
@@ -53,7 +56,8 @@ class LABelsToolkitIntensitiesManipulate(object):
         :return:
         """
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_input_segmentation, filename_output_contour, self.pfo_in, self.pfo_out)
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_input_segmentation, filename_output_contour,
+                                             self.pfo_in, self.pfo_out)
         im_segm = nib.load(pfi_in)
 
         im_contour = contour_from_segmentation(im_segm, omit_axis=omit_axis, verbose=verbose)
@@ -85,3 +89,23 @@ class LABelsToolkitIntensitiesManipulate(object):
         pfi_output = connect_path_tail_head(self.pfo_out, pfi_output_grafted)
         nib.save(im_grafted, pfi_output)
 
+    def crop_outside_mask(self, filename_input_image, filename_mask, filename_output_image_masked):
+        """
+        Set to zero all the values outside the mask.
+        Adaptative - if the mask is 3D and the image is 4D, will create a temporary mask,
+        generate the stack of masks, and apply the stacks to the image.
+        :param filename_input_image: path to file 3d x T image
+        :param filename_mask: 3d mask same dimension as the 3d of the pfi_input
+        :param filename_output_image_masked: apply the mask to each time point T in the fourth dimension if any.
+        :return: None, it saves the output in pfi_output.
+        """
+        pfi_in, pfi_out = get_pfi_in_pfi_out(filename_input_image, filename_output_image_masked,
+                                             self.pfo_in, self.pfo_out)
+
+        pfi_mask = connect_path_tail_head(self.pfo_in, filename_mask)
+
+        im_in, im_mask = nib.load(pfi_in), nib.load(pfi_mask)
+        im_masked = apply_a_mask_nib(im_in, im_mask)
+
+        pfi_output = connect_path_tail_head(self.pfo_out, filename_output_image_masked)
+        nib.save(im_masked, pfi_output)
