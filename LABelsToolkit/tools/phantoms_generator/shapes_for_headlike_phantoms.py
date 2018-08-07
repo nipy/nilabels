@@ -29,13 +29,14 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     dd_sk = 2 * np.sqrt(omega[1] + skull_thickness ** 2)
 
     if random_perturbation > 0:
-        alpha = (0.05 * random_perturbation * np.random.randn() + alpha[0],  0.05 * random_perturbation * np.random.randn() + alpha[1])
+        alpha = (0.05 * random_perturbation * np.random.randn() + alpha[0],  0.05 * random_perturbation *
+                 np.random.randn() + alpha[1])
         epsilon = 0.01 * random_perturbation * np.random.randn()
         dd_gm = epsilon + 2 * np.sqrt(omega[1])
         dd_sk = epsilon + 2 * np.sqrt(omega[1] + skull_thickness ** 2)
 
     # omega centre
-    omega_c = [int(omega[k] / 2) for k in range(3)]
+    omega_c = [int(omega[j] / 2) for j in range(3)]
 
     print('- generate brain shape')
     sh_gm = oval_shape(omega, omega_c, foreground_intensity=1, alpha=alpha, dd=dd_gm)
@@ -79,7 +80,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
 
 if __name__ == '__main__':
 
-    omega = (70, 70, 70)
-    omega_c = [int(omega[k] / 2) for k in range(3)]
-    anatomy, segm = headlike_phantom(omega)
-    see_array(anatomy)
+    omega_ = (70, 70, 70)
+    omega_c_ = [int(omega_[k] / 2) for k in range(3)]
+    anatomy_, segm_ = headlike_phantom(omega_)
+    see_array(anatomy_)

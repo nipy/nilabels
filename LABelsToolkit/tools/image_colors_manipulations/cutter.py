@@ -11,9 +11,14 @@ def cut_4d_volume_with_a_1_slice_mask(data_4d, data_mask):
     :return:
     """
     assert data_4d.shape[:3] == data_mask.shape
-    data_masked_4d = np.zeros_like(data_4d)
-    for t in range(data_4d.shape[-1]):
-        data_masked_4d[..., t] = np.multiply(data_mask, data_4d[..., t])
+
+    if len(data_4d.shape) == 3:  # 4d data is actually a 3d data
+        data_masked_4d = np.multiply(data_mask, data_4d)
+    else:
+        data_masked_4d = np.zeros_like(data_4d)
+        for t in range(data_4d.shape[-1]):
+            data_masked_4d[..., t] = np.multiply(data_mask, data_4d[..., t])
+
     return data_masked_4d
 
 
