@@ -13,7 +13,6 @@ from LABelsToolkit.tools.aux_methods.morpological_operations import get_morpholo
 
 
 def test_get_morpological_patch():
-
     expected = np.ones([3, 3]).astype(np.bool)
     expected[0, 0] = False
     expected[0, 2] = False
@@ -53,7 +52,6 @@ def test_get_shell_for_given_radius():
 from LABelsToolkit.tools.aux_methods.sanity_checks import check_pfi_io
 
 def test_check_pfi_io():
-
     assert check_pfi_io(root_dir, None)
     assert check_pfi_io(root_dir, root_dir)
 
@@ -66,13 +64,11 @@ def test_check_pfi_io():
         check_pfi_io(root_dir, file_in_non_existing_folder)
 
 
-''' Test aux_methods.utils.py '''
+''' Test aux_methods.utils_nib.py '''
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
-# eliminates_consecutive_duplicates, binarise_a_matrix, get_values_below_label
 
 
 def test_set_new_data_simple_modifications():
-
     aff = np.eye(4); aff[2, 1] = 42.0
 
     im_0 = nib.Nifti1Image(np.zeros([3,3,3]), affine=aff)
@@ -92,21 +88,18 @@ def test_set_new_data_simple_modifications():
 
 
 def test_compare_two_nib_equals():
-
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     assert_equals(compare_two_nib(im_0, im_1), True)
 
 
 def test_compare_two_nib_different_nifti_version():
-
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti2Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     assert_equals(compare_two_nib(im_0, im_1), False)
 
 
 def test_compare_two_nib_different_affine():
-
     aff_1 = np.eye(4)
     aff_1[3,3] = 5
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
@@ -114,21 +107,65 @@ def test_compare_two_nib_different_affine():
     assert_equals(compare_two_nib(im_0, im_1), False)
 
 
-# def test_eliminates_consecutive_duplicates():
+''' Test tools.aux_methods.utils.py'''
+
+
+from LABelsToolkit.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
+
+
+def test_eliminates_consecutive_duplicates():
+    l_in, l_out = [0,0,0,1,1,2,3,4,5,5,5,6,7,8,9], range(10)
+    assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
+
+
+def test_lift_list_1():
+    l_in, l_out = [[0,1],2,3,[4,[5,6]],7,[8,[9]]], range(10)
+    assert_array_equal(lift_list(l_in), l_out)
+
+
+def test_lift_list_2():
+    l_in, l_out = [0,1,2,3,4,5,6,7,8,9], range(10)
+    assert_array_equal(lift_list(l_in), l_out)
+
+
+def test_lift_list_3():
+    l_in, l_out = [], []
+    assert_array_equal(lift_list(l_in), l_out)
+
+
+def test_labels_query_int_input():
+    lab, lab_names = labels_query(1)
+    assert_array_equal(lab, [1])
+    assert_array_equal(lab_names, ['1'])
+
+
+def test_labels_query_list_input1():
+    lab, lab_names = labels_query([1, 2, 3])
+    assert_array_equal(lab, [1, 2, 3])
+    assert_array_equal(lab_names, ['1', '2', '3'])
+
+
+def test_labels_query_list_input2():
+    lab, lab_names = labels_query([1, 2, 3, [4, 5, 6]])
+    assert_array_equal(lift_list(lab), lift_list([1, 2, 3, [4, 5, 6]]))
+    assert_array_equal(lab_names, ['1', '2', '3', '[4, 5, 6]'])
+
+
+def test_labels_query_all_or_tot_input():
+    v = np.arange(10).reshape(5, 2)
+    lab, lab_names = labels_query('all', v, remove_zero=False)
+    assert_array_equal(lab, np.arange(10))
+    assert_array_equal(lab_names, 'all')
+    lab, lab_names = labels_query('tot', v, remove_zero=False)
+    assert_array_equal(lab, np.arange(10))
+    assert_array_equal(lab_names, 'tot')
+    lab, lab_names = labels_query('tot', v, remove_zero=True)
+    assert_array_equal(lab, np.arange(10)[1:])
+    assert_array_equal(lab_names, 'tot')
+
+# def test_labels_query_label_descriptor_dict():
+#     pass
 #
-#     l_in = [0,0,0,1,1,2,3,4,5,5,5,6,7,8,9]
-#     l_out = range(10)
-#     assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
-
-
-# def test_get_values_below_label():
 #
-#     image = np.array(range(8 * 8)).reshape(8, 8)
-#     mask = np.zeros_like(image)
-#     mask[2, 2] = 1
-#     mask[2, 3] = 1
-#     mask[3, 2] = 1
-#     mask[3, 3] = 1
-#     vals = get_values_below_label(image, mask, 1)
-#     assert_array_equal([image[2, 2], image[2, 3], image[3, 2], image[3, 3]], vals)
-
+# def test_labels_query_path_to_label_descriptor():
+#     pass

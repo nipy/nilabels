@@ -12,10 +12,14 @@ def lift_list(input_list):
     :param input_list: a list of lists.
     :return: eliminates the first nesting levels of lists.
     E.G.
-    >> lift_list([[1,2,3], [1,2], [4,5, 6], [3,4]])
-    [1, 2, 3, 1, 2, 4, 5, 6, 3, 4]
+    >> lift_list([1, 2, [1,2,3], [1,2], [4,5, 6], [3,4]])
+    [1, 2, 1, 2, 3, 1, 2, 4, 5, 6, 3, 4]
     """
-    return [val for sublist in input_list for val in sublist]
+    if input_list == []:
+        return []
+    else:
+        return lift_list(input_list[0]) + (lift_list(input_list[1:]) if len(input_list) > 1 else []) \
+            if type(input_list) is list else [input_list]
 
 
 def eliminates_consecutive_duplicates(input_list):
@@ -27,7 +31,6 @@ def eliminates_consecutive_duplicates(input_list):
     for i in range(1, len(input_list)):
         if not input_list[i] == input_list[i-1]:
             output_list.append(input_list[i])
-
     return output_list
 
 
@@ -73,7 +76,7 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
 # ---------- Labels processors ---------------
 
 
-def labels_query(labels, segmentation_array=None):
+def labels_query(labels, segmentation_array=None, remove_zero=True):
     """
     labels_list can be a list or a list of lists in case some labels have to be considered together. labels_names
     :param labels: can be int, list, string as 'all' or 'tot', or a string containing a path to a .txt or a numpy array
@@ -86,7 +89,8 @@ def labels_query(labels, segmentation_array=None):
         labels = 'all'
 
     if isinstance(labels, int):
-        assert labels in segmentation_array
+        if segmentation_array is not None:
+            assert labels in segmentation_array
         labels_list = [labels, ]
     elif isinstance(labels, list):
         labels_list = labels
@@ -96,15 +100,18 @@ def labels_query(labels, segmentation_array=None):
         elif labels == 'tot' and segmentation_array is not None:
             labels_list = [list(np.sort(list(set(segmentation_array.astype(np.int).flat))))]
             if labels_list[0][0] == 0:
-                labels_list = [labels_list[0][1:]]  # remove zeros!
+                if remove_zero:
+                    labels_list = labels_list[0][1:]  # remove zeros!
+                else:
+                    labels_list = labels_list[0]
         elif os.path.exists(labels):
             if labels.endswith('.txt'):
                 labels_list = list(np.loadtxt(labels))
             else:
                 labels_list = list(np.load(labels))
         else:
-            raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
-                          "file with the labels.")
+            raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' (with "
+                          "segmentation array not set to none)) or the path to a file with the labels.")
     elif isinstance(labels, dict):
         # expected input is the output of manipulate_descriptor.get_multi_label_dict (keys are labels names id are
         # list of labels)
@@ -115,14 +122,12 @@ def labels_query(labels, segmentation_array=None):
                 labels_list.append(labels[k])
             else:
                 labels_list.append(labels[k][0])
-
     else:
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                       "file with the labels.")
-
     if not isinstance(labels, dict):
         if labels == 'all':
-            labels_names = 'all'
+            labels_names = 'all'  # swap label list with label name to remind that all the labels are considered.
         elif labels == 'tot':
             labels_names = 'tot'
         else:
@@ -144,26 +149,3 @@ def triangular_density_function(x, a, mu, b):
         return 2 * (b - x) / float((b - a) * (b - mu))
     else:
         return 0
-
-
-# --------- Pandas Utils ----------------
-
-def custom_dataframe_to_csv(df, pfi_where_to_save):
-    """
-    Used in some projects and left here, waiting to be erased.
-    """
-    with open(pfi_where_to_save, "w") as text_file:
-        header = ' , '
-        for hd in list(df.columns):
-            header += hd + ', '
-        text_file.write(header + '\n')
-        for i in df.index:
-            m = str(i).replace(',', ' ') + ', '
-            for c in df.columns:
-                if isinstance(df[c][i], str):
-                    m += df[c][i] + ', '
-                elif isinstance(df[c][i], list):
-                    m += str(df[c][i]).replace(',', ' ') + ', '
-                else:
-                    m += str(list(df[c][i])).replace('[', '').replace(']', '')
-            text_file.write(m +'\n')
