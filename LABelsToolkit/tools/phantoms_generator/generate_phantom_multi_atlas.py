@@ -25,6 +25,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     # B) Create modality and segmentation ground truth:
     intensities = (0.9, 0.3, 0.6, 0.8)
     omega = (80, 90, 80)
+    print('\n\nIn folder {}'.format(pfo_where_to_save_atlas))
     mod_gt, segm_gt = headlike_phantom(omega=omega, random_perturbation=randomness_shape, intensities=intensities)
 
     # B1) get roi mask (from the ground truth):

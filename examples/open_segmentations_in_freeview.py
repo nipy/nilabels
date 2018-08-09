@@ -1,13 +1,14 @@
 """
-Use ITK-snap and fls to obtain the surfaces and overlay the surface to the main image.
+Use ITK-snap, its labels_descriptor.txt and freeview to get the surfaces and overlay the surface to the main image
+directly in freeview with correct naming convention.
 """
 
 import os
-from os.path import join as jph
+
 from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
 
 
-def fsl_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, convention_descriptor='itk-snap',
+def freesurfer_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, convention_descriptor='itk-snap',
                           suffix_surf='surf', add_colors=True, labels_to_delineate='all'):
     """
     Manual step: from a segmentation export all the labels in stand-alone .stl files with ITK-snap, in a folder
@@ -44,6 +45,8 @@ def fsl_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, convent
 
 
 if __name__ == '__main__':
-    # TODO add an example from the ellipsoids.
-    pass
-
+    print('Step 0: create segmented atlas with phantom generator.')
+    print('Step 1: Manual step - open the segmentation in ITK-Snap and export all the surfaces in .stl in the '
+          'specified folder')
+    print('Step 2: run freesurfer_surface_overlayed')
+    # TODO

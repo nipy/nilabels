@@ -1,10 +1,7 @@
 import numpy as np
-
 from scipy import ndimage
 
-
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import oval_shape, sulci_structure, ellipsoid_shape
-from LABelsToolkit.tools.visualiser.see_volume import see_array
 
 
 def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), random_perturbation=.0):
@@ -76,11 +73,3 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
             np.place(anatomy, places, i)
 
     return anatomy, segm
-
-
-if __name__ == '__main__':
-
-    omega_ = (70, 70, 70)
-    omega_c_ = [int(omega_[k] / 2) for k in range(3)]
-    anatomy_, segm_ = headlike_phantom(omega_)
-    see_array(anatomy_)
