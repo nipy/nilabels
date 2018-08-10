@@ -9,7 +9,7 @@ from LABelsToolkit.agents.propagator import LABelsToolkitPropagate
 from LABelsToolkit.agents.symmetrizer import LABelsToolkitSymmetrize
 from LABelsToolkit.agents.checker import LABelsToolkitChecker
 from LABelsToolkit.agents.header_controller import LABelsToolkitHeaderController
-
+from LABelsToolkit.tools.icv.icv_estimator import ICV_estimator
 
 class LABelsToolkit(object):
 
@@ -51,3 +51,4 @@ class LABelsToolkit(object):
         self.symmetrize             = LABelsToolkitSymmetrize(self._pfo_in, self._pfo_out)
         self.check                  = LABelsToolkitChecker(self._pfo_in, self._pfo_out)
         self.header                 = LABelsToolkitHeaderController(self._pfo_in, self._pfo_out)
+        self.icv                    = ICV_estimator

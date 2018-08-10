@@ -21,10 +21,10 @@ class LABelsToolkitMeasure(object):
     """.format(definition_label)
 
     def __init__(self, input_data_folder=None, output_data_folder=None, return_mm3=True, verbose=0):
-        self.pfo_in = input_data_folder
-        self.pfo_out = output_data_folder
+        self.pfo_in     = input_data_folder
+        self.pfo_out    = output_data_folder
         self.return_mm3 = return_mm3
-        self.verbose = verbose
+        self.verbose    = verbose
 
     def volume(self, segmentation_filename, labels=None, tot_volume_prior=None, where_to_save=None):
         """
@@ -35,30 +35,23 @@ class LABelsToolkitMeasure(object):
         :return:
         """
         pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
-        assert os.path.exists(pfi_segm)
+        assert os.path.exists(pfi_segm), pfi_segm
         im_segm = nib.load(pfi_segm)
-
         labels_list, labels_names = labels_query(labels, im_segm.get_data())
-
         df_volumes_per_label = get_volumes_per_label(im_segm, labels=labels_list, labels_names=labels_names,
                                                      tot_volume_prior=tot_volume_prior, verbose=self.verbose)
-
         if self.verbose > 0:
             print(df_volumes_per_label)
-
         if where_to_save is not None:
             pfi_output_table = connect_path_tail_head(self.pfo_out, where_to_save)
             df_volumes_per_label.to_pickle(pfi_output_table)
-
         return df_volumes_per_label
 
     def get_total_volume(self, segmentation_filename):
-
         return self.volume(segmentation_filename, labels='tot')
 
     def values_below_labels(self, segmentation_filename, anatomy_filename, labels=None):
         """
-
         :param segmentation_filename:
         :param anatomy_filename:
         :param labels:
@@ -66,17 +59,13 @@ class LABelsToolkitMeasure(object):
         """
         pfi_anat = connect_path_tail_head(self.pfo_in, anatomy_filename)
         pfi_segm = connect_path_tail_head(self.pfo_in, segmentation_filename)
-
         assert os.path.exists(pfi_anat)
-        im_anat = nib.load(pfi_anat)
-
         assert os.path.exists(pfi_segm)
+        im_anat = nib.load(pfi_anat)
         im_segm = nib.load(pfi_segm)
 
         labels_list, labels_names = labels_query(labels, segmentation_array=im_segm.get_data())
-
         labels_values = get_values_below_labels_list(im_segm, im_anat, labels_list)
-
         return pa.Series(labels_values, index=labels_names)
 
     def dist(self, segm_1_filename, segm_2_filename, labels_list=None, labels_names=None,
@@ -85,7 +74,6 @@ class LABelsToolkitMeasure(object):
 
         pfi_segm1 = connect_path_tail_head(self.pfo_in, segm_1_filename)
         pfi_segm2 = connect_path_tail_head(self.pfo_in, segm_2_filename)
-
         assert os.path.exists(pfi_segm1), pfi_segm1
         assert os.path.exists(pfi_segm2), pfi_segm2
 

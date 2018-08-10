@@ -3,18 +3,21 @@ from os.path import join as jph
 import nibabel as nib
 import numpy as np
 
-from generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
+from examples.generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
 from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.main import LABelsToolkit
+from LABelsToolkit.tools.icv.icv_estimator import ICV_estimator
+
 
 if __name__ == '__main__':
 
-    controller = {'Get_initial_data'      : True,
-                  'Create_data_folders'   : True,
-                  'Compute_groud_icv'     : True,
-                  'Icv_estimation_transf' : True,
-                  'Icv_estimation'        : True,
-                  'Compare_output'        : True}
+    controller = {'Get_initial_data'                   : False,
+                  'Create_data_folders'                : False,
+                  'Compute_groud_icv_and_m'            : False,
+                  'Icv_estimation_transf'              : True,
+                  'Estimate_m_and_compare_with_ground' : False,
+                  'Icv_estimation'                     : True,
+                  'Compare_output'                     : True}
 
     num_subjects = 7
 
@@ -24,7 +27,7 @@ if __name__ == '__main__':
     pfo_icv_estimation     = jph(pfo_examples, 'icv_benchmarking')
     pfo_icv_brains         = jph(pfo_icv_estimation, 'brains')
     pfo_icv_segmentations  = jph(pfo_icv_estimation, 'segm')
-    pfo_intermediate       = jph(pfo_icv_estimation, 'intermediate')
+    pfo_output             = jph(pfo_icv_estimation, 'output')
 
     if controller['Get_initial_data']:
         if not os.path.exists(pfo_dummy_multi_atlas):
@@ -35,9 +38,9 @@ if __name__ == '__main__':
         # multi atlas created above.
         os.system('mkdir -p {}'.format(pfo_icv_brains))
         os.system('mkdir -p {}'.format(pfo_icv_segmentations))
-        os.system('mkdir -p {}'.format(pfo_intermediate))
+        os.system('mkdir -p {}'.format(pfo_output))
 
-        for j in range(num_subjects):
+        for j in range(1, num_subjects + 1):
             pfi_dummy_atlas = jph(pfo_dummy_multi_atlas, 'e00{}'.format(j))
             pfi_modGT  = jph(pfi_dummy_atlas, 'mod', 'e00{}_modGT.nii.gz'.format(j) )
             pfi_segmGT = jph(pfi_dummy_atlas, 'segm', 'e00{}_segmGT.nii.gz'.format(j))
@@ -48,27 +51,50 @@ if __name__ == '__main__':
             os.system('cp {} {}'.format(pfi_modGT, pfi_modGT_new))
             os.system('cp {} {}'.format(pfi_segmGT, pfi_segmGT_new))
 
-    if controller['Compute_groud_icv']:
-        # Compute the ground truth icv (up to discretisation)
-        v_tilda = np.zeros(num_subjects, dtype=np.float)
-        lab = LABelsToolkit()
+    list_pfi_sj      = [jph(pfo_icv_brains, 'e00{}_modGT.nii.gz'.format(j + 1)) for j in range(num_subjects)]
+    list_pfi_sj_segm = [jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j + 1)) for j in range(num_subjects)]
 
-        for j in range(num_subjects):
+    if controller['Compute_groud_icv_and_m']:
+        # Compute the ground truth icv (up to discretisation
+        os.system('mkdir -p {}'.format(pfo_output))
+        v_hat = np.zeros(num_subjects, dtype=np.float)
+        lab = LABelsToolkit()
+        for j in range(1, num_subjects + 1):
             pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
             df_vols = lab.measure.volume(pfi_segmGT, labels=[1, ])
-
-            v_tilda[j] = ''
-
-
+            v_hat[j-1] = df_vols['Volume'][0]
+            print('Subject {}, volume: {}'.format(j, v_hat[j-1]))
+        np.savetxt(jph(pfo_output, 'v_hat.txt'), v_hat, fmt='%10.1f')
+        print('Average volume {}'.format(np.mean(v_hat)))
+        np.savetxt(jph(pfo_output, 'm.txt'), [np.mean(v_hat)], fmt='%10.1f')
 
     if controller['Icv_estimation_transf']:
-        # Estimate the icv with our method.
-        v = ''
+        # compute transformations and S matrix
+        lab = LABelsToolkit()
+        icv_estimator = lab.icv(list_pfi_sj, pfo_output)
+        # icv_estimator.generate_transformations()
+        icv_estimator.compute_S()
+        np.savetxt(jph(pfo_output, 'S.txt'), icv_estimator.S, fmt='%5.5f')
+        del lab, icv_estimator
+
+    if controller['Estimate_m_and_compare_with_ground']:
+        lab = LABelsToolkit()
+        icv_estimator = lab.icv(list_pfi_sj, pfo_output)
+        icv_estimator.compute_m_from_list_masks(list_pfi_sj_segm, correction_volume_estimate=0)
+        print('Average volume estimated {}'.format(icv_estimator.m))
 
     if controller['Icv_estimation']:
-        # Compare ground truth and estimated ground truth.
-        pass
+        # Estimate the icv with our method.
+        m = np.loadtxt(jph(pfo_output, 'm.txt'))
+        S = np.loadtxt(jph(pfo_output, 'S.txt'))
+        lab = LABelsToolkit()
+        icv_estimator = lab.icv(list_pfi_sj, pfo_output, m=m, S=S)
+        v_est = icv_estimator.estimate_icv()
+        np.savetxt(jph(pfo_output, 'v_est.txt'), v_est, fmt='%8.10f')
 
     if controller['Compare_output']:
         # Compare ground truth and estimated ground truth.
-        pass
+        v_tilda = np.loadtxt(jph(pfo_output, 'v_tilda.txt'))
+        v_est   = np.loadtxt(jph(pfo_output, 'v_est.txt'))
+        print(v_tilda)
+        print(v_est)

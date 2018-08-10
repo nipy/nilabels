@@ -14,15 +14,26 @@ from LABelsToolkit.tools.aux_methods.utils import print_and_run
 class ICV_estimator(object):
     """
     ICV estimation as in
+
     Iglesias JE, Ferraris S, Modat M, Gsell W, Deprest J, van der Merwe JL, Vercauteren T: "Template-free estimation of
     intracranial volume: a preterm birth animal model study", MICCAI workshop: Fetal and Infant Image Analysis, 2017.
     Please see the paper as code documentation and nomenclature.
     Note: paper results were not produced with this code.
+
+    # Steps:
+    > To compute the adjacency matrix, run self.generate_transformations() and then self.compute_S().
+    > To change the graph connectivity matrix, modify the graph connection parameter before
+     running self.compute_S.
+    > if m (expected mean of the estimated icv) is known set it up with self.m = ...
+    > If m is not know a priori but you have some way of initialise a brain mask, run it with
+    self.compute_m_from_list_masks(), correcting with its parameter correction_volume_estimate.
+    > Get the vector of icvs with the function self.icv_estimator().
+
     """
-    def __init__(self, pfi_list_subjects_to_coregister, pfo_output, S=None, m=None,
-                      n=0.001, a=0.001, b=0.1, alpha=0.001, beta=0.1):
+    def __init__(self, list_pfi_subjects_to_coregister, pfo_output, S=None, m=None,
+                 n=0.001, a=0.001, b=0.1, alpha=0.001, beta=0.1):
         """
-        :param pfi_list_subjects_to_coregister: list of path to nifti image with anatomies whose icv has to be
+        :param list_pfi_subjects_to_coregister: list of path to nifti image with anatomies whose icv has to be
         estimated.  The folder must contain only these files in .nii or .nii.gz format.
         :param pfo_output: path to folder where output files are stored.
         :param S: Adjacency matrix for the connections between co-registered brains.
@@ -37,20 +48,14 @@ class ICV_estimator(object):
         computed to get S.
         :param beta: second hyperparameter of the hidden c, modeled with a Laplacian(alpha, beta).
         ---
-        # Steps:
-        > To compute the adjacency matrix, run self.generate_transformations() and then self.compute_S().
-        > To change the graph connectivity matrix, modify the graph connection parameter before
-         running self.compute_S.
-        > if m (expected mean of the estimated icv) is known set it up with self.m = ...
-        > If m is not know a priori but you have some way of initialise a brain mask, run it with
-        self.compute_m_from_list_masks(), correcting with its parameter correction_volume_estimate.
-        > Get the vector of icvs with the function self.icv_estimator().
+
         """
         # Input subjects
-        self.pfi_list_subjects_to_coregister = pfi_list_subjects_to_coregister
+        self.pfi_list_subjects_to_coregister = list_pfi_subjects_to_coregister
         self.pfo_output = pfo_output
-        self.num_subjects = len(pfi_list_subjects_to_coregister)
-        self.subjects_id = [os.path.dirname(p).split('.')[0] for p in pfi_list_subjects_to_coregister]
+        self.num_subjects = len(list_pfi_subjects_to_coregister)
+        self.subjects_id = [os.path.basename(s).split('.')[0] for s in self.pfi_list_subjects_to_coregister
+                            if (s.endswith('.nii') or s.endswith('.nii.gz'))]
         # Optimisation function parameters
         self.S = S
         self.m = m
@@ -64,40 +69,22 @@ class ICV_estimator(object):
         # Folder structure
         self.pfo_warped = jph(self.pfo_output, 'warped')
         self.pfo_transformations = jph(self.pfo_output, 'transformations')
-        # Run initialisations and sanity check:
-        self.__initialise_list_id__()
-
-    def __initialise_list_id__(self):
-        self.subjects_id = [os.path.dirname(s).split('.')[0]
-                            for s in self.pfi_list_subjects_to_coregister
-                            if (s.endswith('.nii') or s.endswith('.nii.gz'))]
 
     def generate_transformations(self):
 
         cmd_1 = 'mkdir -p {0} '.format(self.pfo_warped)
         cmd_2 = 'mkdir -p {0} '.format(self.pfo_transformations)
-
         print_and_run(cmd_1)
         print_and_run(cmd_2)
 
-        for i in [c[0] for c in self.graph_connections]:
-            for j in [c[1] for c in self.graph_connections]:
-                fname_i_j = self.subjects_id[i] + '_' + self.subjects_id[j]
-                fname_j_i = self.subjects_id[j] + '_' + self.subjects_id[i]
-                pfi_aff_i_j = jph(self.pfo_transformations, fname_i_j + '.txt')
-                pfi_res_i_j = jph(self.pfo_warped, fname_i_j + '.nii.gz')
-                pfi_aff_j_i = jph(self.pfo_transformations, fname_j_i + '.txt')
-                pfi_res_j_i = jph(self.pfo_warped, fname_j_i + '.nii.gz')
-
-                cmd_reg_i_j = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3} -speeeeed '.format(
-                            self.pfi_list_subjects_to_coregister[i], self.pfi_list_subjects_to_coregister[j],
-                            pfi_aff_i_j, pfi_res_i_j)
-                cmd_reg_j_i = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3} -speeeeed '.format(
-                            self.pfi_list_subjects_to_coregister[j], self.pfi_list_subjects_to_coregister[i],
-                            pfi_aff_j_i, pfi_res_j_i)
-
-                print_and_run(cmd_reg_i_j)
-                print_and_run(cmd_reg_j_i)
+        for i, j in self.graph_connections:
+            fname_i_j = self.subjects_id[i] + '_' + self.subjects_id[j]
+            pfi_aff_i_j = jph(self.pfo_transformations, fname_i_j + '.txt')
+            pfi_res_i_j = jph(self.pfo_warped, fname_i_j + '.nii.gz')
+            cmd_reg_i_j = 'reg_aladin -ref {0} -flo {1} -aff {2} -res {3} -speeeeed '.format(
+                        self.pfi_list_subjects_to_coregister[i], self.pfi_list_subjects_to_coregister[j],
+                        pfi_aff_i_j, pfi_res_i_j)
+            print_and_run(cmd_reg_i_j)
 
     def compute_S(self):
         """
@@ -105,24 +92,16 @@ class ICV_estimator(object):
         run after self.generate_transformations()
         :return: fills the class variable self.S.
         """
-
         if not os.path.exists(self.pfo_transformations):
             msg = "Folder {} not created. Did you run generate_transformations first?".format(self.pfo_transformations)
             raise IOError(msg)
-
-        S = np.zeros(2, 2)
-
+        S = np.zeros([self.num_subjects, self.num_subjects])
         for i in range(self.num_subjects):
             for j in range(i+1, self.num_subjects):
-
                 pfi_aff_i_j = jph(self.pfo_transformations,
                                   self.subjects_id[i] + '_' + self.subjects_id[j] + '.txt')
-                pfi_aff_j_i = jph(self.pfo_transformations,
-                                  self.subjects_id[j] + '_' + self.subjects_id[i] + '.txt')
-
-                S[i, j] = np.linalg.det(np.loadtxt(pfi_aff_i_j))
-                S[j, i] = np.linalg.det(np.loadtxt(pfi_aff_j_i))
-
+                S[i, j] = np.log(np.linalg.det(np.loadtxt(pfi_aff_i_j)))
+                S[j, i] = -1 * S[i, j]
         self.S = S
 
     def compute_m_from_list_masks(self, pfi_list_brain_masks, correction_volume_estimate=0.05):
@@ -146,22 +125,17 @@ class ICV_estimator(object):
         print('Estimate of mean volume: {}'.format(mean_vol_estimate))
         self.m = mean_vol_estimate
 
-    def icv_estimator(self):
+    def estimate_icv(self):
         """
         Core method to estimate the icv.
         :return: estimate of the icv for each brain.
         """
-
         assert self.S.shape[0] == self.S.shape[1]
-
         if self.m is None:
             raise IOError('Please provide an estimate for the hyperparameter self.m .')
 
-
-        log_estimate_v = self.m * np.ones(self.S.shape[0], dtype=np.float64)
-
-        def cost(v, S, m, n, a, b, alpha, beta):
-
+        log_estimate_v = np.log(self.m * np.ones(self.S.shape[0], dtype=np.float64))
+        def cost(v, S=self.S, m=self.m, n=self.n, a=self.a, b=self.b, alpha=self.alpha, beta=self.beta):
             sum_abs_log_diff = 0
             for i in range(len(v)):
                 for j in range(i+1, len(v)):
@@ -172,11 +146,10 @@ class ICV_estimator(object):
             a1 = alpha + np.linalg.det(S)
             a2 = np.log(beta + sum_abs_log_diff)
             a3 = (2 * a + N) / float(2)
-            a4 = np.log(b + 0.5 * np.sum([(v_i + mean_v) ** 2 for v_i in list(v)]) +
-                        (N * n * (mean_v - m) ** 2) / (2 * (N + n)))
+            a4 = np.log(b + 0.5 * np.sum((v + mean_v) ** 2) + (N * n * (mean_v - np.log(m)) ** 2) / (2 * (N + n)))
             return a1 * a2 + a3 * a4
 
-        init_values = np.array([log_estimate_v, self.S, self.m, self.n, self.a, self.b, self.alpha, self.beta])
-        log_answer = minimize(cost, init_values, method='trust-ncg', tol=1e-6)
-
-        return np.exp(log_answer)
+        init_values = log_estimate_v
+        ans = minimize(cost, init_values)
+        print ans
+        return ans.x

@@ -25,7 +25,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     # B) Create modality and segmentation ground truth:
     intensities = (0.9, 0.3, 0.6, 0.8)
     omega = (80, 90, 80)
-    print('\n\nIn folder {}'.format(pfo_where_to_save_atlas))
+    print('In folder {}'.format(pfo_where_to_save_atlas))
     mod_gt, segm_gt = headlike_phantom(omega=omega, random_perturbation=randomness_shape, intensities=intensities)
 
     # B1) get roi mask (from the ground truth):
@@ -100,7 +100,7 @@ def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_o
     print_and_run('mkdir {}'.format(pfo_where_to_create_the_multi_atlas))
     for sj in range(number_of_subjects):
         sj_name = multi_atlas_root_name + str(sj + 1).zfill(len(str(number_of_subjects)) + 1)
-        print('Creating atlas {0} ({1}/{2})'.format(sj_name, sj+1, number_of_subjects))
+        print('\n\nCreating atlas {0} ({1}/{2})'.format(sj_name, sj+1, number_of_subjects))
         print_and_run('mkdir {}'.format(jph(pfo_where_to_create_the_multi_atlas, sj_name)))
         generate_atlas_at_folder(jph(pfo_where_to_create_the_multi_atlas, sj_name), atlas_name=sj_name,
                                  randomness_shape=randomness_shape, randomness_noise=randomness_noise)

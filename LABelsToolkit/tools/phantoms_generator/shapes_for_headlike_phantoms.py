@@ -11,7 +11,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     :param random_perturbation: value between 0 and 1 providing the level of randomness.
     :return:
     """
-    print('Creating headlike phantom')
+    print('Creating headlike phantom:')
 
     for d in omega:
         assert d > 69, 'Omega must be at least (70, 70, 70) to contain a head-like phantom'
