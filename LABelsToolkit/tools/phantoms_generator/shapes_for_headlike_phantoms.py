@@ -15,7 +15,6 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
 
     for d in omega:
         assert d > 69, 'Omega must be at least (70, 70, 70) to contain a head-like phantom'
-
     # Parameters
     skull_thickness = 3
     wm_spacing = 2
@@ -34,13 +33,10 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
 
     # omega centre
     omega_c = [int(omega[j] / 2) for j in range(3)]
-
     print('- generate brain shape')
     sh_gm = oval_shape(omega, omega_c, foreground_intensity=1, alpha=alpha, dd=dd_gm)
-
     print('- generate skull')
     sh_sk = oval_shape(omega, omega_c, foreground_intensity=1, alpha=alpha, dd=dd_sk)
-
     print('- generate wm')
     # erode brain to get an initial wm-like structure
     struct = ndimage.morphology.generate_binary_structure(3, 2)
@@ -49,7 +45,6 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     # smoothing and then re-take the smoothed as binary.
     sc = sulci_structure(omega, omega_c, foreground_intensity=1, a_b_c=None, dd=None, alpha=alpha,
                          random_perturbation=0.1 * random_perturbation)
-
     sh_wm = sh_wm.astype(np.bool) ^ sc.astype(np.bool) * sh_wm.astype(np.bool)
 
     print('- generate csf')
@@ -59,7 +54,6 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     d = 1.2 * np.linalg.norm(f1 - f21)
     csf = ellipsoid_shape(omega, f1, f21, d, background_intensity=0, foreground_intensity=1)
     csf += ellipsoid_shape(omega, f1, f22, d, background_intensity=0, foreground_intensity=1)
-
     csf = csf.astype(np.bool)
 
     # ground truth segmentation:

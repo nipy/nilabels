@@ -16,16 +16,42 @@ class ICV_estimator(object):
     ICV estimation as in
     Iglesias JE, Ferraris S, Modat M, Gsell W, Deprest J, van der Merwe JL, Vercauteren T: "Template-free estimation of
     intracranial volume: a preterm birth animal model study", MICCAI workshop: Fetal and Infant Image Analysis, 2017.
-    Note: not the same code used to produce the paper
+    Please see the paper as code documentation and nomenclature.
+    Note: paper results were not produced with this code.
     """
     def __init__(self, pfi_list_subjects_to_coregister, pfo_output, S=None, m=None,
                       n=0.001, a=0.001, b=0.1, alpha=0.001, beta=0.1):
-        # input subjects
+        """
+        :param pfi_list_subjects_to_coregister: list of path to nifti image with anatomies whose icv has to be
+        estimated.  The folder must contain only these files in .nii or .nii.gz format.
+        :param pfo_output: path to folder where output files are stored.
+        :param S: Adjacency matrix for the connections between co-registered brains.
+        The matrix S is computed with the class method compute_S, according to the connections specified by
+         the class variable graph_connections (complete graph by default), and it may take some time.
+        :param m: mean hyperparameter of the nomal distribution of the hidden mu, mean of the gaussian distribution
+        modeling the  icv. Its standard deviation is the hidden sigma^2.
+        :param n: ratio of the hyperparameter sigma^2 of the normal distribution of mu.
+        :param a: hyperparameter of sigma^2.
+        :param b: hyperparameter of sigma^2, modeled with an InverseGamma(a,b)
+        :param alpha: hyperparameter of the hidden c, parameter of the Laplacian error of the log-transformation
+        computed to get S.
+        :param beta: second hyperparameter of the hidden c, modeled with a Laplacian(alpha, beta).
+        ---
+        # Steps:
+        > To compute the adjacency matrix, run self.generate_transformations() and then self.compute_S().
+        > To change the graph connectivity matrix, modify the graph connection parameter before
+         running self.compute_S.
+        > if m (expected mean of the estimated icv) is known set it up with self.m = ...
+        > If m is not know a priori but you have some way of initialise a brain mask, run it with
+        self.compute_m_from_list_masks(), correcting with its parameter correction_volume_estimate.
+        > Get the vector of icvs with the function self.icv_estimator().
+        """
+        # Input subjects
         self.pfi_list_subjects_to_coregister = pfi_list_subjects_to_coregister
         self.pfo_output = pfo_output
         self.num_subjects = len(pfi_list_subjects_to_coregister)
-        self.subjects_id = None
-        # optimisation function parameters
+        self.subjects_id = [os.path.dirname(p).split('.')[0] for p in pfi_list_subjects_to_coregister]
+        # Optimisation function parameters
         self.S = S
         self.m = m
         self.n = n
@@ -33,12 +59,12 @@ class ICV_estimator(object):
         self.b = b
         self.alpha = alpha
         self.beta = beta
-        # graph connection is complete by default. Have to edit this directly.
+        # Graph connection - it is complete by default.
         self.graph_connections = [[i, j] for i in range(self.num_subjects) for j in range(i+1, self.num_subjects)]
-        # folder structure
+        # Folder structure
         self.pfo_warped = jph(self.pfo_output, 'warped')
         self.pfo_transformations = jph(self.pfo_output, 'transformations')
-        # run initialisations
+        # Run initialisations and sanity check:
         self.__initialise_list_id__()
 
     def __initialise_list_id__(self):
@@ -74,6 +100,11 @@ class ICV_estimator(object):
                 print_and_run(cmd_reg_j_i)
 
     def compute_S(self):
+        """
+        Method to compute the matrix S.
+        run after self.generate_transformations()
+        :return: fills the class variable self.S.
+        """
 
         if not os.path.exists(self.pfo_transformations):
             msg = "Folder {} not created. Did you run generate_transformations first?".format(self.pfo_transformations)
@@ -94,22 +125,38 @@ class ICV_estimator(object):
 
         self.S = S
 
-    def compute_m_from_list_masks(self, pfi_list_brain_masks, increase_volume_estimate=0.05):
-        # compute m from a list of propagated segmentation of the brain.
-        # the icv is the mean volume of some propagated segmentation, whose path is stored in the list
-        # pfi_list_brain_mask
+    def compute_m_from_list_masks(self, pfi_list_brain_masks, correction_volume_estimate=0.05):
+        """
+        Estimate the hyperparameter m from a list of propagated segmentation of the brain.
+        the icv is the mean volume of some propagated segmentation, whose path is stored in the list
+        pfi_list_brain_mask. If propagated segmentations are not available, use instead the
+        estimated brain volume from literature for the animal considered.
+        :param pfi_list_brain_masks: list of path to file where to find the initial mask.
+        :param correction_volume_estimate: epsilon that engineers likes to add when not confident about their
+        computations.
+        :return: fills the class variable self.m.
+        """
         sum_vol = 0.
         for p in pfi_list_brain_masks:
             im_nib = nib.load(p)
             one_voxel_volume = np.round(np.abs(np.prod(np.diag(im_nib.get_affine()))), decimals=6)  # (in mm)
             sum_vol += np.count_nonzero(im_nib.get_data()) * one_voxel_volume
 
-        mean_vol_estimate = (sum_vol / float(len(pfi_list_brain_masks))) * (1 + increase_volume_estimate)
+        mean_vol_estimate = (sum_vol / float(len(pfi_list_brain_masks))) * (1 + correction_volume_estimate)
+        print('Estimate of mean volume: {}'.format(mean_vol_estimate))
         self.m = mean_vol_estimate
 
     def icv_estimator(self):
+        """
+        Core method to estimate the icv.
+        :return: estimate of the icv for each brain.
+        """
 
         assert self.S.shape[0] == self.S.shape[1]
+
+        if self.m is None:
+            raise IOError('Please provide an estimate for the hyperparameter self.m .')
+
 
         log_estimate_v = self.m * np.ones(self.S.shape[0], dtype=np.float64)
 

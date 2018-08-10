@@ -21,20 +21,20 @@ def example_generate_atlas_at_specified_folder():
     pfo_target_atlas = jph(pfo_examples, 'dummy_target')
     os.system('mkdir -p {}'.format(pfo_target_atlas))
     generate_atlas_at_folder(pfo_target_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4)
-    print('look under {}'.format(pfo_target_atlas))
+    print('Please look under {}'.format(pfo_target_atlas))
 
 
-def example_generate_multi_atlas_at_specified_folder():
+def example_generate_multi_atlas_at_specified_folder(n=10):
     print('Example generation of a multi-atlas')
     pfo_examples = jph(root_dir, 'data_examples')
-    pfo_multi_atlas = jph(pfo_examples, 'dummy_template')
+    pfo_multi_atlas = jph(pfo_examples, 'dummy_multi_atlas')
     os.system('mkdir -p {}'.format(pfo_multi_atlas))
-    generate_multi_atlas_at_folder(pfo_multi_atlas, number_of_subjects=10,
+    generate_multi_atlas_at_folder(pfo_multi_atlas, number_of_subjects=n,
                                    multi_atlas_root_name='e', randomness_shape=0.3, randomness_noise=0.4)
-    print('look under {}'.format(pfo_multi_atlas))
+    print('Please look under {}'.format(pfo_multi_atlas))
 
 
 if __name__ == '__main__':
-    # example_generate_and_visualise_headlike()
+    example_generate_and_visualise_headlike()
     example_generate_atlas_at_specified_folder()
     example_generate_multi_atlas_at_specified_folder()
