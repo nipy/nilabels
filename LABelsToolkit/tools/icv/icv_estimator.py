@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 
 
-# WARNING: to be tested! Ab-normal. Do not use this Brain
+# testing in progress
 
 
 class ICV_estimator(object):
@@ -95,7 +95,9 @@ class ICV_estimator(object):
         if not os.path.exists(self.pfo_transformations):
             msg = "Folder {} not created. Did you run generate_transformations first?".format(self.pfo_transformations)
             raise IOError(msg)
-        S = np.zeros([self.num_subjects, self.num_subjects])
+        S = np.nan * np.zeros([self.num_subjects, self.num_subjects])
+        for i in range(self.num_subjects):
+            S[i, i] = 0
         for i in range(self.num_subjects):
             for j in range(i+1, self.num_subjects):
                 pfi_aff_i_j = jph(self.pfo_transformations,
@@ -122,7 +124,7 @@ class ICV_estimator(object):
             sum_vol += np.count_nonzero(im_nib.get_data()) * one_voxel_volume
 
         mean_vol_estimate = (sum_vol / float(len(pfi_list_brain_masks))) * (1 + correction_volume_estimate)
-        print('Estimate of mean volume: {}'.format(mean_vol_estimate))
+        # print('Estimate of mean volume: {}'.format(mean_vol_estimate))
         self.m = mean_vol_estimate
 
     def estimate_icv(self):
@@ -146,10 +148,9 @@ class ICV_estimator(object):
             a1 = alpha + np.linalg.det(S)
             a2 = np.log(beta + sum_abs_log_diff)
             a3 = (2 * a + N) / float(2)
-            a4 = np.log(b + 0.5 * np.sum((v + mean_v) ** 2) + (N * n * (mean_v - np.log(m)) ** 2) / (2 * (N + n)))
+            a4 = np.log(b + 0.5 * np.sum((v + mean_v) ** 2) + (N * n * (mean_v - m) ** 2) / (2 * (N + n)))
             return a1 * a2 + a3 * a4
 
         init_values = log_estimate_v
         ans = minimize(cost, init_values)
-        print ans
-        return ans.x
+        return np.exp(ans.x)

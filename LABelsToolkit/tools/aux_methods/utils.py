@@ -126,12 +126,7 @@ def labels_query(labels, segmentation_array=None, remove_zero=True):
         raise IOError("Input labels must be a list, a list of lists, or an int or the string 'all' or the path to a"
                       "file with the labels.")
     if not isinstance(labels, dict):
-        if labels == 'all':
-            labels_names = 'all'  # swap label list with label name to remind that all the labels are considered.
-        elif labels == 'tot':
-            labels_names = 'tot'
-        else:
-            labels_names = [str(l) for l in labels_list]
+        labels_names = [str(l) for l in labels_list]
 
     return labels_list, labels_names
 

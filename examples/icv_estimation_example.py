@@ -1,21 +1,19 @@
 import os
 from os.path import join as jph
-import nibabel as nib
 import numpy as np
 
 from examples.generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
 from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.main import LABelsToolkit
-from LABelsToolkit.tools.icv.icv_estimator import ICV_estimator
 
 
 if __name__ == '__main__':
 
     controller = {'Get_initial_data'                   : False,
                   'Create_data_folders'                : False,
-                  'Compute_groud_icv_and_m'            : False,
-                  'Icv_estimation_transf'              : True,
-                  'Estimate_m_and_compare_with_ground' : False,
+                  'Compute_groud_icv_and_m'            : True,
+                  'Icv_estimation_transf'              : False,
+                  'Estimate_m_and_compare_with_ground' : True,
                   'Icv_estimation'                     : True,
                   'Compare_output'                     : True}
 
@@ -57,16 +55,16 @@ if __name__ == '__main__':
     if controller['Compute_groud_icv_and_m']:
         # Compute the ground truth icv (up to discretisation
         os.system('mkdir -p {}'.format(pfo_output))
-        v_hat = np.zeros(num_subjects, dtype=np.float)
+        v_ground = np.zeros(num_subjects, dtype=np.float)
         lab = LABelsToolkit()
         for j in range(1, num_subjects + 1):
             pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
-            df_vols = lab.measure.volume(pfi_segmGT, labels=[1, ])
-            v_hat[j-1] = df_vols['Volume'][0]
-            print('Subject {}, volume: {}'.format(j, v_hat[j-1]))
-        np.savetxt(jph(pfo_output, 'v_hat.txt'), v_hat, fmt='%10.1f')
-        print('Average volume {}'.format(np.mean(v_hat)))
-        np.savetxt(jph(pfo_output, 'm.txt'), [np.mean(v_hat)], fmt='%10.1f')
+            df_vols = lab.measure.volume(pfi_segmGT, labels='tot')
+            v_ground[j - 1] = np.sum(df_vols['Volume'])
+            print('Subject {}, volume: {}'.format(j, v_ground[j - 1]))
+        np.savetxt(jph(pfo_output, 'v_ground.txt'), v_ground, fmt='%10.1f')
+        print('Average volume {}'.format(np.mean(v_ground)))
+        np.savetxt(jph(pfo_output, 'm.txt'), [np.mean(v_ground)], fmt='%10.1f')
 
     if controller['Icv_estimation_transf']:
         # compute transformations and S matrix
@@ -81,7 +79,7 @@ if __name__ == '__main__':
         lab = LABelsToolkit()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output)
         icv_estimator.compute_m_from_list_masks(list_pfi_sj_segm, correction_volume_estimate=0)
-        print('Average volume estimated {}'.format(icv_estimator.m))
+        print('Average volume estimated with ICV {}'.format(icv_estimator.m))
 
     if controller['Icv_estimation']:
         # Estimate the icv with our method.
@@ -94,7 +92,9 @@ if __name__ == '__main__':
 
     if controller['Compare_output']:
         # Compare ground truth and estimated ground truth.
-        v_tilda = np.loadtxt(jph(pfo_output, 'v_tilda.txt'))
+        v_ground = np.loadtxt(jph(pfo_output, 'v_ground.txt'))
         v_est   = np.loadtxt(jph(pfo_output, 'v_est.txt'))
-        print(v_tilda)
+        print(v_ground)
         print(v_est)
+        print
+        print(np.abs(v_ground  - v_est)/v_ground)
