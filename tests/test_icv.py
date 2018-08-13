@@ -2,14 +2,10 @@ import os
 from os.path import join as jph
 
 import numpy as np
-from nose.tools import assert_equals, assert_almost_equals
+from nose.tools import assert_equals
 
 from LABelsToolkit.main import LABelsToolkit
-from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
-from LABelsToolkit.tools.aux_methods.sanity_checks import check_pfi_io
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
-from LABelsToolkit.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
 
 
 num_subjects = 7
@@ -21,7 +17,6 @@ pfo_output             = jph(pfo_icv_estimation, 'output')
 
 list_pfi_sj      = [jph(pfo_icv_brains, 'e00{}_modGT.nii.gz'.format(j + 1)) for j in range(num_subjects)]
 list_pfi_sj_segm = [jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j + 1)) for j in range(num_subjects)]
-
 
 
 def _create_data_set_for_tests():

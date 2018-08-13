@@ -51,7 +51,7 @@ def headlike_phantom(omega=(161, 181, 201), intensities=(0.9, 0.3, 0.6, 0.8), ra
     f1 = np.array(omega_c) + np.array([0, csf_spacing, 0])
     f21 = np.array(omega_c) + np.array([csf_spacing, - 2 * csf_spacing, 0])
     f22 = np.array(omega_c) + np.array([-csf_spacing, - 2 * csf_spacing, 0])
-    d = 1.2 * np.linalg.norm(f1 - f21)
+    d = 1.2 * np.linalg.norm(f1 - f21) * np.random.normal(1, random_perturbation / float(5))
     csf = ellipsoid_shape(omega, f1, f21, d, background_intensity=0, foreground_intensity=1)
     csf += ellipsoid_shape(omega, f1, f22, d, background_intensity=0, foreground_intensity=1)
     csf = csf.astype(np.bool)

@@ -5,13 +5,14 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
-from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import descriptor_standard_header
 
 
-def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomness_shape=0.3, randomness_noise=0.4):
+def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4,
+                             get_labels_descriptor=False):
 
     assert os.path.exists(pfo_where_to_save_atlas), 'Input folder {} does not exist'.format(pfo_where_to_save_atlas)
     pfo_mod = jph(pfo_where_to_save_atlas, 'mod')
@@ -82,6 +83,29 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='test', randomn
     nib.save(im_mod2, jph(pfo_mod, '{}_mod2.nii.gz'.format(atlas_name)))
     nib.save(im_roi_mask, jph(pfo_masks, '{}_roi_mask.nii.gz'.format(atlas_name)))
     nib.save(im_reg_mask, jph(pfo_masks, '{}_reg_mask.nii.gz'.format(atlas_name)))
+
+    if get_labels_descriptor:
+        pfi_label_descriptor = jph(pfo_where_to_save_atlas, 'label_descriptor.txt')
+        f = open(pfi_label_descriptor, 'w+')
+        f.write(descriptor_standard_header)
+        dict_ld = {0: [[0,     0,   0], [1.0, 1.0, 1.0], 'Bkg'],
+                   1: [[255,   0,   0], [1.0, 1.0, 1.0], 'Skull'],
+                   2: [[  0, 255,   0], [1.0, 1.0, 1.0], 'WM'],
+                   3: [[  0,   0, 255], [1.0, 1.0, 1.0], 'GM'],
+                   4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']}
+
+        for j in dict_ld.keys():
+            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(
+                j,
+                dict_ld[j][0][0],
+                dict_ld[j][0][1],
+                dict_ld[j][0][2],
+                dict_ld[j][1][0],
+                int(dict_ld[j][1][1]),
+                int(dict_ld[j][1][2]),
+                dict_ld[j][2])
+            f.write(line)
+        f.close()
 
 
 def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_of_subjects=10,

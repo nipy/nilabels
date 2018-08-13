@@ -76,9 +76,13 @@ class LabelsDescriptorManager(object):
         elif self._convention == 'fsl':
             self._dict_label_descriptor = self.get_dict_fsl()
         else:
-            raise IOError("Signature convention can be only 'itk-snap' or 'fsl'. ")
+            raise IOError("Signature for the variable **convention** can be only 'itk-snap' or 'fsl'.")
 
     def _check_path(self):
+        """
+        The path to labels descriptor it must exist.
+        :return: input path sanity check.
+        """
         if not os.path.exists(self.pfi_label_descriptor):
             msg = 'Label descriptor file {} does not exist'.format(self.pfi_label_descriptor)
             raise IOError(msg)
@@ -87,10 +91,8 @@ class LabelsDescriptorManager(object):
         """
         Parse the ITK-Snap label descriptor into an ordered dict data structure.
         Each element of the ordered dict is of the kind
-         (218, [[128, 0, 128], [1.0, 1.0, 1.0], 'Corpus callosum'])
-        key: 128
-        value: [[128, 0, 128], [1.0, 1.0, 1.0], 'Corpus callosum']
-                [RGB, others, label_name]
+         {218 : [[128, 0, 128], [1.0, 1.0, 1.0], 'Corpus callosum']}
+          key : [[RGB],         [B A vis],       "label_name"]
 
         :return: dict with information relative to the parsed label descriptor.
         id : ''
@@ -99,7 +101,7 @@ class LabelsDescriptorManager(object):
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
-                args = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
+                args        = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
 
                 args[0] = [int(k) for k in args[0]]
                 args[1] = [float(k) for k in args[1]]
@@ -116,7 +118,7 @@ class LabelsDescriptorManager(object):
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split(' ') if not j == '']
-                args = [list(parsed_line[2:5]), list(parsed_line[5]), parsed_line[1]]
+                args        = [list(parsed_line[2:5]), list(parsed_line[5]), parsed_line[1]]
 
                 args[0] = [int(k) for k in args[0]]
                 args[1] = [int(k) for k in args[1]]
