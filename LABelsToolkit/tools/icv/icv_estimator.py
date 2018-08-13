@@ -8,9 +8,6 @@ from scipy.optimize import minimize
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 
 
-# testing in progress
-
-
 class ICV_estimator(object):
     """
     ICV estimation as in
@@ -71,7 +68,10 @@ class ICV_estimator(object):
         self.pfo_transformations = jph(self.pfo_output, 'transformations')
 
     def generate_transformations(self):
-
+        """
+        Generate transformation to build the adjacency matrix S
+        :return: provides <reference>_<floating>.txt transformations in pfo_output
+        """
         cmd_1 = 'mkdir -p {0} '.format(self.pfo_warped)
         cmd_2 = 'mkdir -p {0} '.format(self.pfo_transformations)
         print_and_run(cmd_1)

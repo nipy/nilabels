@@ -70,7 +70,7 @@ if __name__ == '__main__':
         # compute transformations and S matrix
         lab = LABelsToolkit()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output)
-        # icv_estimator.generate_transformations()
+        icv_estimator.generate_transformations()
         icv_estimator.compute_S()
         np.savetxt(jph(pfo_output, 'S.txt'), icv_estimator.S, fmt='%5.5f')
         del lab, icv_estimator
@@ -97,4 +97,8 @@ if __name__ == '__main__':
         print(v_ground)
         print(v_est)
         print
-        print(np.abs(v_ground  - v_est)/v_ground)
+        av = (np.abs(v_ground  + v_est) /float(2))
+        err = np.abs(v_ground  - v_est)
+        print av
+        print err
+        print err / av  # check this error is below 1%.

@@ -1,11 +1,6 @@
-import os
-from os.path import join as jph
-
-from LABelsToolkit.tools.defs import root_dir
-from LABelsToolkit.tools.visualiser.see_volume import see_array
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
-from LABelsToolkit.tools.phantoms_generator.generate_phantom_multi_atlas import generate_atlas_at_folder, \
-    generate_multi_atlas_at_folder
+from LABelsToolkit.tools.visualiser.see_volume import see_array
+from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
 
 
 def example_generate_and_visualise_headlike():
@@ -17,21 +12,14 @@ def example_generate_and_visualise_headlike():
 
 def example_generate_atlas_at_specified_folder():
     print('Example generation of an atlas')
-    pfo_examples = jph(root_dir, 'data_examples')
-    pfo_target_atlas = jph(pfo_examples, 'dummy_target')
-    os.system('mkdir -p {}'.format(pfo_target_atlas))
-    generate_atlas_at_folder(pfo_target_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4)
-    print('Please look under {}'.format(pfo_target_atlas))
+    ldg.generate_atlas_at_specified_folder()
+    print('Please look under {}'.format(ldg.pfo_target_atlas))
 
 
-def example_generate_multi_atlas_at_specified_folder(n=10):
+def example_generate_multi_atlas_at_specified_folder():
     print('Example generation of a multi-atlas')
-    pfo_examples = jph(root_dir, 'data_examples')
-    pfo_multi_atlas = jph(pfo_examples, 'dummy_multi_atlas')
-    os.system('mkdir -p {}'.format(pfo_multi_atlas))
-    generate_multi_atlas_at_folder(pfo_multi_atlas, number_of_subjects=n,
-                                   multi_atlas_root_name='e', randomness_shape=0.3, randomness_noise=0.4)
-    print('Please look under {}'.format(pfo_multi_atlas))
+    ldg.generate_multi_atlas_at_specified_folder()
+    print('Please look under {}'.format(ldg.pfo_multi_atlas))
 
 
 if __name__ == '__main__':
