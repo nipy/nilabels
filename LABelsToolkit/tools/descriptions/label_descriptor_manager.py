@@ -167,7 +167,7 @@ class LabelsDescriptorManager(object):
 
         for j in self._dict_label_descriptor.keys():
             if self._convention == 'itk-snap':
-                line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(
+                line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(
                         j,
                         self._dict_label_descriptor[j][0][0],
                         self._dict_label_descriptor[j][0][1],

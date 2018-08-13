@@ -95,7 +95,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
                    4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']}
 
         for j in dict_ld.keys():
-            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7: >5}"\n'.format(
+            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(
                 j,
                 dict_ld[j][0][0],
                 dict_ld[j][0][1],
