@@ -23,8 +23,7 @@ def permute_labels_from_descriptor(in_ldm, permutation):
     return out_ldm
 
 
-def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None,
-                                    list_colors_triplets=None):
+def generate_dummy_label_descriptor(pfi_output, list_labels=range(5), list_roi_names=None, list_colors_triplets=None):
     """
     For testing purposes, it creates a dummy label descriptor with the itk-snap convention
     :param pfi_output: where to save the eventual label descriptor
@@ -39,12 +38,13 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
     if list_roi_names is None:
         list_roi_names = ["label {}".format(j) for j in list_labels]
     else:
-        assert len(list_labels) == len(list_roi_names)
+        if not len(list_labels) == len(list_roi_names):
+            raise IOError('Wrong input data')
     if list_colors_triplets is None:
         list_colors_triplets = [list(np.random.choice(range(256), 3)) for _ in range(num_labels)]
     else:
-        assert len(list_labels) == len(list(list_colors_triplets))
-
+        if not len(list_labels) == len(list(list_colors_triplets)):
+            raise IOError('Wrong input data')
     for j in range(num_labels):
         up_d = {str(j): [list_colors_triplets[j], visibility[j], list_roi_names[j]]}
         d.update(up_d)

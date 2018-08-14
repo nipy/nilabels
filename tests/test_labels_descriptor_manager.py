@@ -14,7 +14,6 @@ def _create_data_set_for_tests():
     if not os.path.exists(jph(ldg.pfo_target_atlas, 'label_descriptor.txt')):
         print('Generating testing dataset. May take a while, but it is done only once!')
         ldg.generate_atlas_at_specified_folder()
-        assert os.path.exists(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'))
 
 
 def check_equal(l1, l2):
