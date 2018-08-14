@@ -41,7 +41,8 @@ without the need of reinstalling.
 ## Code testing
 
 Code testing is a work in progress. We are aiming at reaching the 80% of coverage for the methods acting on numpy arrays and nibabel images, below the facade.
-To run the test, type `nosetests` in the root directory of the project.
+To run the test, type `nosetests -s` in the root directory of the project. Note that at the first run
+a testing dataset is generated. This may take some minutes.
 
 ## Licence
 

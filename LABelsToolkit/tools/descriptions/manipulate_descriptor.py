@@ -1,8 +1,9 @@
 import collections
+import copy
 
+from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
 from LABelsToolkit.tools.aux_methods.colours_rgb_lab import get_random_rgb
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager, \
-    descriptor_standard_header
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import descriptor_standard_header
 
 
 def permute_labels_from_descriptor(in_ldm, permutation):
@@ -14,10 +15,12 @@ def permute_labels_from_descriptor(in_ldm, permutation):
     sanity_check).
     :return:
     """
-    # permute the label
-    # TODO
-
-    return in_ldm, permutation
+    assert is_valid_permutation(permutation)
+    out_ldm = copy.copy(in_ldm)
+    d = out_ldm.dict_label_descriptor
+    for k1, k2 in zip(permutation[0],permutation[1]):
+        d[k1], d[k2] = d[k2], d[k1]
+    return out_ldm
 
 
 def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_roi_names=None):
@@ -49,28 +52,3 @@ def generate_dummy_label_descriptor(pfi_output=None, list_labels=range(5), list_
             f.write(line)
     f.close()
     return d
-
-
-# temporary test
-if __name__ == '__main__':
-
-    # TODO move to examples
-
-    pfi_descriptor = '/Users/sebastiano/Desktop/colour_label.txt'
-
-    ldm = LabelsDescriptorManager(pfi_descriptor, convention='fsl')
-
-    print ldm.get_dict_fsl()
-
-    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_fsl.txt')
-
-
-    pfi_descriptor = '/Users/sebastiano/Desktop/labels_descriptor.txt'
-
-    ldm = LabelsDescriptorManager(pfi_descriptor, convention='itk-snap')
-
-    print ldm._dict_label_descriptor
-
-    ldm._convention = 'fsl'
-
-    ldm.save_label_descriptor('/Users/sebastiano/Desktop/colour_label_as_fsl.txt')

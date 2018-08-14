@@ -7,8 +7,11 @@ from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 
 from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
+from LABelsToolkit.tools.image_colors_manipulations.segmentation_to_rgb import \
+    get_rgb_image_from_segmentation_and_label_descriptor
 from LABelsToolkit.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
 from LABelsToolkit.tools.cleaning. labels_cleaner import clean_semgentation
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager as LdM
 
 
 class LABelsToolkitLabelsManipulate(object):
@@ -26,7 +29,7 @@ class LABelsToolkitLabelsManipulate(object):
 
     def relabel(self, pfi_input, pfi_output=None, list_old_labels=(), list_new_labels=()):
         """
-        Masks of :func:`labels_manager.tools.manipulations.relabeller.relabeller` using filename
+        Masks of :func:`labels_manager.tools.manipulations.relabeller.relabeller` using filenames
         """
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in,
@@ -69,7 +72,7 @@ class LABelsToolkitLabelsManipulate(object):
         return pfi_out
 
     def assign_all_other_labels_the_same_value(self, pfi_input, pfi_output=None,
-        labels_to_keep=(), same_value_label=255):
+                                               labels_to_keep=(), same_value_label=255):
 
         pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
 
@@ -105,7 +108,8 @@ class LABelsToolkitLabelsManipulate(object):
 
         vec = [np.prod(im_stack_crisp.shape[:3])] + [dims[3]]
 
-        array_output = from_segmentations_stack_to_probabilistic_segmentation(im_stack_crisp.get_data().reshape(vec).T).T
+        array_output = from_segmentations_stack_to_probabilistic_segmentation(
+            im_stack_crisp.get_data().reshape(vec).T).T
 
         data_output = array_output.reshape(list(im_stack_crisp.shape[:3]) + [array_output.shape[1]])
 
@@ -147,3 +151,32 @@ class LABelsToolkitLabelsManipulate(object):
         nib.save(im_segm_cleaned, pfi_out)
         if verbose:
             print('Segmentation {} cleaned saved to {}'.format(pfi_in, pfi_out))
+
+    def from_segmentation_and_labels_descriptor_to_rgb(self, input_segmentation, input_txt_labels_descriptor,
+                                                       output_4d_rgb_image,
+                                                       invert_black_white=False, dtype_output=np.int32,
+                                                       convention='itk-snap'):
+        """
+        + Masks of :func:`LABelsToolkit.tools.image_colors_manipulations.segmentation_to_rgb.
+        get_rgb_image_from_segmentation_and_label_descriptor` using filenames.
+        From a segmentation and its label descriptro in itk-snap convention or in fsl convention
+        it creates a corresponding 4d image with the 3 R G B channels in the fourth dimension.
+        :param input_segmentation: path to the input segmentation
+        :param input_txt_labels_descriptor: path to the txt labels descriptor
+        :param output_4d_rgb_image: path where to save the output
+        :param invert_black_white: changes the background colour, if black to white.
+        :param dtype_output: data type of the output np.int32
+        :param convention: convention of the given txt labels descriptor, can be 'itk-snap' or 'fsl'.
+        :return:
+        """
+        pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)
+        pfi_ld = connect_path_tail_head(self.pfo_in, input_txt_labels_descriptor)
+
+        im_segm = nib.load(pfi_segm)
+        ldm = LdM(pfi_ld, convention=convention)
+        im_rgb_4d_image = get_rgb_image_from_segmentation_and_label_descriptor(im_segm, ldm,
+                                                                               invert_black_white=invert_black_white,
+                                                                               dtype_output=dtype_output)
+
+        pfi_out = connect_path_tail_head(self.pfo_out, output_4d_rgb_image)
+        nib.save(im_rgb_4d_image, pfi_out)

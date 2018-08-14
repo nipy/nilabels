@@ -27,16 +27,16 @@ def freesurfer_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, 
     cmd = 'source $FREESURFER_HOME/SetUpFreeSurfer.sh; freeview -v {0} -f '.format(pfi_anatomy)
 
     if labels_to_delineate:
-        labels_to_delineate = ldm._dict_label_descriptor.keys()[1:-1]
+        labels_to_delineate = ldm.dict_label_descriptor.keys()[1:-1]
 
     for k in labels_to_delineate:
 
         pfi_surface = os.path.join(pfo_stl_surfaces, '{0}{1:05d}.stl'.format(suffix_surf, k))
         assert os.path.exists(pfi_surface), pfi_surface
         if add_colors:
-            triplet_rgb = '{0},{1},{2}'.format(ldm._dict_label_descriptor[k][0][0],
-                                               ldm._dict_label_descriptor[k][0][1],
-                                               ldm._dict_label_descriptor[k][0][2])
+            triplet_rgb = '{0},{1},{2}'.format(ldm.dict_label_descriptor[k][0][0],
+                                               ldm.dict_label_descriptor[k][0][1],
+                                               ldm.dict_label_descriptor[k][0][2])
 
             cmd += ' {0}:edgecolor={1}:color={1} '.format(pfi_surface, triplet_rgb)
         else:

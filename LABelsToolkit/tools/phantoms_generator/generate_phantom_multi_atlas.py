@@ -1,5 +1,6 @@
 import os
 from os.path import join as jph
+import collections
 
 import nibabel as nib
 import numpy as np
@@ -88,11 +89,13 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
         pfi_label_descriptor = jph(pfo_where_to_save_atlas, 'label_descriptor.txt')
         f = open(pfi_label_descriptor, 'w+')
         f.write(descriptor_standard_header)
-        dict_ld = {0: [[0,     0,   0], [1.0, 1.0, 1.0], 'Bkg'],
-                   1: [[255,   0,   0], [1.0, 1.0, 1.0], 'Skull'],
-                   2: [[  0, 255,   0], [1.0, 1.0, 1.0], 'WM'],
-                   3: [[  0,   0, 255], [1.0, 1.0, 1.0], 'GM'],
-                   4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']}
+
+        dict_ld = collections.OrderedDict()
+        dict_ld.update({0: [[0,     0,   0], [1.0, 1.0, 1.0], 'Bkg']})
+        dict_ld.update({1: [[255,   0,   0], [1.0, 1.0, 1.0], 'Skull']})
+        dict_ld.update({2: [[  0, 255,   0], [1.0, 1.0, 1.0], 'WM']})
+        dict_ld.update({3: [[  0,   0, 255], [1.0, 1.0, 1.0], 'GM']})
+        dict_ld.update({4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']})
 
         for j in dict_ld.keys():
             line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(

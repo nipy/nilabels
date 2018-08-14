@@ -69,12 +69,12 @@ class LabelsDescriptorManager(object):
 
     def __init__(self, pfi_label_descriptor, convention='itk-snap'):
         self.pfi_label_descriptor = pfi_label_descriptor
-        self._convention = convention
+        self.convention = convention
         self._check_path()
-        if self._convention == 'itk-snap':
-            self._dict_label_descriptor = self.get_dict_itk_snap()
-        elif self._convention == 'fsl':
-            self._dict_label_descriptor = self.get_dict_fsl()
+        if self.convention == 'itk-snap':
+            self.dict_label_descriptor = self.get_dict_itk_snap()
+        elif self.convention == 'fsl':
+            self.dict_label_descriptor = self.get_dict_fsl()
         else:
             raise IOError("Signature for the variable **convention** can be only 'itk-snap' or 'fsl'.")
 
@@ -137,9 +137,9 @@ class LabelsDescriptorManager(object):
         mld_tmp = collections.OrderedDict()
         # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
         # the label id - note: possible abbreviations gets lost.
-        for k in self._dict_label_descriptor.keys():
+        for k in self.dict_label_descriptor.keys():
             if combine_right_left:
-                mld_tmp.update({self._dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
+                mld_tmp.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
                 # second round, add the left right in dictionary entry.
                 for k in mld_tmp.keys():
                     if keep_duplicate:
@@ -156,35 +156,35 @@ class LabelsDescriptorManager(object):
                         if not keep_duplicate:
                             mld.update({k: mld_tmp[k]})
             else:
-                mld.update({self._dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
+                mld.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
 
         return mld
 
     def save_label_descriptor(self, pfi_where_to_save):
         f = open(pfi_where_to_save, 'w+')
-        if self._convention == 'itk-snap':
+        if self.convention == 'itk-snap':
             f.write(descriptor_standard_header)
 
-        for j in self._dict_label_descriptor.keys():
-            if self._convention == 'itk-snap':
+        for j in self.dict_label_descriptor.keys():
+            if self.convention == 'itk-snap':
                 line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(
                         j,
-                        self._dict_label_descriptor[j][0][0],
-                        self._dict_label_descriptor[j][0][1],
-                        self._dict_label_descriptor[j][0][2],
-                        self._dict_label_descriptor[j][1][0],
-                        int(self._dict_label_descriptor[j][1][1]),
-                        int(self._dict_label_descriptor[j][1][2]),
-                        self._dict_label_descriptor[j][2])
+                        self.dict_label_descriptor[j][0][0],
+                        self.dict_label_descriptor[j][0][1],
+                        self.dict_label_descriptor[j][0][2],
+                        self.dict_label_descriptor[j][1][0],
+                        int(self.dict_label_descriptor[j][1][1]),
+                        int(self.dict_label_descriptor[j][1][2]),
+                        self.dict_label_descriptor[j][2])
 
-            elif self._convention == 'fsl':
+            elif self.convention == 'fsl':
                 line = '{0} {1} {2} {3} {4} {5}\n'.format(
                         j,
-                        self._dict_label_descriptor[j][2].replace(' ', '-'),
-                        self._dict_label_descriptor[j][0][0],
-                        self._dict_label_descriptor[j][0][1],
-                        self._dict_label_descriptor[j][0][2],
-                        self._dict_label_descriptor[j][1][0])
+                        self.dict_label_descriptor[j][2].replace(' ', '-'),
+                        self.dict_label_descriptor[j][0][0],
+                        self.dict_label_descriptor[j][0][1],
+                        self.dict_label_descriptor[j][0][2],
+                        self.dict_label_descriptor[j][1][0])
             else:
                 return
             f.write(line)
@@ -212,28 +212,3 @@ class LabelsDescriptorManager(object):
             f.write(line)
             f.write('\n')
         f.close()
-
-    def get_corresponding_rgb_image(self, im_segm, invert_black_white=False):
-        """
-        From the labels descriptor and a nibabel segmentation image.
-        :param im_segm: nibabel segmentation whose labels corresponds to the input labels descriptor.
-        :return: a 4d image, where at each voxel there is the [r, g, b] vector in the fourth dimension.
-        """
-        labels_in_image = list(np.sort(list(set(im_segm.get_data().flatten()))))
-
-        assert len(im_segm.shape) == 3
-
-        rgb_image_arr = np.ones(list(im_segm.shape) + [3])
-
-        for l in self._dict_label_descriptor.keys():
-            if l not in labels_in_image:
-                msg = 'get_corresponding_rgb_image: Label {} present in the label descriptor and not in ' \
-                      'selected image'.format(l)
-                print(msg)
-            pl = im_segm.get_data() == l
-            rgb_image_arr[pl, :] = self._dict_label_descriptor[l][0]
-
-        if invert_black_white:
-            pl = im_segm.get_data() == 0
-            rgb_image_arr[pl, :] = np.array([255, 255, 255])
-        return set_new_data(im_segm, rgb_image_arr, new_dtype=np.int32)
