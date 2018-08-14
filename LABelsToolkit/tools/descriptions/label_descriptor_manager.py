@@ -118,7 +118,7 @@ class LabelsDescriptorManager(object):
                 parsed_line = [j.strip() for j in l.split(' ') if not j == '']
                 args        = [list(parsed_line[2:5]), float(parsed_line[5]), parsed_line[1]]
                 args[0]     = [int(k) for k in args[0]]
-                args[1]     = [args[1], ] * 3
+                args[1]     = [args[1], 1, 1]
                 label_descriptor_dict.update({int(parsed_line[0]): args})
         return label_descriptor_dict
 

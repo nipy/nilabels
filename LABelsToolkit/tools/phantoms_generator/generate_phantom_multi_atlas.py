@@ -10,6 +10,7 @@ from LABelsToolkit.tools.aux_methods.utils import print_and_run
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
 from LABelsToolkit.tools.descriptions.label_descriptor_manager import descriptor_standard_header
+from LABelsToolkit.tools.descriptions.manipulate_descriptor import generate_dummy_label_descriptor
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4,
@@ -87,28 +88,11 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
 
     if get_labels_descriptor:
         pfi_label_descriptor = jph(pfo_where_to_save_atlas, labels_descriptor_name)
-        f = open(pfi_label_descriptor, 'w+')
-        f.write(descriptor_standard_header)
 
-        dict_ld = collections.OrderedDict()
-        dict_ld.update({0: [[0,     0,   0], [1.0, 1.0, 1.0], 'Bkg']})
-        dict_ld.update({1: [[255,   0,   0], [1.0, 1.0, 1.0], 'Skull']})
-        dict_ld.update({2: [[  0, 255,   0], [1.0, 1.0, 1.0], 'WM']})
-        dict_ld.update({3: [[  0,   0, 255], [1.0, 1.0, 1.0], 'GM']})
-        dict_ld.update({4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']})
-
-        for j in dict_ld.keys():
-            line = '{0: >5}{1: >6}{2: >6}{3: >6}{4: >9}{5: >6}{6: >6}    "{7}"\n'.format(
-                j,
-                dict_ld[j][0][0],
-                dict_ld[j][0][1],
-                dict_ld[j][0][2],
-                dict_ld[j][1][0],
-                int(dict_ld[j][1][1]),
-                int(dict_ld[j][1][2]),
-                dict_ld[j][2])
-            f.write(line)
-        f.close()
+        generate_dummy_label_descriptor(pfi_label_descriptor, list_labels=range(5),
+                                        list_roi_names=['Bkg', 'Skull', 'WM', 'GM', 'CSF'],
+                                        list_colors_triplets=[[0, 0, 0], [255, 0, 0], [0, 255, 0],
+                                                              [0, 0, 255], [255, 0, 255]])
 
 
 def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_of_subjects=10,

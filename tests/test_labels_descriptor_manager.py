@@ -38,7 +38,7 @@ def test_basics_methods_labels_descriptor_manager_wrong_input_convention():
 def test_basic_dict_input():
     _create_data_set_for_tests()
     dict_ld = collections.OrderedDict()
-    dict_ld.update({0: [[0, 0, 0], [1.0, 1.0, 1.0], 'Bkg']})
+    dict_ld.update({0: [[0, 0, 0],   [1.0, 1.0, 1.0], 'Bkg']})
     dict_ld.update({1: [[255, 0, 0], [1.0, 1.0, 1.0], 'Skull']})
     dict_ld.update({2: [[0, 255, 0], [1.0, 1.0, 1.0], 'WM']})
     dict_ld.update({3: [[0, 0, 255], [1.0, 1.0, 1.0], 'GM']})
