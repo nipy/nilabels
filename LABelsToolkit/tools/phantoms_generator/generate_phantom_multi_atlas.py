@@ -13,7 +13,7 @@ from LABelsToolkit.tools.descriptions.label_descriptor_manager import descriptor
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4,
-                             get_labels_descriptor=False):
+                             get_labels_descriptor=False, labels_descriptor_name='label_descriptor.txt'):
 
     assert os.path.exists(pfo_where_to_save_atlas), 'Input folder {} does not exist'.format(pfo_where_to_save_atlas)
     pfo_mod = jph(pfo_where_to_save_atlas, 'mod')
@@ -86,7 +86,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
     nib.save(im_reg_mask, jph(pfo_masks, '{}_reg_mask.nii.gz'.format(atlas_name)))
 
     if get_labels_descriptor:
-        pfi_label_descriptor = jph(pfo_where_to_save_atlas, 'label_descriptor.txt')
+        pfi_label_descriptor = jph(pfo_where_to_save_atlas, labels_descriptor_name)
         f = open(pfi_label_descriptor, 'w+')
         f.write(descriptor_standard_header)
 
@@ -98,7 +98,7 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
         dict_ld.update({4: [[255,   0, 255], [1.0, 1.0, 1.0], 'CSF']})
 
         for j in dict_ld.keys():
-            line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(
+            line = '{0: >5}{1: >6}{2: >6}{3: >6}{4: >9}{5: >6}{6: >6}    "{7}"\n'.format(
                 j,
                 dict_ld[j][0][0],
                 dict_ld[j][0][1],

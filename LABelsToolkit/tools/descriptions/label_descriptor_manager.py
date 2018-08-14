@@ -99,14 +99,12 @@ class LabelsDescriptorManager(object):
         """
         label_descriptor_dict = collections.OrderedDict()
         for l in open(self.pfi_label_descriptor, 'r'):
-            if not l.strip().startswith('#'):
+            if not l.strip().startswith('#') and not l == '':
                 parsed_line = [j.strip() for j in l.split('  ') if not j == '']
                 args        = [tuple(parsed_line[1:4]), tuple(parsed_line[4:7]), parsed_line[7].replace('"', '')]
-
-                args[0] = [int(k) for k in args[0]]
-                args[1] = [float(k) for k in args[1]]
-                dd = {int(parsed_line[0]): args}
-                label_descriptor_dict.update(dd)
+                args[0]     = [int(k) for k in args[0]]
+                args[1]     = [float(k) for k in args[1]]
+                label_descriptor_dict.update({int(parsed_line[0]): args})
 
         return label_descriptor_dict
 
@@ -118,12 +116,10 @@ class LabelsDescriptorManager(object):
         for l in open(self.pfi_label_descriptor, 'r'):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split(' ') if not j == '']
-                args        = [list(parsed_line[2:5]), list(parsed_line[5]), parsed_line[1]]
-
-                args[0] = [int(k) for k in args[0]]
-                args[1] = [int(k) for k in args[1]]
-                dd = {int(parsed_line[0]): args}
-                label_descriptor_dict.update(dd)
+                args        = [list(parsed_line[2:5]), float(parsed_line[5]), parsed_line[1]]
+                args[0]     = [int(k) for k in args[0]]
+                args[1]     = [args[1], ] * 3
+                label_descriptor_dict.update({int(parsed_line[0]): args})
         return label_descriptor_dict
 
     def get_multi_label_dict(self, keep_duplicate=False, combine_right_left=True):
@@ -167,7 +163,7 @@ class LabelsDescriptorManager(object):
 
         for j in self.dict_label_descriptor.keys():
             if self.convention == 'itk-snap':
-                line = '{0: >5}{1: >6}{2: >4}{3: >4}{4: >9}{5: >3}{6: >3}    "{7}"\n'.format(
+                line = '{0: >5}{1: >6}{2: >6}{3: >6}{4: >9}{5: >6}{6: >6}    "{7}"\n'.format(
                         j,
                         self.dict_label_descriptor[j][0][0],
                         self.dict_label_descriptor[j][0][1],
