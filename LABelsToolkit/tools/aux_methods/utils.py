@@ -4,6 +4,7 @@ import subprocess
 
 from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
 
+
 # ---- List utils ----
 
 
@@ -194,3 +195,7 @@ def from_disjoint_cycles_to_permutation(dc):
         for i, c in enumerate(cycle):
             perm[c-1] = cycle[(i + 1) % len(cycle)]
     return [list(range(1, len(perm) + 1)), perm]
+
+
+if __name__ == '__main__':
+    print from_permutation_to_disjoints_cycles([[1, 2, 3], [3, 2, 1]])

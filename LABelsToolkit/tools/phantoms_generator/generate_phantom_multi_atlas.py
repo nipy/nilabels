@@ -1,6 +1,6 @@
 import os
 from os.path import join as jph
-import collections
+
 
 import nibabel as nib
 import numpy as np
@@ -9,8 +9,7 @@ import scipy.ndimage.filters as fil
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
 from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import descriptor_standard_header
-from LABelsToolkit.tools.descriptions.manipulate_descriptor import generate_dummy_label_descriptor
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import generate_dummy_label_descriptor
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4,

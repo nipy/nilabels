@@ -1,9 +1,3 @@
-import collections
-import os
-import numpy as np
-
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
-
 """
 Module to manipulate descriptors as formatted by ITK-snap,
 as the one in the descriptor below:
@@ -32,9 +26,17 @@ as the one in the descriptor below:
     7   255  255    0        1  1  1    "label seven"
     8   255  50    50        1  1  1    "label eight"
     ...
-    
-A label descriptor can be as well saved as 
+
 """
+import collections
+import os
+import copy
+import numpy as np
+
+from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
+from LABelsToolkit.tools.aux_methods.utils import from_permutation_to_disjoints_cycles
+
+
 descriptor_standard_header = \
 """################################################
 # ITK-SnAP Label Description File
@@ -65,6 +67,43 @@ descriptor_data_examples = \
 """
 
 
+def generate_dummy_label_descriptor(pfi_output, list_labels=range(5),
+                                    list_roi_names=None, list_colors_triplets=None):
+    """
+    For testing purposes, it creates a dummy label descriptor with the itk-snap convention
+    :param pfi_output: where to save the eventual label descriptor
+    :param list_labels: list of labels range, default 0:5
+    :param list_roi_names: names of the regions of interests. If None, default names are assigned.
+    :param list_colors_triplets: list of lists of rgb same lenght of list_roi_names if any.
+    :return: label descriptor as a dictionary.
+    """
+    d = collections.OrderedDict()
+    num_labels = len(list_labels)
+    visibility = [(1.0, 1, 1)] * num_labels
+    if list_roi_names is None:
+        list_roi_names = ["label {}".format(j) for j in list_labels]
+    else:
+        if not len(list_labels) == len(list_roi_names):
+            raise IOError('Wrong input data')
+    if list_colors_triplets is None:
+        list_colors_triplets = [list(np.random.choice(range(256), 3)) for _ in range(num_labels)]
+    else:
+        if not len(list_labels) == len(list(list_colors_triplets)):
+            raise IOError('Wrong input data')
+    for j in range(num_labels):
+        up_d = {str(j): [list_colors_triplets[j], visibility[j], list_roi_names[j]]}
+        d.update(up_d)
+    f = open(pfi_output, 'w+')
+    f.write(descriptor_standard_header)
+    for j in d.keys():
+        if j.isdigit():
+            line = '{0: >5}{1: >6}{2: >6}{3: >6}{4: >9}{5: >6}{6: >6}    "{7}"\n'.format(
+                j, d[j][0][0], d[j][0][1], d[j][0][2], d[j][1][0], d[j][1][1], d[j][1][2], d[j][2])
+            f.write(line)
+    f.close()
+    return d
+
+
 class LabelsDescriptorManager(object):
 
     def __init__(self, pfi_label_descriptor, convention='itk-snap'):
@@ -78,6 +117,8 @@ class LabelsDescriptorManager(object):
         else:
             raise IOError("Signature for the variable **convention** can be only 'itk-snap' or 'fsl'.")
 
+    # Sanity checks:
+
     def _check_path(self):
         """
         The path to labels descriptor it must exist.
@@ -86,6 +127,8 @@ class LabelsDescriptorManager(object):
         if not os.path.exists(self.pfi_label_descriptor):
             msg = 'Label descriptor file {} does not exist'.format(self.pfi_label_descriptor)
             raise IOError(msg)
+
+    # Getters-setters:
 
     def get_dict_itk_snap(self):
         """
@@ -137,20 +180,20 @@ class LabelsDescriptorManager(object):
             if combine_right_left:
                 mld_tmp.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
                 # second round, add the left right in dictionary entry.
-                for k in mld_tmp.keys():
+                for k1 in mld_tmp.keys():
                     if keep_duplicate:
-                        mld.update({k: mld_tmp[k]})
-                    if 'Right' in k:
-                        left_key = k.replace('Right', 'Left')
-                        key = k.replace('Right', '').strip()
+                        mld.update({k1: mld_tmp[k1]})
+                    if 'Right' in k1:
+                        left_key = k1.replace('Right', 'Left')
+                        key = k1.replace('Right', '').strip()
                         if key.startswith('-'):
                             key = key[1:]
-                        mld.update({key : mld_tmp[left_key] + mld_tmp[k]})
-                    elif 'Left' in k:
+                        mld.update({key : mld_tmp[left_key] + mld_tmp[k1]})
+                    elif 'Left' in k1:
                         pass
                     else:
                         if not keep_duplicate:
-                            mld.update({k: mld_tmp[k]})
+                            mld.update({k1: mld_tmp[k1]})
             else:
                 mld.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
 
@@ -208,3 +251,84 @@ class LabelsDescriptorManager(object):
             f.write(line)
             f.write('\n')
         f.close()
+
+    # Methods for labels manipulations -  all these methods are not destructive.
+
+    def relabel(self, old_labels, new_labels, sort=True):
+        """
+        :param old_labels: list of existing labels
+        :param new_labels: list of new labels to substitute the previous one
+        :param sort: provide sorted OrderedDict output.
+        E.G. old_labels = [3, 6, 9]  new_labels = [4, 4, 100]
+        will transform label 3 in label 4, label 6 in label 4 and label 9 in label 100, even if label 100 was not
+        present before in the labels descriptor.
+        Note: where multiple labels are relabelled to the same one, the arguments kept in the labels descriptor are the
+        one of the last label. In the example, label 4 will have the arguments of label 6 and arguments of label 3 will
+        be lost in the output ldm.
+        """
+        ldm_new = copy.deepcopy(self)
+        for k in old_labels:
+            del ldm_new.dict_label_descriptor[k]
+        for k_new in new_labels:
+            k_old = old_labels[new_labels.index(k_new)]
+            if k_old in self.dict_label_descriptor.keys():
+                ldm_new.dict_label_descriptor.update({k_new : self.dict_label_descriptor[k_old]})
+            else:
+                ldm_new.dict_label_descriptor.update({k_new: [[255, 0, 255], [1.0, 1.0, 1.0], 'NewLabel']})
+        if sort:
+            d_sorted = collections.OrderedDict()
+            for k in sorted(ldm_new.dict_label_descriptor.keys()):
+                d_sorted.update({k : ldm_new.dict_label_descriptor[k]})
+                ldm_new.dict_label_descriptor = d_sorted
+        return ldm_new
+
+    def permute_labels(self, permutation):
+        """
+        Given a permutation, as specified in is_valid_permutation, provides a new labels descriptor manager
+        with the permuted labels.
+        :param permutation: a permutation defined by a list of integers (checked by is_valid_permutation under
+        sanity_check).
+        :return:
+        """
+        if not is_valid_permutation(permutation):
+            raise IOError('Not valid input permutation, please see the documentation.')
+        ldm_new = copy.deepcopy(self)
+
+        cycles = from_permutation_to_disjoints_cycles(permutation)
+        for cycle in cycles:
+            len_perm = len(cycle)
+            for i in range(len_perm):
+                ldm_new.dict_label_descriptor[cycle[i]] = self.dict_label_descriptor[cycle[(i + 1) % len_perm]]
+        return ldm_new
+
+    def erase_labels(self, labels_to_erase):
+        """
+        :param labels_to_change: is a list of labels.
+        :param single_new_label:
+        E.G. labels_to_change = [1,2,3,4] single_new_label = 7
+        will transform the labels 1,2,3,4 in the label 7.
+        Note: the arguments kept in the labels descriptor corresponding to the new label are the one corresponding to
+        the last lables of labels_to_change. Other labels argumetns are lost in the output ldm.
+        """
+        ldm_new = copy.deepcopy(self)
+        for l in labels_to_erase:
+            del ldm_new.dict_label_descriptor[l]
+        return ldm_new
+
+    def assign_all_other_labels_the_same_value(self, labels_to_keep, other_value):
+        """
+        :param labels_to_keep:
+        :param other_values:
+        :return:
+        """
+        labels_that_will_have_the_same_value = list(set(self.dict_label_descriptor.keys()) - set(labels_to_keep) - {0})
+        return self.relabel(labels_that_will_have_the_same_value,
+                            [other_value] * len(labels_that_will_have_the_same_value))
+
+    def keep_one_label(self, label_to_keep=1):
+        """
+        :param label_to_keep:
+        :return:
+        """
+        labels_not_to_keep = list(set(self.dict_label_descriptor.keys()) - {label_to_keep})
+        return self.relabel(labels_not_to_keep, [0] * len(labels_not_to_keep))

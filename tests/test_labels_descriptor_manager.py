@@ -1,13 +1,11 @@
 import os
 import collections
 from os.path import join as jph
-
 from nose.tools import assert_raises
-from numpy.testing import assert_array_equal
 
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
+from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager, \
+    generate_dummy_label_descriptor
 from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
-
 
 
 def _create_data_set_for_tests():
@@ -16,7 +14,7 @@ def _create_data_set_for_tests():
         ldg.generate_atlas_at_specified_folder()
 
 
-def check_equal(l1, l2):
+def check_list_equal(l1, l2):
     return len(l1) == len(l2) and sorted(l1) == sorted(l2)
 
 
@@ -29,7 +27,7 @@ def test_basics_methods_labels_descriptor_manager_wrong_input_path():
 
 def test_basics_methods_labels_descriptor_manager_wrong_input_convention():
     _create_data_set_for_tests()
-    not_allowed_convention_name = 'jsut_spam'
+    not_allowed_convention_name = 'just_spam'
     with assert_raises(IOError):
         LabelsDescriptorManager(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'), not_allowed_convention_name)
 
@@ -45,9 +43,9 @@ def test_basic_dict_input():
 
     ldm = LabelsDescriptorManager(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'))
 
-    check_equal(ldm.dict_label_descriptor.keys(), dict_ld.keys())
+    check_list_equal(ldm.dict_label_descriptor.keys(), dict_ld.keys())
     for k in ldm.dict_label_descriptor.keys():
-        check_equal(ldm.dict_label_descriptor[k], dict_ld[k])
+        check_list_equal(ldm.dict_label_descriptor[k], dict_ld[k])
 
 
 def test_save_in_itk_snap_convention():
@@ -73,9 +71,58 @@ def test_save_in_fsl_convention_reload_as_dict_and_compare():
 
     ldm_fsl = LabelsDescriptorManager(jph(ldg.pfo_target_atlas, 'label_descriptor_fsl.txt'), convention='fsl')
 
-    # NOTE: works only with default 1.0 values, as fsl convention is less informative than itk-snap..
-    check_equal(ldm_itk.dict_label_descriptor.keys(), ldm_fsl.dict_label_descriptor.keys())
+    # NOTE: test works only with default 1.0 values - fsl convention is less informative than itk-snap..
+    check_list_equal(ldm_itk.dict_label_descriptor.keys(), ldm_fsl.dict_label_descriptor.keys())
     for k in ldm_itk.dict_label_descriptor.keys():
-        check_equal(ldm_itk.dict_label_descriptor[k], ldm_fsl.dict_label_descriptor[k])
+        check_list_equal(ldm_itk.dict_label_descriptor[k], ldm_fsl.dict_label_descriptor[k])
 
     os.system('rm {}'.format(jph(ldg.pfo_target_atlas, 'label_descriptor_fsl.txt')))
+
+
+# IN progress:
+
+# TESTING: labels permutations - permute_labels_in_descriptor
+
+def test_relabel():
+    pass
+
+
+def test_permute_labels_from_descriptor_wrong_input_permutation():
+    pfi_input_label_descriptor = jph(ldg.pfo_target_atlas, 'label_descriptor.txt')
+    perm = [[1, 2, 3], [1, 1]]
+    ldm = LabelsDescriptorManager(pfi_input_label_descriptor)
+    with assert_raises(IOError):
+        ldm.permute_labels(perm)
+
+
+def test_permute_labels_from_descriptor_check():
+    pfi_input_label_descriptor = jph(ldg.pfo_target_atlas, 'label_descriptor.txt')
+    perm = [[1, 2, 3], [1, 3, 2]]
+    ldm = LabelsDescriptorManager(pfi_input_label_descriptor)
+    ldm_new = ldm.permute_labels(perm)
+    for k1, k2 in zip(perm[0], perm[1]):
+        print k1, k2
+
+
+# TESTING: Generate dummy descriptor - generate_dummy_label_descriptor
+
+
+pfi_testing_output = jph(ldg.pfo_target_atlas, 'label_descriptor.txt')
+
+
+def test_generate_dummy_labels_descriptor_wrong_input1():
+    with assert_raises(IOError):
+        generate_dummy_label_descriptor(pfi_testing_output, list_labels=range(5),
+                                        list_roi_names=['1', '2'])
+
+
+def test_generate_dummy_labels_descriptor_wrong_input2():
+    with assert_raises(IOError):
+        generate_dummy_label_descriptor(pfi_testing_output, list_labels=range(5),
+                                        list_roi_names=['1', '2', '3', '4', '5'],
+                                        list_colors_triplets=[[0,0,0], [1,1,1]])
+
+
+def none():
+    print jph(ldg.pfo_target_atlas, 'label_descriptor.txt')
+
