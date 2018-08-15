@@ -15,15 +15,20 @@ def permute_labels_from_descriptor(in_ldm, permutation):
     sanity_check).
     :return:
     """
-    assert is_valid_permutation(permutation)
-    out_ldm = copy.copy(in_ldm)
-    d = out_ldm.dict_label_descriptor
-    for k1, k2 in zip(permutation[0],permutation[1]):
-        d[k1], d[k2] = d[k2], d[k1]
-    return out_ldm
+    if not is_valid_permutation(permutation):
+        raise IOError('Not valid permutation, please see the docs.')
+    # out_ldm = copy.copy(in_ldm)
+    for k1, k2 in zip(permutation[0], permutation[1]):
+        print(k1, k2)
+        print
+        in_ldm.dict_label_descriptor[k1], in_ldm.dict_label_descriptor[k2] = \
+            in_ldm.dict_label_descriptor[k2], in_ldm.dict_label_descriptor[k1]
+    return in_ldm
 
 
-def generate_dummy_label_descriptor(pfi_output, list_labels=range(5), list_roi_names=None, list_colors_triplets=None):
+
+def generate_dummy_label_descriptor(pfi_output, list_labels=range(5),
+                                    list_roi_names=None, list_colors_triplets=None):
     """
     For testing purposes, it creates a dummy label descriptor with the itk-snap convention
     :param pfi_output: where to save the eventual label descriptor

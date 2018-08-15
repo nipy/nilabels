@@ -2,6 +2,7 @@ import numpy as np
 import os
 import subprocess
 
+from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
 
 # ---- List utils ----
 
@@ -144,3 +145,52 @@ def triangular_density_function(x, a, mu, b):
         return 2 * (b - x) / float((b - a) * (b - mu))
     else:
         return 0
+
+
+# ------------ Permutations --------------
+
+
+def decouple_permutation(perm):
+    """
+    from [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
+    to   [[1,3], [2,4], [3,5], [4,2], [5,1]]
+    """
+    return [a for a in [list(a) for a in zip(perm[0], perm[1]) if perm[0] != perm[1]] if a[0] != a[1]]
+
+
+def merge_decoupled_permutation(decoupled):
+    """
+    From [[1,3], [2,4], [3,5], [4,2], [5,1]]
+    to   [[1, 3, 5], [2, 4]]
+    """
+    ans = []
+    while len(decoupled):
+        index_next = [k[0] for k in decoupled[1:]].index(decoupled[0][-1]) + 1
+        decoupled[0].append(decoupled[index_next][1])
+        decoupled.pop(index_next)
+        if decoupled[0][0] == decoupled[0][-1]:
+            ans.append(decoupled[0][:-1])
+            decoupled.pop(0)
+    return ans
+
+
+def from_permutation_to_disjoints_cycles(perm):
+    """
+    from [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
+    to   [[1, 3, 5], [2, 4]]
+    """
+    if not is_valid_permutation(perm):
+        raise IOError('Input permutation is not valid')
+    return merge_decoupled_permutation(decouple_permutation(perm))
+
+
+def from_disjoint_cycles_to_permutation(dc):
+    """
+    from [[1, 3, 5], [2, 4]]
+    to   [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
+    """
+    perm = [0, ] * max(lift_list(dc))
+    for cycle in dc:        
+        for i, c in enumerate(cycle):
+            perm[c-1] = cycle[(i + 1) % len(cycle)]
+    return [list(range(1, len(perm) + 1)), perm]
