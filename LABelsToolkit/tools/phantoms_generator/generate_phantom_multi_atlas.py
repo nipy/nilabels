@@ -1,15 +1,14 @@
 import os
 from os.path import join as jph
 
-
 import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
+from LABelsToolkit.tools.aux_methods.label_descriptor_manager import generate_dummy_label_descriptor
 from LABelsToolkit.tools.aux_methods.utils import print_and_run
-from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import generate_dummy_label_descriptor
+from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import sphere_shape
 
 
 def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomness_shape=0.3, randomness_noise=0.4,
@@ -87,7 +86,6 @@ def generate_atlas_at_folder(pfo_where_to_save_atlas, atlas_name='t01', randomne
 
     if get_labels_descriptor:
         pfi_label_descriptor = jph(pfo_where_to_save_atlas, labels_descriptor_name)
-
         generate_dummy_label_descriptor(pfi_label_descriptor, list_labels=range(5),
                                         list_roi_names=['Bkg', 'Skull', 'WM', 'GM', 'CSF'],
                                         list_colors_triplets=[[0, 0, 0], [255, 0, 0], [0, 255, 0],

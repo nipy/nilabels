@@ -1,9 +1,9 @@
 import nibabel as nib
 from scipy import ndimage
 
+from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
 from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 from LABelsToolkit.tools.detections.check_imperfections import check_missing_labels
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager
 
 
 class LABelsToolkitChecker(object):

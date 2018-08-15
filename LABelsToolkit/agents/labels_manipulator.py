@@ -1,17 +1,17 @@
 import os
+
 import nibabel as nib
 import numpy as np
 
-from LABelsToolkit.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
+from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager as LdM
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
-
+from LABelsToolkit.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
+from LABelsToolkit.tools.cleaning.labels_cleaner import clean_semgentation
 from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller, \
     permute_labels, erase_labels, assign_all_other_labels_the_same_value, keep_only_one_label
 from LABelsToolkit.tools.image_colors_manipulations.segmentation_to_rgb import \
     get_rgb_image_from_segmentation_and_label_descriptor
 from LABelsToolkit.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
-from LABelsToolkit.tools.cleaning. labels_cleaner import clean_semgentation
-from LABelsToolkit.tools.descriptions.label_descriptor_manager import LabelsDescriptorManager as LdM
 
 
 class LABelsToolkitLabelsManipulate(object):
