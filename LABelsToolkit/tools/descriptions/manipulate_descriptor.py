@@ -15,6 +15,7 @@ def permute_labels_from_descriptor(in_ldm, permutation):
     sanity_check).
     :return:
     """
+    # Not working test in progress
     if not is_valid_permutation(permutation):
         raise IOError('Not valid permutation, please see the docs.')
     # out_ldm = copy.copy(in_ldm)
