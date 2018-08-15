@@ -18,9 +18,9 @@ def relabeller(in_data, list_old_labels, list_new_labels, verbose=True):
     if isinstance(list_old_labels, int):
         list_old_labels = [list_old_labels, ]
 
-    # sanity check: old and new have the same number of elements
+    # sanity check: old and new must have the same number of elements
     if not len(list_old_labels) == len(list_new_labels):
-        raise IOError('Labels list does not have the same length.')
+        raise IOError('Labels lists old and new do not have the same length.')
 
     new_data = copy.deepcopy(in_data)
 
@@ -94,7 +94,8 @@ def keep_only_one_label(in_data, label_to_keep):
         return in_data
 
     labels_not_to_keep = list(set(list_labels) - {label_to_keep})
-    return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0,]*len(labels_not_to_keep), verbose=False)
+    return relabeller(in_data, list_old_labels=labels_not_to_keep, list_new_labels=[0, ]*len(labels_not_to_keep),
+                      verbose=False)
 
 
 def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, axis, plane_intercept):
@@ -107,7 +108,6 @@ def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, a
     :param plane_intercept:
     :return:
     """
-
     msg = 'Input array must be 3-dimensional.'
     assert in_data.ndim == 3, msg
 

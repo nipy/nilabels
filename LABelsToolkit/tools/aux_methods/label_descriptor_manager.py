@@ -117,7 +117,7 @@ class LabelsDescriptorManager(object):
         else:
             raise IOError("Signature for the variable **convention** can be only 'itk-snap' or 'fsl'.")
 
-    # Sanity checks:
+    # ----------- Sanity checks -----------
 
     def _check_path(self):
         """
@@ -128,7 +128,7 @@ class LabelsDescriptorManager(object):
             msg = 'Label descriptor file {} does not exist'.format(self.pfi_label_descriptor)
             raise IOError(msg)
 
-    # Getters-setters:
+    # ---------- Getters-setters -----------
 
     def get_dict_itk_snap(self):
         """
@@ -160,7 +160,7 @@ class LabelsDescriptorManager(object):
             if not l.strip().startswith('#'):
                 parsed_line = [j.strip() for j in l.split(' ') if not j == '']
                 args        = [list(parsed_line[2:5]), float(parsed_line[5]), parsed_line[1]]
-                args[0]     = [int(k) for k in args[0]]
+                args[0]     = [int(k) for k in list(args[0])]
                 args[1]     = [args[1], 1, 1]
                 label_descriptor_dict.update({int(parsed_line[0]): args})
         return label_descriptor_dict
@@ -252,7 +252,7 @@ class LabelsDescriptorManager(object):
             f.write('\n')
         f.close()
 
-    # Methods for labels manipulations -  all these methods are not destructive.
+    # ----------- Methods for labels manipulations -  all these methods are not destructive -----------
 
     def relabel(self, old_labels, new_labels, sort=True):
         """
@@ -303,12 +303,7 @@ class LabelsDescriptorManager(object):
 
     def erase_labels(self, labels_to_erase):
         """
-        :param labels_to_change: is a list of labels.
-        :param single_new_label:
-        E.G. labels_to_change = [1,2,3,4] single_new_label = 7
-        will transform the labels 1,2,3,4 in the label 7.
-        Note: the arguments kept in the labels descriptor corresponding to the new label are the one corresponding to
-        the last lables of labels_to_change. Other labels argumetns are lost in the output ldm.
+        :param labels_to_erase: is a list of labels that will be erased.
         """
         ldm_new = copy.deepcopy(self)
         for l in labels_to_erase:
@@ -318,7 +313,7 @@ class LabelsDescriptorManager(object):
     def assign_all_other_labels_the_same_value(self, labels_to_keep, other_value):
         """
         :param labels_to_keep:
-        :param other_values:
+        :param other_value:
         :return:
         """
         labels_that_will_have_the_same_value = list(set(self.dict_label_descriptor.keys()) - set(labels_to_keep) - {0})
