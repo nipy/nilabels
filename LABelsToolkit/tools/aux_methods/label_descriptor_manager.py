@@ -279,7 +279,7 @@ class LabelsDescriptorManager(object):
             d_sorted = collections.OrderedDict()
             for k in sorted(ldm_new.dict_label_descriptor.keys()):
                 d_sorted.update({k : ldm_new.dict_label_descriptor[k]})
-                ldm_new.dict_label_descriptor = d_sorted
+            ldm_new.dict_label_descriptor = d_sorted
         return ldm_new
 
     def permute_labels(self, permutation):
@@ -301,13 +301,16 @@ class LabelsDescriptorManager(object):
                 ldm_new.dict_label_descriptor[cycle[i]] = self.dict_label_descriptor[cycle[(i + 1) % len_perm]]
         return ldm_new
 
-    def erase_labels(self, labels_to_erase):
+    def erase_labels(self, labels_to_erase, verbose=True):
         """
         :param labels_to_erase: is a list of labels that will be erased.
         """
         ldm_new = copy.deepcopy(self)
-        for l in labels_to_erase:
-            del ldm_new.dict_label_descriptor[l]
+        for lab in labels_to_erase:
+            if verbose and lab not in ldm_new.dict_label_descriptor.keys():
+                print('Label {} can not be erased as not present in the labels descriptor manager.'.format(lab))
+            else:
+                del ldm_new.dict_label_descriptor[lab]
         return ldm_new
 
     def assign_all_other_labels_the_same_value(self, labels_to_keep, other_value):
