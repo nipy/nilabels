@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import subprocess
+from sympy.combinatorics import Permutation
 
 from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
 
@@ -50,7 +51,6 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
     :param safety_on: safety, in case you want to see the messages at a first run.
     :return:
     """
-
     def scan_and_remove_path(msg):
         """
         Take a string with a series of paths separated by a space and keeps only the base-names of each path.
@@ -58,9 +58,6 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
         a = [os.path.basename(p) for p in msg.split(' ')]
         return ' '.join(a)
 
-    # if len(cmd) > 249:
-    #     print(cmd)
-    #     raise IOError('input command is too long, this may create problems. Please use shortest names!')
     if short_path_output:
         path_free_cmd = scan_and_remove_path(cmd)
     else:
@@ -72,7 +69,6 @@ def print_and_run(cmd, msg=None, safety_on=False, short_path_output=True):
         print('\n-> ' + path_free_cmd + '\n')
 
     if not safety_on:
-        # os.system(cmd)
         subprocess.call(cmd, shell=True)
 
 # ---------- Labels processors ---------------
@@ -103,7 +99,7 @@ def labels_query(labels, segmentation_array=None, remove_zero=True):
             labels_list = [list(np.sort(list(set(segmentation_array.astype(np.int).flat))))]
             if labels_list[0][0] == 0:
                 if remove_zero:
-                    labels_list = labels_list[0][1:]  # remove zeros!
+                    labels_list = labels_list[0][1:]  # remove initial zero
                 else:
                     labels_list = labels_list[0]
         elif os.path.exists(labels):
@@ -149,53 +145,49 @@ def triangular_density_function(x, a, mu, b):
 
 
 # ------------ Permutations --------------
+# Thanks to Martin R and Accumulation
+# https://codereview.stackexchange.com/questions/201725/disjoint-cycles-of-a-permutation
 
 
-def decouple_permutation(perm):
-    """
-    from [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
-    to   [[1,3], [2,4], [3,5], [4,2], [5,1]]
-    """
-    return [a for a in [list(a) for a in zip(perm[0], perm[1]) if perm[0] != perm[1]] if a[0] != a[1]]
-
-
-def merge_decoupled_permutation(decoupled):
-    """
-    From [[1,3], [2,4], [3,5], [4,2], [5,1]]
-    to   [[1, 3, 5], [2, 4]]
-    """
-    ans = []
-    while len(decoupled):
-        index_next = [k[0] for k in decoupled[1:]].index(decoupled[0][-1]) + 1
-        decoupled[0].append(decoupled[index_next][1])
-        decoupled.pop(index_next)
-        if decoupled[0][0] == decoupled[0][-1]:
-            ans.append(decoupled[0][:-1])
-            decoupled.pop(0)
-    return ans
-
-
-def from_permutation_to_disjoints_cycles(perm):
+def permutation_from_cauchy_to_disjoints_cycles(cauchy_perm):
     """
     from [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
     to   [[1, 3, 5], [2, 4]]
+    :param cauchy_perm: permutation in generalised Cauchy convention (any object, not necessarily numbers from 1 to n
+    or from 0 ot n-1) where the objects that are not permuted do not appear.
+    :return: input permutation written in disjoint cycles.
     """
-    if not is_valid_permutation(perm):
+    if not is_valid_permutation(cauchy_perm):
         raise IOError('Input permutation is not valid')
-    return merge_decoupled_permutation(decouple_permutation(perm))
+    list_cycles = []
+    cycle = [cauchy_perm[0][0]]
+    while len(cauchy_perm[0]) > 0:
+
+        first_row_element, second_row_element = cycle[-1], cauchy_perm[1][cauchy_perm[0].index(cycle[-1])]
+        cycle.append(second_row_element)
+        cauchy_perm[0].remove(first_row_element)
+        cauchy_perm[1].remove(second_row_element)
+        if cycle[0] == cycle[-1]:
+            if len(cycle) > 2:
+               list_cycles += [cycle[:-1]]
+            if len(cauchy_perm[0]) > 0:
+                cycle = [cauchy_perm[0][0]]
+    return list_cycles
 
 
-def from_disjoint_cycles_to_permutation(dc):
+def permutation_from_disjoint_cycles_to_cauchy(cyclic_perm):
     """
     from [[1, 3, 5], [2, 4]]
     to   [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
     """
-    perm = [0, ] * max(lift_list(dc))
-    for cycle in dc:        
-        for i, c in enumerate(cycle):
-            perm[c-1] = cycle[(i + 1) % len(cycle)]
-    return [list(range(1, len(perm) + 1)), perm]
-
+    pairs = sorted([(a, b) for cycle in cyclic_perm for a, b in zip(cycle, cycle[1:] + cycle[:1])])
+    return [list(i) for i in zip(*pairs)]
 
 if __name__ == '__main__':
-    print from_permutation_to_disjoints_cycles([[1, 2, 3], [3, 2, 1]])
+    cauchy_perm = [[1, 2, 3, 4, 5, 6, 7, 8,9,10],
+                   [3, 4, 5, 1, 2, 7, 6, 8,10,9]]
+    cycles_perm = permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
+    expected_ans = [[1, 3, 5, 2, 4], [6, 7]]
+    print('\n\n')
+    print expected_ans
+    print cycles_perm

@@ -31,11 +31,11 @@ def _create_data_set_for_tests():
 
         for j in range(1, num_subjects + 1):
             pfi_dummy_atlas = jph(ldg.pfo_multi_atlas, 'e00{}'.format(j))
-            pfi_modGT = jph(pfi_dummy_atlas, 'mod', 'e00{}_modGT.nii.gz'.format(j))
+            pfi_modGT  = jph(pfi_dummy_atlas, 'mod', 'e00{}_modGT.nii.gz'.format(j))
             pfi_segmGT = jph(pfi_dummy_atlas, 'segm', 'e00{}_segmGT.nii.gz'.format(j))
             assert os.path.exists(pfi_modGT), pfi_modGT
             assert os.path.exists(pfi_segmGT), pfi_segmGT
-            pfi_modGT_new = jph(pfo_icv_brains, 'e00{}_modGT.nii.gz'.format(j))
+            pfi_modGT_new  = jph(pfo_icv_brains, 'e00{}_modGT.nii.gz'.format(j))
             pfi_segmGT_new = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
             os.system('cp {} {}'.format(pfi_modGT, pfi_modGT_new))
             os.system('cp {} {}'.format(pfi_segmGT, pfi_segmGT_new))
@@ -54,7 +54,7 @@ def test_compute_ground_truth_m_and_estimated_m():
     lab = LABelsToolkit()
     for j in range(1, num_subjects + 1):
         pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
-        df_vols = lab.measure.volume(pfi_segmGT, labels='tot')
+        df_vols    = lab.measure.volume(pfi_segmGT, labels='tot')
         v_ground[j - 1] = np.sum(df_vols['Volume'])
         print('Subject {}, volume: {}'.format(j, v_ground[j - 1]))
     m_ground = np.mean(v_ground)

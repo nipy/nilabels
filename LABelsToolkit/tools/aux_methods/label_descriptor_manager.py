@@ -34,7 +34,7 @@ import copy
 import numpy as np
 
 from LABelsToolkit.tools.aux_methods.sanity_checks import is_valid_permutation
-from LABelsToolkit.tools.aux_methods.utils import from_permutation_to_disjoints_cycles
+from LABelsToolkit.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles
 
 
 descriptor_standard_header = \
@@ -294,7 +294,7 @@ class LabelsDescriptorManager(object):
             raise IOError('Not valid input permutation, please see the documentation.')
         ldm_new = copy.deepcopy(self)
 
-        cycles = from_permutation_to_disjoints_cycles(permutation)
+        cycles = permutation_from_cauchy_to_disjoints_cycles(permutation)
         for cycle in cycles:
             len_perm = len(cycle)
             for i in range(len_perm):

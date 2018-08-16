@@ -9,6 +9,8 @@ from LABelsToolkit.tools.defs import root_dir
 from LABelsToolkit.tools.aux_methods.sanity_checks import check_pfi_io
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 from LABelsToolkit.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
+from LABelsToolkit.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
+    permutation_from_disjoint_cycles_to_cauchy
 
 
 ''' Test aux_methods.morphological.py'''
@@ -155,3 +157,57 @@ def test_labels_query_all_or_tot_input():
     assert_array_equal(lab, np.arange(10))
     lab, lab_names = labels_query('tot', v, remove_zero=True)
     assert_array_equal(lab, np.arange(10)[1:])
+
+
+# Test permutations:
+
+
+def test_from_permutation_to_disjoints_cycles():
+    cauchy_perm = [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
+    cycles_perm = permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
+    expected_ans = [[1, 3, 5], [2, 4]]
+    for c1, c2 in zip(expected_ans, cycles_perm):
+        assert_array_equal(c1, c2)
+
+
+def test_from_disjoint_cycles_to_permutation():
+    cycles_perm = [[1, 3, 5], [2, 4]]
+    cauchy_perm = permutation_from_disjoint_cycles_to_cauchy(cycles_perm)
+    expected_ans = [[1, 2, 3, 4, 5], [3, 4, 5, 2, 1]]
+    for c1, c2 in zip(cauchy_perm, expected_ans):
+        assert_array_equal(c1, c2)
+
+
+def test_from_permutation_to_disjoints_cycles_single_cycle():
+    cauchy_perm = [[1, 2, 3, 4, 5, 6, 7],
+                   [3, 4, 5, 1, 2, 7, 6]]
+    cycles_perm = permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
+    expected_ans = [[1, 3, 5, 2, 4], [6,7]]
+
+    print expected_ans
+    print cycles_perm
+
+    for c1, c2 in zip(expected_ans, cycles_perm):
+        assert_array_equal(c1, c2)
+
+
+def test_from_disjoint_cycles_to_permutation_single_cycle():
+    cycles_perm = [[1, 3, 5, 2, 4]]
+    cauchy_perm = permutation_from_disjoint_cycles_to_cauchy(cycles_perm)
+    expected_ans = [[1, 2, 3, 4, 5], [3, 4, 5, 1, 2]]
+
+    print expected_ans
+    print cauchy_perm
+
+    for c1, c2 in zip(cauchy_perm, expected_ans):
+        assert_array_equal(c1, c2)
+
+
+test_from_permutation_to_disjoints_cycles_single_cycle()
+test_from_disjoint_cycles_to_permutation_single_cycle()
+
+test_from_disjoint_cycles_to_permutation()
+test_from_permutation_to_disjoints_cycles()
+
+#
+# permutation_from_cauchy_to_disjoints_cycles,
