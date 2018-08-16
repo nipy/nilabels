@@ -106,9 +106,9 @@ def generate_dummy_label_descriptor(pfi_output, list_labels=range(5),
 
 class LabelsDescriptorManager(object):
 
-    def __init__(self, pfi_label_descriptor, convention='itk-snap'):
+    def __init__(self, pfi_label_descriptor, labels_descriptor_convention='itk-snap'):
         self.pfi_label_descriptor = pfi_label_descriptor
-        self.convention = convention
+        self.convention = labels_descriptor_convention
         self._check_path()
         if self.convention == 'itk-snap':
             self.dict_label_descriptor = self.get_dict_itk_snap()
@@ -254,10 +254,10 @@ class LabelsDescriptorManager(object):
 
     # ----------- Methods for labels manipulations -  all these methods are not destructive -----------
 
-    def relabel(self, old_labels, new_labels, sort=True):
+    def relabel(self, list_old_labels, list_new_labels, sort=True):
         """
-        :param old_labels: list of existing labels
-        :param new_labels: list of new labels to substitute the previous one
+        :param list_old_labels: list of existing labels
+        :param list_new_labels: list of new labels to substitute the previous one
         :param sort: provide sorted OrderedDict output.
         E.G. old_labels = [3, 6, 9]  new_labels = [4, 4, 100]
         will transform label 3 in label 4, label 6 in label 4 and label 9 in label 100, even if label 100 was not
@@ -267,10 +267,10 @@ class LabelsDescriptorManager(object):
         be lost in the output ldm.
         """
         ldm_new = copy.deepcopy(self)
-        for k in old_labels:
+        for k in list_old_labels:
             del ldm_new.dict_label_descriptor[k]
-        for k_new in new_labels:
-            k_old = old_labels[new_labels.index(k_new)]
+        for k_new in list_new_labels:
+            k_old = list_old_labels[list_new_labels.index(k_new)]
             if k_old in self.dict_label_descriptor.keys():
                 ldm_new.dict_label_descriptor.update({k_new : self.dict_label_descriptor[k_old]})
             else:
@@ -308,24 +308,24 @@ class LabelsDescriptorManager(object):
         ldm_new = copy.deepcopy(self)
         for lab in labels_to_erase:
             if verbose and lab not in ldm_new.dict_label_descriptor.keys():
-                print('Label {} can not be erased as not present in the labels descriptor manager.'.format(lab))
+                print('Labels descriptor manager: Label {} can not be erased as not present.'.format(lab))
             else:
                 del ldm_new.dict_label_descriptor[lab]
         return ldm_new
 
-    def assign_all_other_labels_the_same_value(self, labels_to_keep, other_value):
+    def assign_all_other_labels_the_same_value(self, labels_to_keep, same_value_label):
         """
         :param labels_to_keep:
-        :param other_value:
+        :param same_value_label:
         :return:
         """
         labels_that_will_have_the_same_value = list(set(self.dict_label_descriptor.keys()) - set(labels_to_keep) - {0})
         return self.relabel(labels_that_will_have_the_same_value,
-                            [other_value] * len(labels_that_will_have_the_same_value))
+                            [same_value_label] * len(labels_that_will_have_the_same_value))
 
     def keep_one_label(self, label_to_keep=1):
         """
-        :param label_to_keep:
+        :param label_to_keep: all other values will be set to zero.
         :return:
         """
         labels_not_to_keep = list(set(self.dict_label_descriptor.keys()) - {label_to_keep})

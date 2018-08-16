@@ -75,7 +75,7 @@ def test_save_in_fsl_convention_reload_as_dict_and_compare():
     ldm_itk.convention = 'fsl'
     ldm_itk.save_label_descriptor(jph(ldg.pfo_target_atlas, 'label_descriptor_fsl.txt'))
 
-    ldm_fsl = LabelsDescriptorManager(jph(ldg.pfo_target_atlas, 'label_descriptor_fsl.txt'), convention='fsl')
+    ldm_fsl = LabelsDescriptorManager(jph(ldg.pfo_target_atlas, 'label_descriptor_fsl.txt'), labels_descriptor_convention='fsl')
 
     # NOTE: test works only with default 1.0 values - fsl convention is less informative than itk-snap..
     check_list_equal(ldm_itk.dict_label_descriptor.keys(), ldm_fsl.dict_label_descriptor.keys())

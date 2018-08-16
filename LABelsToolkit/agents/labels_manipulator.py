@@ -21,18 +21,20 @@ class LABelsToolkitLabelsManipulate(object):
     one or more input manipulate them according to some rule and save the
     output in the output_data_folder or in the specified paths.
     """
-    # TODO add filename for labels descriptors and manipulations of labels descriptors.
-
     def __init__(self, input_data_folder=None, output_data_folder=None):
-        self.pfo_in = input_data_folder
+        self.pfo_in  = input_data_folder
         self.pfo_out = output_data_folder
+        self.verbose = True
+        self.labels_descriptor_convention = 'itk-snap'
 
-    def relabel(self, pfi_input, pfi_output=None, list_old_labels=(), list_new_labels=()):
+    def relabel(self, path_to_input_segmentation, path_to_output_segmentation=None,
+                list_old_labels=(), list_new_labels=(), path_to_input_labels_descriptor=None,
+                path_to_output_labels_descriptor=None):
         """
         Masks of :func:`labels_manager.tools.manipulations.relabeller.relabeller` using filenames
         """
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in,
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation, self.pfo_in,
                                              self.pfo_out)
         im_labels = nib.load(pfi_in)
         data_labels = im_labels.get_data()
@@ -42,12 +44,27 @@ class LABelsToolkitLabelsManipulate(object):
         im_relabelled = set_new_data(im_labels, data_relabelled)
 
         nib.save(im_relabelled, pfi_out)
+
+        if path_to_input_labels_descriptor is not None:
+            pfi_in_ld = connect_path_tail_head(self.pfo_in, path_to_input_labels_descriptor)
+
+            ldm_input = LdM(pfi_in_ld, labels_descriptor_convention=self.labels_descriptor_convention)
+            ldm_relabelled = ldm_input.relabel(list_old_labels=list_old_labels, list_new_labels=list_new_labels)
+
+            if path_to_output_labels_descriptor is None:
+                ldm_relabelled.save_label_descriptor(pfi_in_ld)
+            else:
+                pfi_out_ld = connect_path_tail_head(self.pfo_out, path_to_output_labels_descriptor)
+                ldm_relabelled.save_label_descriptor(pfi_out_ld)
+
         print('Relabelled image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def permute_labels(self, pfi_input, pfi_output=None, permutation=()):
+    def permute_labels(self, path_to_input_segmentation, path_to_output_segmentation=None, permutation=(),
+                       path_to_input_labels_descriptor=None, path_to_output_labels_descriptor=None):
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation,
+                                             self.pfo_in, self.pfo_out)
 
         im_labels = nib.load(pfi_in)
         data_labels = im_labels.get_data()
@@ -55,12 +72,27 @@ class LABelsToolkitLabelsManipulate(object):
 
         im_permuted = set_new_data(im_labels, data_permuted)
         nib.save(im_permuted, pfi_out)
+
+        if path_to_input_labels_descriptor is not None:
+            pfi_in_ld = connect_path_tail_head(self.pfo_in, path_to_input_labels_descriptor)
+
+            ldm_input = LdM(pfi_in_ld, labels_descriptor_convention=self.labels_descriptor_convention)
+            ldm_relabelled = ldm_input.permute_labels(permutation)
+
+            if path_to_output_labels_descriptor is None:
+                ldm_relabelled.save_label_descriptor(pfi_in_ld)
+            else:
+                pfi_out_ld = connect_path_tail_head(self.pfo_out, path_to_output_labels_descriptor)
+                ldm_relabelled.save_label_descriptor(pfi_out_ld)
+
         print('Permuted labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def erase_labels(self, pfi_input, pfi_output=None, labels_to_erase=()):
+    def erase_labels(self, path_to_input_segmentation, path_to_output_segmentation=None, labels_to_erase=(),
+                     path_to_input_labels_descriptor=None, path_to_output_labels_descriptor=None):
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation,
+                                             self.pfo_in, self.pfo_out)
 
         im_labels = nib.load(pfi_in)
         data_labels = im_labels.get_data()
@@ -68,13 +100,29 @@ class LABelsToolkitLabelsManipulate(object):
 
         im_erased = set_new_data(im_labels, data_erased)
         nib.save(im_erased, pfi_out)
+
+        if path_to_input_labels_descriptor is not None:
+            pfi_in_ld = connect_path_tail_head(self.pfo_in, path_to_input_labels_descriptor)
+
+            ldm_input = LdM(pfi_in_ld, labels_descriptor_convention=self.labels_descriptor_convention)
+            ldm_relabelled = ldm_input.erase_labels(labels_to_erase, verbose=self.verbose)
+
+            if path_to_output_labels_descriptor is None:
+                ldm_relabelled.save_label_descriptor(pfi_in_ld)
+            else:
+                pfi_out_ld = connect_path_tail_head(self.pfo_out, path_to_output_labels_descriptor)
+                ldm_relabelled.save_label_descriptor(pfi_out_ld)
+
         print('Erased labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def assign_all_other_labels_the_same_value(self, pfi_input, pfi_output=None,
-                                               labels_to_keep=(), same_value_label=255):
+    def assign_all_other_labels_the_same_value(self, path_to_input_segmentation, path_to_output_segmentation=None,
+                                               labels_to_keep=(), same_value_label=255,
+                                               path_to_input_labels_descriptor=None,
+                                               path_to_output_labels_descriptor=None):
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation,
+                                             self.pfo_in, self.pfo_out)
 
         im_labels = nib.load(pfi_in)
         data_labels = im_labels.get_data()
@@ -83,26 +131,54 @@ class LABelsToolkitLabelsManipulate(object):
 
         im_reassigned = set_new_data(im_labels, data_reassigned)
         nib.save(im_reassigned, pfi_out)
+
+        if path_to_input_labels_descriptor is not None:
+            pfi_in_ld = connect_path_tail_head(self.pfo_in, path_to_input_labels_descriptor)
+
+            ldm_input = LdM(pfi_in_ld, labels_descriptor_convention=self.labels_descriptor_convention)
+            ldm_relabelled = ldm_input.assign_all_other_labels_the_same_value(labels_to_keep=labels_to_keep,
+                                                                              same_value_label=same_value_label)
+
+            if path_to_output_labels_descriptor is None:
+                ldm_relabelled.save_label_descriptor(pfi_in_ld)
+            else:
+                pfi_out_ld = connect_path_tail_head(self.pfo_out, path_to_output_labels_descriptor)
+                ldm_relabelled.save_label_descriptor(pfi_out_ld)
+
         print('Reassigned labels from image {0} saved in {1}.'.format(pfi_in, pfi_out))
         return pfi_out
 
-    def keep_one_label(self, pfi_input, pfi_output=None, label_to_keep=1):
+    def keep_one_label(self, path_to_input_segmentation, path_to_output_segmentation=None, label_to_keep=1,
+                       path_to_input_labels_descriptor=None, path_to_output_labels_descriptor=None):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation,
+                                             self.pfo_in, self.pfo_out)
 
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_input, pfi_output, self.pfo_in, self.pfo_out)
-
-        im_labels = nib.load(pfi_in)
-        data_labels = im_labels.get_data()
+        im_labels      = nib.load(pfi_in)
+        data_labels    = im_labels.get_data()
         data_one_label = keep_only_one_label(data_labels, label_to_keep)
 
         im_one_label = set_new_data(im_labels, data_one_label)
         nib.save(im_one_label, pfi_out)
+
+        if path_to_input_labels_descriptor is not None:
+            pfi_in_ld = connect_path_tail_head(self.pfo_in, path_to_input_labels_descriptor)
+
+            ldm_input = LdM(pfi_in_ld, labels_descriptor_convention=self.labels_descriptor_convention)
+            ldm_relabelled = ldm_input.keep_one_label(label_to_keep)
+
+            if path_to_output_labels_descriptor is None:
+                ldm_relabelled.save_label_descriptor(pfi_in_ld)
+            else:
+                pfi_out_ld = connect_path_tail_head(self.pfo_out, path_to_output_labels_descriptor)
+                ldm_relabelled.save_label_descriptor(pfi_out_ld)
+
         print('Label {0} kept from image {1} and saved in {2}.'.format(label_to_keep, pfi_in, pfi_out))
         return pfi_out
 
-    def get_probabilistic_prior_from_stack_segmentations(self, pfi_stack_crisp_segm, pfi_fuzzy_output):
-        pfi_in, pfi_out = get_pfi_in_pfi_out(pfi_stack_crisp_segm, pfi_fuzzy_output, self.pfo_in, self.pfo_out)
+    def get_probabilistic_prior_from_stack_segmentations(self, path_to_stack_crisp_segm, path_to_fuzzy_output):
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_stack_crisp_segm, path_to_fuzzy_output, self.pfo_in, self.pfo_out)
 
-        im_stack_crisp = nib.load(pfi_stack_crisp_segm)
+        im_stack_crisp = nib.load(path_to_stack_crisp_segm)
 
         dims = im_stack_crisp.shape
 
@@ -118,13 +194,13 @@ class LABelsToolkitLabelsManipulate(object):
 
         return pfi_out
 
-    def clean_segmentation(self, input_segmentation, output_cleaned_segmentation, labels_to_clean=(), verbose=1,
-                           special_label=None):
+    def clean_segmentation(self, path_to_input_segmentation, path_to_output_cleaned_segmentation, labels_to_clean=(),
+                           verbose=1, special_label=None):
         """
         Clean the segmentation merging the small connected components with the surrounding tissue.
-        :param input_segmentation: path to the input segmentation
-        :param output_cleaned_segmentation: path to the output cleaned segmentation. For safety this file can not exist
-        before calling this method.
+        :param path_to_input_segmentation: path to the input segmentation
+        :param path_to_output_cleaned_segmentation: path to the output cleaned segmentation. For safety this file can
+        not exist before calling this method.
         :param labels_to_clean: list of binaries lists. [[z_1, zc_1], ... , [z_J, zc_J]] where z_j is the label you want
         to clean and zc_1 is the number of components you want to keep. If empty tuple, by default cleans all the labels
         keeping only one component.
@@ -135,7 +211,8 @@ class LABelsToolkitLabelsManipulate(object):
         Note: as a feature (really!) after the holes identification, all labels, and not only the ones indicated in the
         input dilate iteratively over the 'holes'.
         """
-        pfi_in, pfi_out = get_pfi_in_pfi_out(input_segmentation, output_cleaned_segmentation, self.pfo_in, self.pfo_out)
+        pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_cleaned_segmentation,
+                                             self.pfo_in, self.pfo_out)
         if os.path.exists(pfi_out):
             raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))
 
@@ -152,31 +229,30 @@ class LABelsToolkitLabelsManipulate(object):
         if verbose:
             print('Segmentation {} cleaned saved to {}'.format(pfi_in, pfi_out))
 
-    def from_segmentation_and_labels_descriptor_to_rgb(self, input_segmentation, input_txt_labels_descriptor,
-                                                       output_4d_rgb_image,
-                                                       invert_black_white=False, dtype_output=np.int32,
-                                                       convention='itk-snap'):
+    def from_segmentation_and_labels_descriptor_to_rgb(self, path_to_input_segmentation,
+                                                       path_to_input_txt_labels_descriptor,
+                                                       path_to_output_4d_rgb_image,
+                                                       invert_black_white=False, dtype_output=np.int32):
         """
         + Masks of :func:`LABelsToolkit.tools.image_colors_manipulations.segmentation_to_rgb.
         get_rgb_image_from_segmentation_and_label_descriptor` using filenames.
         From a segmentation and its label descriptro in itk-snap convention or in fsl convention
         it creates a corresponding 4d image with the 3 R G B channels in the fourth dimension.
-        :param input_segmentation: path to the input segmentation
-        :param input_txt_labels_descriptor: path to the txt labels descriptor
-        :param output_4d_rgb_image: path where to save the output
+        :param path_to_input_segmentation: path to the input segmentation
+        :param path_to_input_txt_labels_descriptor: path to the txt labels descriptor
+        :param path_to_output_4d_rgb_image: path where to save the output
         :param invert_black_white: changes the background colour, if black to white.
         :param dtype_output: data type of the output np.int32
-        :param convention: convention of the given txt labels descriptor, can be 'itk-snap' or 'fsl'.
         :return:
         """
-        pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)
-        pfi_ld = connect_path_tail_head(self.pfo_in, input_txt_labels_descriptor)
+        pfi_segm = connect_path_tail_head(self.pfo_in, path_to_input_segmentation)
+        pfi_ld = connect_path_tail_head(self.pfo_in, path_to_input_txt_labels_descriptor)
 
         im_segm = nib.load(pfi_segm)
-        ldm = LdM(pfi_ld, convention=convention)
+        ldm = LdM(pfi_ld, labels_descriptor_convention=self.labels_descriptor_convention)
         im_rgb_4d_image = get_rgb_image_from_segmentation_and_label_descriptor(im_segm, ldm,
                                                                                invert_black_white=invert_black_white,
                                                                                dtype_output=dtype_output)
 
-        pfi_out = connect_path_tail_head(self.pfo_out, output_4d_rgb_image)
+        pfi_out = connect_path_tail_head(self.pfo_out, path_to_output_4d_rgb_image)
         nib.save(im_rgb_4d_image, pfi_out)

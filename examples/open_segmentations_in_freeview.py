@@ -22,7 +22,7 @@ def freesurfer_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, 
     :param labels_to_delineate:
     :return:
     """
-    ldm = LabelsDescriptorManager(pfi_descriptor, convention=convention_descriptor)
+    ldm = LabelsDescriptorManager(pfi_descriptor, labels_descriptor_convention=convention_descriptor)
 
     cmd = 'source $FREESURFER_HOME/SetUpFreeSurfer.sh; freeview -v {0} -f '.format(pfi_anatomy)
 
