@@ -1,11 +1,10 @@
+import numpy as np
 import nibabel as nib
 from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.detections.get_segmentation import intensity_segmentation, otsu_threshold, \
     MoG_array
-
-
 
 
 class LABelsToolkitSegmenter(object):
@@ -18,17 +17,18 @@ class LABelsToolkitSegmenter(object):
         self.pfo_out = output_data_folder
 
     def simple_intensities_thresholding(self):
+        # intensity_segmentation
         # TODO
-        intensity_segmentation
         pass
 
     def otsu_thresholding(self):
-        otsu_threshold
+        # otsu_threshold
         # TODO
         pass
 
-    def get_MoG(self, path_to_input_image, path_to_output_segmentation, K=None, mask_im=None, pre_process_median_filter=False,
-            pre_process_only_interquartile=False, see_histogram=None, reorder_mus=True):
+    def mixture_of_gaussians(self, path_to_input_image, path_to_output_segmentation_crisp,
+                             path_to_output_segmentation_prob, K=None, mask_im=None, pre_process_median_filter=False,
+                             pre_process_only_interquartile=False, see_histogram=None, reorder_mus=True):
         """
         Wrap of MoG_array for nibabel images.
         -----
@@ -37,14 +37,15 @@ class LABelsToolkitSegmenter(object):
         :param mask_im: nibabel mask if you want to consider only a subset of the masked data.
         :param pre_process_median_filter: apply a median filter before pre-processing (reduce salt and pepper noise).
         :param pre_process_only_interquartile: set to zero above and below interquartile in the data.
-        :param see_histogram: can be True, False (or None) or a string (with a path where to save the plotted histogram).
+        :param see_histogram: can be True, False (or None) or a string (with a path where to save the plotted
+                              histogram).
         :param reorder_mus: only if output_gmm_class=False, reorder labels from smallest to bigger means.
-        :return: [c, p] crisp and probabilistic segmentation OR gmm, instance of the class sklearn.mixture.GaussianMixture.
+        :return: save crisp and probabilistic segmentation at the specified files after sklearn.mixture.GaussianMixture
         """
 
-        pfi_segm = connect_path_tail_head(self.pfo_in, path_to_input_image)
+        pfi_input_image = connect_path_tail_head(self.pfo_in, path_to_input_image)
 
-        input_im = nib.load(pfi_segm)
+        input_im = nib.load(pfi_input_image)
         if mask_im is not None:
             mask_array = mask_im.get_data()
         else:
@@ -60,4 +61,8 @@ class LABelsToolkitSegmenter(object):
         im_crisp = set_new_data(input_im, crisp, new_dtype=np.uint8)
         im_prob = set_new_data(input_im, prob, new_dtype=np.float64)
 
-        return im_crisp, im_prob
+        pfi_im_crisp = connect_path_tail_head(self.pfo_out, path_to_output_segmentation_crisp)
+        pfi_im_prob = connect_path_tail_head(self.pfo_out, path_to_output_segmentation_crisp)
+
+        nib.save(im_crisp, pfi_im_crisp)
+        nib.save(im_prob, pfi_im_prob)

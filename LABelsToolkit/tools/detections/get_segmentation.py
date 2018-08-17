@@ -13,47 +13,43 @@ except ImportError:
     from skimage import filter as filters
 
 
-def intensity_segmentation(in_data, num_levels=5):
+def intensity_segmentation(in_array, num_levels=5):
     """
-    Very very very simple way of getting an intensity based segmentation.
-    :param in_data: image data in a numpy array.
+    Simplest way of getting an intensity based segmentation.
+    :param in_array: image data in a numpy array.
     :param num_levels: maximum allowed 65535 - 1.
     :return: segmentation of the result in levels levels based on the intensities of the in_data.
     """
-    # NOTE: right extreme is excluded, must be considered in outside the for loop.
-    segm = np.zeros_like(in_data, dtype=np.uint16)
-    min_data = np.min(in_data)
-    max_data = np.max(in_data)
+    segm = np.zeros_like(in_array, dtype=np.uint16)
+    min_data = np.min(in_array)
+    max_data = np.max(in_array)
     h = (max_data - min_data) / float(int(num_levels))
-
     for k in range(0, num_levels):
-        places = (min_data + k * h <= in_data) * (in_data < min_data + (k + 1) * h)
+        places = (min_data + k * h <= in_array) * (in_array < min_data + (k + 1) * h)
         np.place(segm, places, k)
-
-    places = in_data == max_data
+    places = in_array == max_data
     np.place(segm, places, num_levels-1)
-
     return segm
 
 
-def otsu_threshold(im, side='above', masked=False):
+def otsu_threshold(in_array, side='above', masked=False):
     """
-    Sementation with the Otsu thresholding from skimage filters.
-    :param im: input nibabel imabe
-    :param side: must be 'above' or 'below', representing the side of the image thresholded after otsu value.
+    Segmentation with the Otsu thresholding from skimage filters.
+    :param im: input nibabel image.
+    :param side: must be 'above' or 'below', representing the side of the image thresholded after Otsu response.
     :param masked: the output can be a boolean mask if True.
     :return: thresholded input image according to Otsu and input parameters.
     """
-    otsu_thr = filters.threshold_otsu(im.get_data())
+    otsu_thr = filters.threshold_otsu(in_array)
     if side == 'above':
-        new_data = im.get_data() * (im.get_data() >= otsu_thr)
+        new_data = in_array * (in_array >= otsu_thr)
     elif side == 'below':
-        new_data = im.get_data() * (im.get_data() < otsu_thr)
+        new_data = in_array * (in_array < otsu_thr)
     else:
         raise IOError("Parameter side must be 'above' or 'below'.")
     if masked:
         new_data = new_data.astype(np.bool)
-    return set_new_data(im, new_data)
+    return new_data
 
 
 def MoG_array(in_array, K=None, mask_array=None, pre_process_median_filter=False,
@@ -63,7 +59,6 @@ def MoG_array(in_array, K=None, mask_array=None, pre_process_median_filter=False
     Mixture of gaussians for medical images. A simple wrap of
     sklearn.mixture.GaussianMixture to get a mog-based segmentation of an input
     nibabel image.
-    -----
     :param in_array: input array format to be segmented with a MOG method.
     :param K: number of classes, if None, it is estimated with a BIC criterion (may take a while)
     :param mask_array: nibabel mask if you want to consider only a subset of the masked data.
