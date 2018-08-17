@@ -1,4 +1,4 @@
-...............................................................................................
+.......................................................................................................
 Name                                                                     Stmts   Miss  Cover
 --------------------------------------------------------------------------------------------
 LABelsToolkit/__init__.py                                                    1      0   100%
@@ -31,7 +31,7 @@ LABelsToolkit/tools/defs.py                                                  7  
 LABelsToolkit/tools/detections/__init__.py                                   0      0   100%
 LABelsToolkit/tools/detections/check_imperfections.py                       50     44    12%
 LABelsToolkit/tools/detections/contours.py                                  24     12    50%
-LABelsToolkit/tools/detections/get_segmentation.py                          82     69    16%
+LABelsToolkit/tools/detections/get_segmentation.py                          78     53    32%
 LABelsToolkit/tools/detections/island_detection.py                          17      0   100%
 LABelsToolkit/tools/icv/__init__.py                                          0      0   100%
 LABelsToolkit/tools/icv/icv_estimator.py                                    74     13    82%
@@ -51,8 +51,8 @@ LABelsToolkit/tools/phantoms_generator/shapes_for_headlike_phantoms.py      43  
 LABelsToolkit/tools/phantoms_generator/shapes_for_phantoms.py              118     87    26%
 LABelsToolkit/tools/visualiser/__init__.py                                   0      0   100%
 --------------------------------------------------------------------------------------------
-TOTAL                                                                     2346   1275    46%
+TOTAL                                                                     2342   1259    46%
 ----------------------------------------------------------------------
-Ran 95 tests in 4.024s
+Ran 103 tests in 3.231s
 
 OK

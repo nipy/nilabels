@@ -142,10 +142,8 @@ def test_intensity_segmentation_2():
 
 
 def test_otsu_threshold_bad_input():
+    pass
 
-
-
-test_otsu_threshold_bad_input()
 
 
 def test_otsu_threshold_1():
