@@ -1,6 +1,7 @@
 import os
 import time
 import subprocess
+import itertools
 
 
 def check_pfi_io(pfi_input, pfi_output):
@@ -58,5 +59,8 @@ def is_valid_permutation(in_perm):
     if not len(in_perm) == 2:
         return False
     if not len(in_perm[0]) == len(in_perm[1]) == len(set(in_perm[0])):
+        return False
+    # as dealing with labels, all the elements must be int
+    if not all(isinstance(x, int) for x in list(itertools.chain(*in_perm))):
         return False
     return True

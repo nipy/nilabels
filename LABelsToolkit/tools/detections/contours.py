@@ -8,7 +8,7 @@ def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0)
     Get the contour of a single label
     :param im_arr: input array with segmentation
     :param l: considered label
-    :param thr: threshold (default 0.3) increase to increase the contour.
+    :param thr: threshold (default 0.3) increase to increase the contour thickness.
     :param omit_axis: a directional axis preference for the contour creation, to avoid "walls" when scrolling
     the 3d image in a particular direction. None if no preference axis is expected.
     :param verbose:

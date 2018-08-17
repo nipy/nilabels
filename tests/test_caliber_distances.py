@@ -10,7 +10,11 @@ from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import o_shape, 
 
 from LABelsToolkit.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
-    normalised_symmetric_contour_distance
+    normalised_symmetric_contour_distance, covariance_distance_between_matrices, dice_score_one_label, \
+    d_H, hausdorff_distance_one_label, symmetric_contour_distance_one_label
+
+
+# --- Auxiliaries
 
 
 def test_centroid_array():
@@ -49,16 +53,6 @@ def test_centroid_array_2():
 
 def test_centroid():
     test_arr = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
-                         [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                         [0, 1, 0, 0, 0, 0, 0, 0, 0],
-                         [0, 1, 0, 0, 0, 0, 0, 0, 0],
-                         [0, 1, 0, 0, 0, 0, 2, 0, 0],
-                         [0, 1, 0, 0, 0, 0, 2, 0, 0],
-                         [0, 1, 0, 0, 0, 0, 2, 0, 0],
-                         [0, 0, 0, 0, 0, 0, 2, 0, 0],
-                         [0, 0, 0, 0, 0, 0, 2, 0, 0]],
-
-                         [[0, 0, 0, 0, 0, 0, 0, 0, 0],
                           [0, 0, 0, 0, 0, 0, 0, 0, 0],
                           [0, 1, 0, 0, 0, 0, 0, 0, 0],
                           [0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -66,7 +60,17 @@ def test_centroid():
                           [0, 1, 0, 0, 0, 0, 2, 0, 0],
                           [0, 1, 0, 0, 0, 0, 2, 0, 0],
                           [0, 0, 0, 0, 0, 0, 2, 0, 0],
-                          [0, 0, 0, 0, 0, 0, 2, 0, 0]]
+                          [0, 0, 0, 0, 0, 0, 2, 0, 0]],
+
+                          [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 2, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 2, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 2, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 2, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 2, 0, 0]]
                          ])
 
     im = nib.Nifti1Image(test_arr, 0.5 * np.eye(4))
@@ -81,6 +85,61 @@ def test_centroid():
     assert_array_equal(ans_mm[0], .5 * np.array([0.5, 4, 1]))
     assert_array_equal(ans_mm[1], .5 * np.array([0.5, 6, 6]))
     assert ans_mm[2] == 0 or np.isnan(ans_mm[2])
+
+
+def test_covariance_matrices():
+    arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
+                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 3, 3],
+                       [0, 0, 0, 0, 0, 0, 0, 3, 3],
+                       [0, 0, 0, 0, 0, 3, 3, 3, 3]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
+                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
+                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
+                       [0, 1, 1, 1, 1, 1, 0, 0, 3],
+                       [0, 0, 0, 0, 0, 0, 0, 3, 3],
+                       [0, 0, 0, 0, 0, 0, 3, 3, 3]]
+                      ])
+
+    im1 = nib.Nifti1Image(arr_1, np.eye(4))
+
+    cov =  covariance_matrices(im1, [1, 2, 3])
+    assert len(cov) == 3
+    for i in cov:
+        assert_array_equal(i.shape, [3, 3])
+        if np.count_nonzero(i - np.diag(np.diagonal(i))) == 0:
+            assert_array_equal(np.diag(np.diag(i)), i)
+
+    cov1 = covariance_matrices(im1, [1, 2, 3, 4])
+    assert_array_equal(cov1[-1], np.nan * np.ones([3, 3]))
+
+
+def test_covariance_distance_between_matrices_simple_case():
+    m1 = np.random.randn(4, 4)
+    m2 = np.random.randn(4, 4)
+
+    mul_factor = 1
+    expected_ans = \
+        mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
+
+    assert_equal(expected_ans, covariance_distance_between_matrices(m1, m2))
+
+    m3 = np.random.randn(4, 4)
+    m4 = np.random.randn(4, 4)
+    m3[1, 1] = np.nan
+
+    assert_equal(np.nan, covariance_distance_between_matrices(m3, m4))
+
+
+# --- global distances: (segm, segm) |-> real
 
 
 def test_dice_score():
@@ -198,8 +257,7 @@ def test_global_dice_score():
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 0, 0, 0, 0, 0, 2, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 2, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 2, 0, 0]]])
 
     arr_2 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -219,8 +277,7 @@ def test_global_dice_score():
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]])
 
     arr_3 = np.array([[[0, 0, 0, 0, 1, 1, 0, 0, 0],
                        [0, 0, 0, 0, 1, 1, 0, 0, 0],
@@ -240,8 +297,7 @@ def test_global_dice_score():
                        [2, 2, 2, 0, 0, 0, 0, 0, 0],
                        [2, 2, 2, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]])
 
     arr_void = np.zeros_like(arr_3)
 
@@ -280,8 +336,8 @@ def test_global_outline_error():
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 0, 0, 0, 0, 0, 2, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 2, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 2, 0, 0]]])
+
     arr_2 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -300,8 +356,8 @@ def test_global_outline_error():
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 1, 0, 0, 0, 0, 2, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]])
+
     arr_3 = np.array([[[0, 0, 0, 0, 1, 1, 0, 0, 0],
                        [0, 0, 0, 0, 1, 1, 0, 0, 0],
                        [0, 0, 0, 0, 1, 1, 0, 0, 0],
@@ -320,8 +376,8 @@ def test_global_outline_error():
                        [2, 2, 2, 0, 0, 0, 0, 0, 0],
                        [2, 2, 2, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                      ])
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]])
+
     arr_void = np.zeros_like(arr_3)
 
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
@@ -340,39 +396,117 @@ def test_global_outline_error():
     assert_almost_equal(goe_1_void, 2)  # interesting case!
 
 
-def test_covariance_matrices():
+# --- Single labels distances (segm, segm, label) |-> real
+
+
+def test_dice_score_one_label():
     arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
-                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 3, 3],
-                       [0, 0, 0, 0, 0, 0, 0, 3, 3],
-                       [0, 0, 0, 0, 0, 3, 3, 3, 3]],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0]],
 
                       [[0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 0, 0],
-                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
-                       [0, 1, 1, 1, 1, 1, 2, 2, 0],
-                       [0, 1, 1, 1, 1, 1, 0, 0, 3],
-                       [0, 0, 0, 0, 0, 0, 0, 3, 3],
-                       [0, 0, 0, 0, 0, 0, 3, 3, 3]]
-                      ])
+                       [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0]]])
+
+    arr_2 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 2, 2, 2, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 2, 1, 0],
+                       [0, 1, 0, 0, 0, 2, 2, 0, 0],
+                       [0, 1, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 2, 2, 0]]])
 
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
+    im2 = nib.Nifti1Image(arr_2, np.eye(4))
+    assert_equal(36./40., dice_score_one_label(im1, im2, 2))
+    assert_equal(np.nan, dice_score_one_label(im1, im2, 5))
 
-    cov =  covariance_matrices(im1, [1, 2, 3])
-    assert len(cov) == 3
-    for i in cov:
-        assert_array_equal(i.shape, [3, 3])
-        if np.count_nonzero(i - np.diag(np.diagonal(i))) == 0:
-            assert_array_equal(np.diag(np.diag(i)), i)
 
-    cov1 = covariance_matrices(im1, [1, 2, 3, 4])
-    assert_array_equal(cov1[-1], np.nan * np.ones([3, 3]))
+def test_asymmetric_component_Hausdorff_distance_H_d_and_Hausdorff_distance():
+    arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 2, 2, 0, 0, 0, 0, 0, 0],
+                       [0, 2, 2, 2, 2, 2, 2, 2, 0],
+                       [0, 2, 2, 2, 2, 2, 2, 2, 0],
+                       [0, 2, 2, 2, 2, 2, 2, 2, 0],
+                       [0, 2, 2, 2, 2, 2, 2, 2, 0],
+                       [0, 2, 2, 2, 2, 2, 2, 2, 0],
+                       [2, 0, 0, 0, 0, 0, 2, 2, 0]]])
+
+    arr_2 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 2, 2, 2, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]])
+
+    im1 = nib.Nifti1Image(arr_1, np.eye(4))
+    im2 = nib.Nifti1Image(arr_2, np.eye(4))
+
+    # In label in image 2 is embedded in label in image 1. We expect the Hd to be zero.
+    assert_equal(d_H(im2, im1, 2, True), 0)
+    assert_equal(d_H(im1, im2, 2, True), np.sqrt(3**2 + 3**2))
+
+    # Test symmetry
+    assert_equal(hausdorff_distance_one_label(im1, im2, 2, True), hausdorff_distance_one_label(im1, im2, 2, True))
+    assert_equal(hausdorff_distance_one_label(im1, im2, 2, True), np.max((d_H(im2, im1, 2, True), (d_H(im1, im2, 2, True)))))
+
+
+def test_symmetric_contour_distance_one_label():
+    symmetric_contour_distance_one_label
+    pass
+
+# --- distances - (segm, segm) |-> pandas.Series (indexed by labels)
+
+
+# test dice score for images
 
 
 def test_covariance_distance():
@@ -538,6 +672,10 @@ def test_hausdorff_distance():
     assert_almost_equal(hd_1_void['label2'], np.nan)
 
 
+
+# test symmetric_contour_distance
+
+
 def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
     o1 = o_shape(omega=(19, 19, 19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
     o2 = 2 * o1
@@ -625,9 +763,26 @@ def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/D
     assert_almost_equal(ascd_1_void['label2'], np.nan)
 
 
-test_normalised_symetric_contour_distance()
-
-
 def test_average_symmetric_contour_distance():
     # TODO
+    pass
+
+
+def test_median_symmetric_contour_distance():
+    pass
+
+
+def test_std_symmetric_contour_distance():
+    pass
+
+
+# --- extra:
+
+
+def test_box_side_lenght():
+    pass
+
+
+
+def test_mahalnobis_distance():
     pass

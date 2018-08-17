@@ -13,6 +13,13 @@ from LABelsToolkit.tools.detections.contours import contour_from_array_at_label_
 # --- Auxiliaries
 
 def centroid_array(arr, labels):
+    """
+    Auxiliary of centroid, for arrays in array coordinates.
+    :param arr: numpy array of any dimension > 1 .
+    :param labels: list of labels
+    :return: list of centre of masses for the selected values in the array.
+    If the labels in the labels list is not in the array it returns nan.
+    """
     centers_of_mass = [np.array([0, 0, 0])] * len(labels)
     for l_id, l in enumerate(labels):
         coordinates_l = np.where(arr == l)  # returns [X_vector, Y_vector, Z_vector]
@@ -26,7 +33,7 @@ def centroid_array(arr, labels):
 def centroid(im, labels, return_mm3=True):
     """
     Centroid (center of mass, barycenter) of a list of labels.
-    :param im:
+    :param im: nifti image from nibabel.
     :param labels: list of labels, e.g. [3] or [2, 3, 45]
     :param return_mm3: if true the answer is in mm if false in voxel indexes.
     :return: list of centroids, one for each label in the input order.
@@ -70,7 +77,7 @@ def covariance_matrices(im, labels, return_mm3=True):
     return cov_matrices
 
 
-def covariance_distance_from_matrices(m1, m2, mul_factor=1):
+def covariance_distance_between_matrices(m1, m2, mul_factor=1):
     """
     Covariance distance between matrices m1 and m2, defined as
     d = factor * (1 - (trace(m1 * m2)) / (norm_fro(m1) + norm_fro(m2)))
@@ -118,8 +125,15 @@ def global_outline_error(im_segm1, im_segm2):
 # --- Single labels distances (segm, segm, label) |-> real
 
 
-def dice_score_l(im_segm1, im_segm2, lab):
-    place1 = im_segm1.get_data() == lab  # slow but readable, can be refactored later.
+def dice_score_one_label(im_segm1, im_segm2, lab):
+    """
+    Dice score for a single label. The input images must have the same grid shape (but can have different affine part).
+    :param im_segm1: nibabel image representing a segmentation
+    :param im_segm2: as im_segm1
+    :param lab: a label.
+    :return: dice score distance for the given label. If the label is not present, it returns a nan.
+    """
+    place1 = im_segm1.get_data() == lab
     place2 = im_segm2.get_data() == lab
     non_zero_place1 = np.count_nonzero(place1)
     non_zero_place2 = np.count_nonzero(place2)
@@ -150,17 +164,17 @@ def d_H(im1, im2, lab, return_mm3):
     return np.max(dt2 * arr1)
 
 
-def hausdorff_distance_l(im_segm1, im_segm2, lab, return_mm3):
+def hausdorff_distance_one_label(im_segm1, im_segm2, lab, return_mm3):
     return np.max([d_H(im_segm1, im_segm2, lab, return_mm3), d_H(im_segm2, im_segm1, lab, return_mm3)])
 
 
-def symmetric_contour_distance_l(im1, im2, lab, return_mm3, formula='normalised'):
+def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='normalised'):
     """
     Generalised normalised symmetric contour distance.
-    On the set {d(x, contourY)) | x in contourX}, several statistics can be computed.
-     Mean, median and standard deviation can be useful, as well as a more robust normalisation
+    On the sets {d(x, contourY)) | x in contourX} and {d(y, contourX)) | y in contourY}, several statistics
+    can be computed. Mean, median and standard deviation can be useful, as well as a more robust normalisation.
      Formula can be
-    :param im1:
+    :param im1: nibabel image with a segmentation
     :param im2:
     :param lab:
     :param return_mm3:
@@ -219,7 +233,7 @@ def dice_score(im_segm1, im_segm2, labels_list, labels_names, verbose=1):
     """
     scores = []
     for l in labels_list:
-        d = dice_score_l(im_segm1, im_segm2, l)
+        d = dice_score_one_label(im_segm1, im_segm2, l)
         scores.append(d)
         if verbose > 0:
             print('    Dice scores label {0} : {1} '.format(l, d))
@@ -239,7 +253,7 @@ def covariance_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm
 
     cov_dist = []
     for l, a1, a2 in zip(labels_list, cvs1, cvs2):
-        d = covariance_distance_from_matrices(a1, a2, mul_factor=factor)
+        d = covariance_distance_between_matrices(a1, a2, mul_factor=factor)
         cov_dist.append(d)
         if verbose > 0:
             print('    Covariance distance label {0} : {1} '.format(l, d))
@@ -262,7 +276,7 @@ def hausdorff_distance(im_segm1, im_segm2, labels_list, labels_names, return_mm3
     """
     hausd_dist = []
     for l in labels_list:
-        d = hausdorff_distance_l(im_segm1, im_segm2, l, return_mm3)
+        d = hausdorff_distance_one_label(im_segm1, im_segm2, l, return_mm3)
         hausd_dist.append(d)
         if verbose > 0:
             print('    Hausdoroff distance label {0} : {1} '.format(l, d))
@@ -274,7 +288,7 @@ def symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names, re
                                formula='normalised'):
     nscd_dist = []
     for l in labels_list:
-        d = symmetric_contour_distance_l(im_segm1, im_segm2, l, return_mm3, formula)
+        d = symmetric_contour_distance_one_label(im_segm1, im_segm2, l, return_mm3, formula)
         nscd_dist.append(d)
         if verbose > 0:
             print('    {0}-SCD {1} : {2} '.format(formula, l, d))
@@ -306,6 +320,7 @@ def std_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names
 
 
 # --- extra:
+
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """
@@ -346,78 +361,3 @@ def mahalanobis_distance(im, im_mask=None, trim=False):
         if trim:
             new_data = new_data * im_mask.get_data().astype(np.bool)
         return set_new_data(im, new_data)
-
-
-# --- Experiments new measures between segmentations:
-
-def s_dispersion(im_segm1, im_segm2, labels_list, labels_names, return_mm3=True):
-    # definition of s_dispersion is not the conventional definition of precision
-
-    # def dispersion_l(lab, verbose=verbose):
-    #     c1 = centroid_array(im_segm1.get_data(), labels=[lab,])[0]
-    #     c2 = centroid_array(im_segm2.get_data(), labels=[lab,])[0]
-    #     if return_mm3:
-    #         c1 = im_segm1.affine[:3, :3].dot(c1.astype(np.float64))
-    #         c2 = im_segm1.affine[:3, :3].dot(c2.astype(np.float64))
-    #     d = np.sqrt( sum((c1 - c2)**2) )
-    #     if verbose > 0:
-    #         print('Dispersion, label {0} : {1}'.format(l, d))
-    #     return d
-    #
-    # np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
-    # return pa.Series(np.array([dispersion_l(l) for l in labels_list]), index=labels_names)
-
-    cs1 = centroid_array(im_segm1.get_data(), labels=labels_list)
-    cs2 = centroid_array(im_segm2.get_data(), labels=labels_list)
-    if return_mm3:
-        cs1 = [im_segm1.affine[:3, :3].dot(c.astype(np.float64)) for c in cs1]
-        cs2 = [im_segm1.affine[:3, :3].dot(c.astype(np.float64)) for c in cs2]
-
-    np.testing.assert_array_almost_equal(im_segm1.affine, im_segm2.affine)
-    return pa.Series(np.array([np.sqrt( sum((c1 - c2)**2)) for c1, c2 in zip(cs1, cs2)]), index=labels_names)
-
-
-def s_precision(im_segm1, im_segm2, pfo_intermediate_files, labels_list, labels_names, verbose=0):
-    # deprecated as too imprecise :-) ! -  definition of s_precision is not the conventional definition of precision
-    print_and_run('mkdir -p {}'.format(pfo_intermediate_files))
-    precision_per_label = []
-
-    for l in labels_list:
-        im_segm_single1 = set_new_data(im_segm1, keep_only_one_label(im_segm1.get_data(), l))
-        im_segm_single2 = set_new_data(im_segm2, keep_only_one_label(im_segm2.get_data(), l))
-
-        pfi_im_segm_single1 = os.path.join(pfo_intermediate_files, 'im_segm_single_lab{}_1.nii.gz'.format(l))
-        pfi_im_segm_single2 = os.path.join(pfo_intermediate_files, 'im_segm_single_lab{}_2.nii.gz'.format(l))
-
-        nib.save(im_segm_single1, pfi_im_segm_single1)
-        nib.save(im_segm_single2, pfi_im_segm_single2)
-
-        pfi_warp_1_2 = os.path.join(pfo_intermediate_files, 'warped_single_lab{}_1_on_2.nii.gz'.format(l))
-        pfi_warp_2_1 = os.path.join(pfo_intermediate_files, 'warped_single_lab{}_2_on_1.nii.gz'.format(l))
-        pfi_aff_1_2 = os.path.join(pfo_intermediate_files, 'aff_single_lab{}_1_on_2.txt'.format(l))
-        pfi_aff_2_1 = os.path.join(pfo_intermediate_files, 'warped_single_lab{}_2_on_1.txt'.format(l))
-
-        cmd1_2 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -speeeeed'.format(pfi_im_segm_single1,
-                                                                                             pfi_im_segm_single2,
-                                                                                             pfi_warp_1_2,
-                                                                                             pfi_aff_1_2)
-        cmd2_1 = 'reg_aladin -ref {0} -flo {1} -res {2} -aff {3} -interp 0 -speeeeed'.format(pfi_im_segm_single2,
-                                                                                             pfi_im_segm_single1,
-                                                                                             pfi_warp_2_1,
-                                                                                             pfi_aff_2_1)
-        print_and_run(cmd1_2)
-        print_and_run(cmd2_1)
-
-        t_1_2 = np.loadtxt(pfi_aff_1_2)
-        t_2_1 = np.loadtxt(pfi_aff_2_1)
-
-        d = 1 / float(np.max([np.abs(np.linalg.det(t_1_2)) ** (-1), np.abs(np.linalg.det(t_2_1)) ** (-1)]))
-        precision_per_label.append(d)
-        if verbose > 0:
-            print('------------------------------------')
-            print('Precision, label {0} : {1}'.format(l, d))
-            print('------------------------------------')
-    pa_series = pa.Series(np.array(precision_per_label), index=labels_names)
-    pa_series.to_pickle(os.path.join(pfo_intermediate_files, 'final_precision.pickle'))
-
-    return pa_series
