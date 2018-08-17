@@ -196,13 +196,16 @@ def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='nor
 
     if return_mm3:
         dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
-        dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im1.affine[:3, :3])))
+        dtb2 = nd.distance_transform_edt(1 - arr2_contour, sampling=list(np.diag(im2.affine[:3, :3])))
     else:
         dtb1 = nd.distance_transform_edt(1 - arr1_contour)
         dtb2 = nd.distance_transform_edt(1 - arr2_contour)
 
     dist_border1_array2 = arr2_contour * dtb1
     dist_border2_array1 = arr1_contour * dtb2
+
+    print dist_border1_array2
+    print dist_border2_array1
 
     if formula == 'normalised':
         return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / float(np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
@@ -335,14 +338,22 @@ def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """
     def box_sides_length_l(arr, lab, scaling_factors):
         coordinates = np.where(arr == lab)  # returns [X_vector, Y_vector, Z_vector]
-        dists = [np.abs(np.max(k) - np.min(k)) for k in coordinates]
+        if len(coordinates[0]) == 0:
+            return np.nan
+
         if return_mm3:
-            dists = [d * dd for d, dd in zip(coordinates, scaling_factors)]
+            coordinates = [d * dd for d, dd in zip(scaling_factors, coordinates)]
+
+        dists = [np.abs(np.max(coordinates[k]) - np.min(coordinates[k])) for k in range(len(coordinates))]
+
+        print
+        print scaling_factors
+        print lab
+        print dists
         return dists
 
-    return pa.Series(
-        np.array([box_sides_length_l(im.get_data(), l, np.diag(im.affine)) for l in labels_list]),
-        index=labels_names)
+    boxes_values = [box_sides_length_l(im.get_data(), l, np.diag(im.affine)[:-1]) for l in labels_list]
+    return pa.Series(boxes_values, index=labels_names)
 
 
 def mahalanobis_distance(im, im_mask=None, trim=False):
@@ -361,3 +372,29 @@ def mahalanobis_distance(im, im_mask=None, trim=False):
         if trim:
             new_data = new_data * im_mask.get_data().astype(np.bool)
         return set_new_data(im, new_data)
+
+
+if __name__ == '__main__':
+    arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+
+                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 1, 1, 1, 1, 1, 1, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+                      ])
+    im1 = nib.Nifti1Image(arr_1, np.eye(4))
+
+    print box_sides_length(im1, [0, 1, 2, 3], ['0', '1', '2', '3'])
