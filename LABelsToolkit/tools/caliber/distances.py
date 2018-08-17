@@ -327,74 +327,22 @@ def std_symmetric_contour_distance(im_segm1, im_segm2, labels_list, labels_names
 
 def box_sides_length(im, labels_list, labels_names, return_mm3=True):
     """
-    im_segmentation, labels_to_box, labels_to_box_names
-    Box surrounding the label in the list labels_to_box.
-    A box is an (ordered!) couple of 3d points.
+    Length of the rectangular hull surrounding the labels in the given list.
+    The rectangle is parallel to the matrix coordinate system.
     :param im: sampled on an orthogonal grid.
-    :param labels_list:
-    :param labels_names:
-    :param return_mm3:
-    :return:
+    :param labels_list: list of labels
+    :param labels_names: list of labels names that will appear in the Pandas series
+    :param return_mm3: if True the answer is provided in the real space coordinates.
+    :return: output pandas series. One row for each label.
     """
     def box_sides_length_l(arr, lab, scaling_factors):
-        coordinates = np.where(arr == lab)  # returns [X_vector, Y_vector, Z_vector]
-        if len(coordinates[0]) == 0:
-            return np.nan
 
+        if lab not in arr:
+            return np.nan
+        coordinates = np.where(arr == lab)  # returns [X_vector, Y_vector, Z_vector]
         if return_mm3:
             coordinates = [d * dd for d, dd in zip(scaling_factors, coordinates)]
-
-        dists = [np.abs(np.max(coordinates[k]) - np.min(coordinates[k])) for k in range(len(coordinates))]
-
-        print
-        print scaling_factors
-        print lab
-        print dists
-        return dists
+        return [np.abs(np.max(coordinates[k]) - np.min(coordinates[k])) for k in range(len(coordinates))]
 
     boxes_values = [box_sides_length_l(im.get_data(), l, np.diag(im.affine)[:-1]) for l in labels_list]
     return pa.Series(boxes_values, index=labels_names)
-
-
-def mahalanobis_distance(im, im_mask=None, trim=False):
-    # mono modal, image is vectorised, covariance is the std.
-    if im_mask is None:
-        mu = np.mean(im.get_data().flatten())
-        sigma2 = np.std(im.get_data().flatten())
-        return set_new_data(im, np.sqrt((im.get_data() - mu) * sigma2 * (im.get_data() - mu)))
-    else:
-        np.testing.assert_array_equal(im.affine, im_mask.affine)
-        np.testing.assert_array_equal(im.shape, im_mask.shape)
-        mu = np.mean(im.get_data().flatten() * im_mask.get_data().flatten())
-        print(mu)
-        sigma2 = np.std(im.get_data().flatten() * im_mask.get_data().flatten())
-        new_data = np.sqrt((im.get_data() - mu) * sigma2**(-1) * (im.get_data() - mu))
-        if trim:
-            new_data = new_data * im_mask.get_data().astype(np.bool)
-        return set_new_data(im, new_data)
-
-
-if __name__ == '__main__':
-    arr_1 = np.array([[[0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]],
-
-                      [[0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 1, 1, 1, 1, 1, 1, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 2, 2, 2, 2, 2, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                      ])
-    im1 = nib.Nifti1Image(arr_1, np.eye(4))
-
-    print box_sides_length(im1, [0, 1, 2, 3], ['0', '1', '2', '3'])

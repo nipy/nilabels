@@ -110,3 +110,11 @@ def test_island_for_label_multiple_components_for_more_than_one_m_again():
     ans = island_for_label(in_data, 1, m=4, special_label=-1)
 
     assert_array_equal(expected_output, ans)
+
+
+#  ----- Test get segmentation ----
+
+
+
+
+

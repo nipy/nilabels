@@ -72,3 +72,28 @@ def intensities_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
         im_mask_foreground_data = im_mask_foreground.get_data()
 
     return set_new_data(im_input, im_mask_foreground_data * (a * im_input.get_data() + b))
+
+
+
+def mahalanobis_distance_map(im, im_mask=None, trim=False):
+    """
+    From an image to its Mahalanobis distance map
+    :param im: input image acquired with some modality.
+    :param im_mask: considering only the data below the given mask.
+    :param trim: if mask is provided the output image is masked with zeros values outside the mask.
+    :return: nibabel image same shape as im, with the corresponding Mahalanobis map
+    """
+    if im_mask is None:
+        mu = np.mean(im.get_data().flatten())
+        sigma2 = np.std(im.get_data().flatten())
+        return set_new_data(im, np.sqrt((im.get_data() - mu) * sigma2 * (im.get_data() - mu)))
+    else:
+        np.testing.assert_array_equal(im.affine, im_mask.affine)
+        np.testing.assert_array_equal(im.shape, im_mask.shape)
+        mu = np.mean(im.get_data().flatten() * im_mask.get_data().flatten())
+        print(mu)
+        sigma2 = np.std(im.get_data().flatten() * im_mask.get_data().flatten())
+        new_data = np.sqrt((im.get_data() - mu) * sigma2**(-1) * (im.get_data() - mu))
+        if trim:
+            new_data = new_data * im_mask.get_data().astype(np.bool)
+        return set_new_data(im, new_data)
