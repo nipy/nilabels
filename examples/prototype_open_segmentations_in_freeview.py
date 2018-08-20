@@ -49,4 +49,3 @@ if __name__ == '__main__':
     print('Step 1: Manual step - open the segmentation in ITK-Snap and export all the surfaces in .stl in the '
           'specified folder')
     print('Step 2: run freesurfer_surface_overlayed')
-    # TODO
