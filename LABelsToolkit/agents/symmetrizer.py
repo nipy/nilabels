@@ -52,10 +52,10 @@ class LABelsToolkitSymmetrize(object):
         Symmetrise a segmentation with registration: it uses NiftyReg.
         The old side is symmetrised in the new side, with new relabelling.
         Method based on paths even if in tools
-        :param filename_anatomy: Path to FIle anatomical image
-        :param filename_segmentation: Path to FIle segmentation of the anatomical image
+        :param filename_anatomy: Path to File anatomical image
+        :param filename_segmentation: Path to File segmentation of the anatomical image
         :param results_folder_path: Path to FOlder where intermediate results are stored
-        :param result_img_path: Path to FIle symmetrised segmentation
+        :param result_img_path: Path to File symmetrised segmentation
         :param list_labels_input: labels that will be taken into account in the symmetrisation from the old side.
         :param list_labels_transformed: corresponding labels in the same order. If None, labels of the new side
         will be kept with the same numbering in the new side.

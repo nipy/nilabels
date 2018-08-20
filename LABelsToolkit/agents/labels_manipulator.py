@@ -195,7 +195,7 @@ class LABelsToolkitLabelsManipulate(object):
         return pfi_out
 
     def clean_segmentation(self, path_to_input_segmentation, path_to_output_cleaned_segmentation, labels_to_clean=(),
-                           verbose=1, special_label=None):
+                           verbose=1, special_label=None, force_overwriting=False):
         """
         Clean the segmentation merging the small connected components with the surrounding tissue.
         :param path_to_input_segmentation: path to the input segmentation
@@ -213,8 +213,9 @@ class LABelsToolkitLabelsManipulate(object):
         """
         pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_cleaned_segmentation,
                                              self.pfo_in, self.pfo_out)
-        if os.path.exists(pfi_out):
-            raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))
+        if not force_overwriting:
+            if os.path.exists(pfi_out):
+                raise IOError('File {} already exists. Cleaner can not overwrite a segmentation'.format(pfi_out))
 
         im_segm = nib.load(pfi_in)
 

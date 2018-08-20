@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 from sklearn.mixture import GaussianMixture
 from scipy.signal import medfilt
 
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.image_colors_manipulations.relabeller import relabeller
 try:
     from skimage import filters
