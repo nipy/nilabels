@@ -31,12 +31,12 @@ def intensity_segmentation(in_array, num_levels=5):
     return segm
 
 
-def otsu_threshold(in_array, side='above', masked=False):
+def otsu_threshold(in_array, side='above', return_as_mask=True):
     """
-    Segmentation with the Otsu thresholding from skimage filters.
+    Segmentation of an array with Otsu thresholding parameters from skimage filters.
     :param im: input nibabel image.
     :param side: must be 'above' or 'below', representing the side of the image thresholded after Otsu response.
-    :param masked: the output can be a boolean mask if True.
+    :param return_as_mask: the output can be a boolean mask if True.
     :return: thresholded input image according to Otsu and input parameters.
     """
     otsu_thr = filters.threshold_otsu(in_array)
@@ -46,7 +46,7 @@ def otsu_threshold(in_array, side='above', masked=False):
         new_data = in_array * (in_array < otsu_thr)
     else:
         raise IOError("Parameter side must be 'above' or 'below'.")
-    if masked:
+    if return_as_mask:
         new_data = new_data.astype(np.bool)
     return new_data
 
