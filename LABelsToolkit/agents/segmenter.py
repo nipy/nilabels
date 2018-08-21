@@ -35,7 +35,6 @@ class LABelsToolkitSegmenter(object):
         pfi_output_segm = connect_path_tail_head(self.pfo_out, path_to_output_segmentation)
         nib.save(output_im, pfi_output_segm)
 
-
     def otsu_thresholding(self, path_to_input_image, path_to_output_segmentation, side='above', return_as_mask=True):
         """
         Binary segmentation with Otsu thresholding parameters from skimage filters.
@@ -56,7 +55,6 @@ class LABelsToolkitSegmenter(object):
         pfi_output_segm = connect_path_tail_head(self.pfo_out, path_to_output_segmentation)
         nib.save(output_im, pfi_output_segm)
 
-
     def mixture_of_gaussians(self, path_to_input_image, path_to_output_segmentation_crisp,
                              path_to_output_segmentation_prob, K=None, mask_im=None, pre_process_median_filter=False,
                              pre_process_only_interquartile=False, see_histogram=None, reorder_mus=True,
@@ -64,7 +62,9 @@ class LABelsToolkitSegmenter(object):
         """
         Wrap of MoG_array for nibabel images.
         -----
-        :param input_im: nibabel input image format to be segmented with a MOG method.
+        :param path_to_input_image: path to input image format to be segmented with a MOG method.
+        :param path_to_output_segmentation_crisp: path to output crisp segmentation
+        :param path_to_output_segmentation_prob: path to probabilistic output segmentation
         :param K: number of classes, if None, it is estimated with a BIC criterion (may take a while)
         :param mask_im: nibabel mask if you want to consider only a subset of the masked data.
         :param pre_process_median_filter: apply a median filter before pre-processing (reduce salt and pepper noise).
@@ -96,7 +96,7 @@ class LABelsToolkitSegmenter(object):
         im_prob = set_new_data(input_im, prob, new_dtype=output_dtype_prob)
 
         pfi_im_crisp = connect_path_tail_head(self.pfo_out, path_to_output_segmentation_crisp)
-        pfi_im_prob = connect_path_tail_head(self.pfo_out, path_to_output_segmentation_crisp)
+        pfi_im_prob = connect_path_tail_head(self.pfo_out, path_to_output_segmentation_prob)
 
         nib.save(im_crisp, pfi_im_crisp)
         nib.save(im_prob, pfi_im_prob)
