@@ -70,3 +70,9 @@ a testing dataset is generated. This may take some minutes.
 Copyright (c) 2017, Sebastiano Ferraris. nilabel  (ex. LABelsToolkit ex. LabelsManager) is provided as it is and 
 it is available as free open-source software under 
 [MIT License](https://github.com/SebastianoF/nilabel/blob/master/LICENCE.txt)
+
+
+## Acknowledgements
++ This repository is developed within the [gift-SURG research project](http://www.gift-surg.ac.uk).
++ This work was supported by Wellcome / Engineering and Physical Sciences Research Council (EPSRC) [WT101957; NS/A000027/1; 203145Z/16/Z]. 
+Sebastiano Ferraris is supported by the EPSRC-funded UCL Centre for Doctoral Training in Medical Imaging (EP/L016478/1) and Doctoral Training Grant (EP/M506448/1). 
