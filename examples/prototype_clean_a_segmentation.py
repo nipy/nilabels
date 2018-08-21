@@ -14,7 +14,7 @@ import a_generate_phantoms_for_examples as gen
 # ---- GENERATE DATA ----
 
 
-if True:  # not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids.nii.gz')):
+if not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids.nii.gz')):
 
     creation_list = {'Examples folder'    : True,
                       'Punt e mes'        : False,
@@ -27,7 +27,6 @@ if True:  # not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids.nii.gz
                       'Four-folds'        : False}
 
     gen.generate_figures(creation_list)
-
 
 # ---- PATH MANAGER ----
 

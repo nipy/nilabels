@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib
-from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 
+from LABelsToolkit.tools.aux_methods.utils_path import connect_path_tail_head
 from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
 from LABelsToolkit.tools.detections.get_segmentation import intensity_segmentation, otsu_threshold, \
     MoG_array

@@ -3,6 +3,7 @@ import pandas as pa
 from skimage import measure
 
 from LABelsToolkit.tools.aux_methods.utils_nib import one_voxel_volume
+from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
 
 
 def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
@@ -60,19 +61,3 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
         f.close()
 
         print('Log status saved in {}'.format(pfi_where_log))
-
-
-if __name__ == "__main__":
-    # TODO move to examples:
-    import nibabel as nib
-    from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
-
-    pfi_segm = '/Users/sebastiano/Desktop/test_segmentation.nii.gz'
-    pfi_ld = '/Users/sebastiano/Desktop/labels_descriptor.txt'
-
-    pfi_output_msg = '/Users/sebastiano/Desktop/output.txt'
-
-    ldm = LabelsDescriptorManager(pfi_ld)
-
-    im_se = nib.load(pfi_segm)
-    check_missing_labels(im_se, ldm, pfi_output_msg)
