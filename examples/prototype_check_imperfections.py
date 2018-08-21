@@ -1,8 +1,8 @@
 import nibabel as nib
 
 
-from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
-from LABelsToolkit.main import LABelsToolkit as LaB
+from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
+from nilabel.main import LABelsToolkit as LaB
 
 
 pfi_segm = '/Users/sebastiano/Desktop/test_segmentation.nii.gz'

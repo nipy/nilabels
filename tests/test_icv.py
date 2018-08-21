@@ -4,8 +4,8 @@ from os.path import join as jph
 import numpy as np
 from nose.tools import assert_equals
 
-from LABelsToolkit.main import LABelsToolkit
-from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
+from nilabel.main import LABelsToolkit
+from nilabel.tools.phantoms_generator import local_data_generator as ldg
 
 
 num_subjects = 7

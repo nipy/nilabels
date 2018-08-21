@@ -5,16 +5,16 @@ import numpy as np
 from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
-from LABelsToolkit.tools.defs import root_dir
-from LABelsToolkit.tools.aux_methods.sanity_checks import check_pfi_io
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
-from LABelsToolkit.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
-from LABelsToolkit.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
+from nilabel.tools.defs import root_dir
+from nilabel.tools.aux_methods.sanity_checks import check_pfi_io
+from nilabel.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
+from nilabel.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
+from nilabel.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
     permutation_from_disjoint_cycles_to_cauchy
 
 
 ''' Test aux_methods.morphological.py'''
-from LABelsToolkit.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
+from nilabel.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
     get_circle_shell_for_given_radius
 
 

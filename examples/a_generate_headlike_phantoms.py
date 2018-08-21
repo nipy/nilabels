@@ -1,6 +1,6 @@
-from LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
-from LABelsToolkit.tools.visualiser.see_volume import see_array
-from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
+from nilabel.tools.phantoms_generator.shapes_for_headlike_phantoms import headlike_phantom
+from nilabel.tools.visualiser.see_volume import see_array
+from nilabel.tools.phantoms_generator import local_data_generator as ldg
 
 
 def example_generate_and_visualise_headlike():

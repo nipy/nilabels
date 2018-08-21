@@ -1,14 +1,14 @@
-# LABelsToolkit
+# nilabel (ex labels toolkit)
 Python 2.7
 
-LABelsToolkit is a set of tools to automatise simple manipulations and measurements of medical images and images 
+Nilabel is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
 
-+ [Motivations](https://github.com/SebastianoF/LABelsToolkit/wiki/Motivations)
++ [Motivations](https://github.com/SebastianoF/nilabel/wiki/Motivations)
 
-+ [What you can do with LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit/wiki/What-you-can-do-with-LABelsToolkit)
++ [What you can do with LABelsToolkit](https://github.com/SebastianoF/nilabel/wiki/What-you-can-do-with-LABelsToolkit)
 
-+ [Design pattern](https://github.com/SebastianoF/LABelsToolkit/wiki/Design-Pattern)
++ [Design pattern](https://github.com/SebastianoF/nilabel/wiki/Design-Pattern)
 
 ## How to install (in development mode) 
 
@@ -47,5 +47,5 @@ a testing dataset is generated. This may take some minutes.
 ## Licence
 
 Copyright (c) 2017, Sebastiano Ferraris. LABelsToolkit (ex. LabelsManager) is provided as it is and it is available as free open-source software under 
-[MIT License](https://github.com/SebastianoF/LABelsToolkit/blob/master/LICENCE.txt)
+[MIT License](https://github.com/SebastianoF/nilabel/blob/master/LICENCE.txt)
 

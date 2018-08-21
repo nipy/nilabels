@@ -1,8 +1,8 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LABelsToolkit
-from LABelsToolkit.tools.defs import root_dir
+from nilabel.main import LABelsToolkit
+from nilabel.tools.defs import root_dir
 
 if __name__ == '__main__':
 

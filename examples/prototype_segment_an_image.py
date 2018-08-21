@@ -1,8 +1,8 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.tools.defs import root_dir
-from LABelsToolkit.main import LABelsToolkit as LaB
+from nilabel.tools.defs import root_dir
+from nilabel.main import LABelsToolkit as LaB
 
 import a_generate_phantoms_for_examples as gen
 

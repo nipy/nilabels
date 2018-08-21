@@ -4,9 +4,9 @@ import numpy as np
 import nibabel as nib
 
 
-from LABelsToolkit.main import LABelsToolkit as LT
-from LABelsToolkit.tools.defs import root_dir
-from LABelsToolkit.tools.aux_methods.utils import print_and_run
+from nilabel.main import LABelsToolkit as LT
+from nilabel.tools.defs import root_dir
+from nilabel.tools.aux_methods.utils import print_and_run
 
 import a_generate_phantoms_for_examples as gen
 

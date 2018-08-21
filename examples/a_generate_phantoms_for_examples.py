@@ -5,9 +5,9 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
-from LABelsToolkit.tools.defs import root_dir
-from LABelsToolkit.tools.detections.get_segmentation import intensity_segmentation
-from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import ellipsoid_shape, o_shape, c_shape, \
+from nilabel.tools.defs import root_dir
+from nilabel.tools.detections.get_segmentation import intensity_segmentation
+from nilabel.tools.phantoms_generator.shapes_for_phantoms import ellipsoid_shape, o_shape, c_shape, \
     cube_shape
 
 

@@ -1,9 +1,9 @@
 import os
 from os.path import join as jph
 
-from LABelsToolkit.main import LABelsToolkit as LT
-from LABelsToolkit.tools.caliber.distances import dice_score, covariance_distance, hausdorff_distance
-from LABelsToolkit.tools.defs import root_dir
+from nilabel.main import LABelsToolkit as LT
+from nilabel.tools.caliber.distances import dice_score, covariance_distance, hausdorff_distance
+from nilabel.tools.defs import root_dir
 
 if __name__ == '__main__':
 

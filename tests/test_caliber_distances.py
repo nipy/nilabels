@@ -4,11 +4,11 @@ import os
 from scipy import ndimage as nd
 
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
-from LABelsToolkit.tools.aux_methods.utils_nib import set_new_data
-from LABelsToolkit.tools.detections.contours import contour_from_segmentation
-from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import o_shape, cube_shape
+from nilabel.tools.aux_methods.utils_nib import set_new_data
+from nilabel.tools.detections.contours import contour_from_segmentation
+from nilabel.tools.phantoms_generator.shapes_for_phantoms import o_shape, cube_shape
 
-from LABelsToolkit.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
+from nilabel.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
     normalised_symmetric_contour_distance, covariance_distance_between_matrices, dice_score_one_label, \
     d_H, hausdorff_distance_one_label, box_sides_length

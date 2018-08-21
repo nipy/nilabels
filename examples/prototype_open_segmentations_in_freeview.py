@@ -5,7 +5,7 @@ directly in freeview with correct naming convention.
 
 import os
 
-from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
+from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
 
 
 def freesurfer_surface_overlayed(pfi_anatomy, pfo_stl_surfaces, pfi_descriptor, convention_descriptor='itk-snap',

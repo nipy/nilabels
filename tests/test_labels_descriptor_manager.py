@@ -4,9 +4,9 @@ from os.path import join as jph
 
 from nose.tools import assert_raises
 
-from LABelsToolkit.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager, \
+from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager, \
     generate_dummy_label_descriptor
-from LABelsToolkit.tools.phantoms_generator import local_data_generator as ldg
+from nilabel.tools.phantoms_generator import local_data_generator as ldg
 
 
 def _create_data_set_for_tests():
