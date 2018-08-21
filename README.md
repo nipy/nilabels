@@ -1,6 +1,8 @@
-# nilabel (ex LABelsToolkit)
+# nilabel 
 
-Python 2.7 (upgrading in progress)
+(ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
+
+Python 2.7 (upgrading to Python 3 in progress)
 
 Nilabel is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
@@ -34,8 +36,8 @@ for i in range(1, 11):
 ## How to install (in development mode) 
 
 
-+ Install [NiftySeg](http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftySeg_install)
-+ Install [NiftyReg](http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg_install)
++ Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)
++ Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
 + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
 
 + Install python requirements in requirements.txt with
