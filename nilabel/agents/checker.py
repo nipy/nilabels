@@ -6,7 +6,7 @@ from nilabel.tools.aux_methods.utils_path import connect_path_tail_head
 from nilabel.tools.detections.check_imperfections import check_missing_labels
 
 
-class LABelsToolkitChecker(object):
+class LabelsChecker(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerFuse access label fusion methods.

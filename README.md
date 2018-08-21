@@ -6,7 +6,7 @@ segmentations in nifti format.
 
 + [Motivations](https://github.com/SebastianoF/nilabel/wiki/Motivations)
 
-+ [What you can do with LABelsToolkit](https://github.com/SebastianoF/nilabel/wiki/What-you-can-do-with-LABelsToolkit)
++ [What you can do with nilabel](https://github.com/SebastianoF/nilabel/wiki/What-you-can-do-with-LABelsToolkit)
 
 + [Design pattern](https://github.com/SebastianoF/nilabel/wiki/Design-Pattern)
 
@@ -22,12 +22,12 @@ segmentations in nifti format.
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 
-+ Install LABelsToolkit: the current version is not (yet) pip installable. It can be installed in development mode.
++ Install nilabel: the current version is not (yet) pip installable. It can be installed in development mode.
 To proceede, initialise a virtual environment and execute the following instructions:
 ```
 cd <folder where to clone the code>
-git clone https://github.com/SebastianoF/LABelsToolkit.git
-cd LABelsToolkit
+git clone https://github.com/SebastianoF/nilabel.git
+cd nilabel
 pip install -e .
 ```
 In development mode every change made to your local code will be directly affecting the libray installed in the python distribution
@@ -35,7 +35,7 @@ without the need of reinstalling.
 
 ## Documentations
 
-+ [Wiki-pages documentation](https://github.com/SebastianoF/LABelsToolkit/wiki)
++ [Wiki-pages documentation](https://github.com/SebastianoF/nilabel/wiki)
 
 
 ## Code testing
@@ -46,6 +46,7 @@ a testing dataset is generated. This may take some minutes.
 
 ## Licence
 
-Copyright (c) 2017, Sebastiano Ferraris. LABelsToolkit (ex. LabelsManager) is provided as it is and it is available as free open-source software under 
+Copyright (c) 2017, Sebastiano Ferraris. nilabel  (ex. LABelsToolkit ex. LabelsManager) is provided as it is and 
+it is available as free open-source software under 
 [MIT License](https://github.com/SebastianoF/nilabel/blob/master/LICENCE.txt)
 

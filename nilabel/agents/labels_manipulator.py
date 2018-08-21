@@ -14,7 +14,7 @@ from nilabel.tools.image_colors_manipulations.segmentation_to_rgb import \
 from nilabel.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
 
 
-class LABelsToolkitLabelsManipulate(object):
+class LabelsManipulate(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general
@@ -235,7 +235,7 @@ class LABelsToolkitLabelsManipulate(object):
                                                        path_to_output_4d_rgb_image,
                                                        invert_black_white=False, dtype_output=np.int32):
         """
-        + Masks of :func:`LABelsToolkit.tools.image_colors_manipulations.segmentation_to_rgb.
+        + Masks of :func:`nilabel.tools.image_colors_manipulations.segmentation_to_rgb.
         get_rgb_image_from_segmentation_and_label_descriptor` using filenames.
         From a segmentation and its label descriptro in itk-snap convention or in fsl convention
         it creates a corresponding 4d image with the 3 R G B channels in the fourth dimension.

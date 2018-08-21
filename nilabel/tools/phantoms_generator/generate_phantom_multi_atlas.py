@@ -96,7 +96,7 @@ def generate_multi_atlas_at_folder(pfo_where_to_create_the_multi_atlas, number_o
                                    multi_atlas_root_name='sj', randomness_shape=0.3, randomness_noise=0.4):
     """
     Generate a phatom multi atlas of head-like shapes.
-    This is based on LABelsToolkit.tools.phantoms_generator.shapes_for_headlike_phantoms.headlike_phantom
+    This is based on nilabel.tools.phantoms_generator.shapes_for_headlike_phantoms.headlike_phantom
     and uses .generate_atlas_at_folder to generate a single element.
     :param pfo_where_to_create_the_multi_atlas: path to file where the multi atlas structure will be saved.
     :param number_of_subjects: [10] how many subjects in the multi atlas

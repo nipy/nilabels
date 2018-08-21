@@ -7,7 +7,7 @@ from nilabel.tools.aux_methods.utils_nib import modify_image_type, \
     modify_affine_transformation, replace_translational_part
 
 
-class LABelsToolkitHeaderController(object):
+class HeaderController(object):
     """
     Facade of the methods in tools. symmetrizer, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general

@@ -3,7 +3,7 @@ import os
 from nilabel.tools.aux_methods.utils_path import connect_path_tail_head
 
 
-class LABelsToolkitPropagate(object):
+class LabelsPropagate(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerPropagate are aimed at propagating segmentations.

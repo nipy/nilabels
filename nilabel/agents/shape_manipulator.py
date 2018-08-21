@@ -8,7 +8,7 @@ from nilabel.tools.image_shape_manipulations.merger import merge_labels_from_4d,
 from nilabel.tools.image_shape_manipulations.splitter import split_labels_to_4d
 
 
-class LABelsToolkitShapeManipulate(object):
+class ShapeManipulate(object):
 
     def __init__(self, input_data_folder=None, output_data_folder=None):
         self.pfo_in = input_data_folder

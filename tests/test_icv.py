@@ -4,7 +4,7 @@ from os.path import join as jph
 import numpy as np
 from nose.tools import assert_equals
 
-from nilabel.main import LABelsToolkit
+from nilabel.main import Nilabel
 from nilabel.tools.phantoms_generator import local_data_generator as ldg
 
 
@@ -43,7 +43,7 @@ def _create_data_set_for_tests():
     if not os.path.exists(pfo_icv_segmentations):
         print('Co-registering dummy dataset for testing part 3. May take 1 min.')
         os.system('mkdir -p {}'.format(pfo_icv_segmentations))
-        lab = LABelsToolkit()
+        lab = Nilabel()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output)
         icv_estimator.generate_transformations()
 
@@ -51,7 +51,7 @@ def _create_data_set_for_tests():
 def test_compute_ground_truth_m_and_estimated_m():
     # Ground:
     v_ground = np.zeros(num_subjects, dtype=np.float)
-    lab = LABelsToolkit()
+    lab = Nilabel()
     for j in range(1, num_subjects + 1):
         pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
         df_vols    = lab.measure.volume(pfi_segmGT, labels='tot')
@@ -60,7 +60,7 @@ def test_compute_ground_truth_m_and_estimated_m():
     m_ground = np.mean(v_ground)
     print('Average volume {}'.format(m_ground))
     # Estimated:
-    lab = LABelsToolkit()
+    lab = Nilabel()
     icv_estimator = lab.icv(list_pfi_sj, pfo_output)
     icv_estimator.compute_m_from_list_masks(list_pfi_sj_segm, correction_volume_estimate=0)
     print('Average volume estimated with ICV {}'.format(icv_estimator.m))
@@ -71,14 +71,14 @@ def test_compute_ground_truth_m_and_estimated_m():
 def test_compute_ground_truth_v_and_estimated_v():
     # Ground:
     v_ground = np.zeros(num_subjects, dtype=np.float)
-    lab = LABelsToolkit()
+    lab = Nilabel()
     for j in range(1, num_subjects + 1):
         pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
         df_vols = lab.measure.volume(pfi_segmGT, labels='tot')
         v_ground[j - 1] = np.sum(df_vols['Volume'])
         print('Subject {}, volume: {}'.format(j, v_ground[j - 1]))
     # Estimated:
-    lab = LABelsToolkit()
+    lab = Nilabel()
     icv_estimator = lab.icv(list_pfi_sj, pfo_output)
     icv_estimator.compute_S()
     icv_estimator.compute_m_from_list_masks(list_pfi_sj_segm, correction_volume_estimate=0)

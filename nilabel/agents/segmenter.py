@@ -7,7 +7,7 @@ from nilabel.tools.detections.get_segmentation import intensity_segmentation, ot
     MoG_array
 
 
-class LABelsToolkitSegmenter(object):
+class LabelsSegmenter(object):
     """
     Facade for the simple segmentation methods based on intensities, Otsu thresholding and
     mixture of gaussians.

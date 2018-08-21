@@ -12,7 +12,7 @@ from nilabel.tools.defs import definition_label
 from nilabel.tools.caliber import distances as dist
 
 
-class LABelsToolkitMeasure(object):
+class LabelsMeasure(object):
     """
     Facade of the methods in tools.detections and tools.caliber, where methods are accessed through
     paths to images rather than with data.

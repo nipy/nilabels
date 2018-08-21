@@ -4,7 +4,7 @@ import numpy as np
 
 from examples.a_generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
 from nilabel.tools.defs import root_dir
-from nilabel.main import LABelsToolkit
+from nilabel.main import Nilabel
 
 
 if __name__ == '__main__':
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         # Compute the ground truth icv (up to discretisation
         os.system('mkdir -p {}'.format(pfo_output))
         v_ground = np.zeros(num_subjects, dtype=np.float)
-        lab = LABelsToolkit()
+        lab = Nilabel()
         for j in range(1, num_subjects + 1):
             pfi_segmGT = jph(pfo_icv_segmentations, 'e00{}_segmGT.nii.gz'.format(j))
             df_vols = lab.measure.volume(pfi_segmGT, labels='tot')
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     if controller['Icv_estimation_transf']:
         # compute transformations and S matrix
-        lab = LABelsToolkit()
+        lab = Nilabel()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output)
         icv_estimator.generate_transformations()
         icv_estimator.compute_S()
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         del lab, icv_estimator
 
     if controller['Estimate_m_and_compare_with_ground']:
-        lab = LABelsToolkit()
+        lab = Nilabel()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output)
         icv_estimator.compute_m_from_list_masks(list_pfi_sj_segm, correction_volume_estimate=0)
         print('Average volume estimated with ICV {}'.format(icv_estimator.m))
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         # Estimate the icv with our method.
         m = np.loadtxt(jph(pfo_output, 'm.txt'))
         S = np.loadtxt(jph(pfo_output, 'S.txt'))
-        lab = LABelsToolkit()
+        lab = Nilabel()
         icv_estimator = lab.icv(list_pfi_sj, pfo_output, m=m, S=S)
         v_est = icv_estimator.estimate_icv()
         np.savetxt(jph(pfo_output, 'v_est.txt'), v_est, fmt='%8.10f')
