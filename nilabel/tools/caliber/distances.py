@@ -1,12 +1,7 @@
 import numpy as np
 import pandas as pa
-import os
-import nibabel as nib
 from scipy import ndimage as nd
 
-from nilabel.tools.image_colors_manipulations.relabeller import keep_only_one_label
-from nilabel.tools.aux_methods.utils_nib import set_new_data
-from nilabel.tools.aux_methods.utils import print_and_run
 from nilabel.tools.detections.contours import contour_from_array_at_label_l
 
 

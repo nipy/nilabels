@@ -4,7 +4,7 @@ import numpy as np
 import nibabel as nib
 
 
-from nilabel.main import Nilabel as LT
+from nilabel.main import Nilabel as NiL
 from nilabel.tools.defs import root_dir
 from nilabel.tools.aux_methods.utils import print_and_run
 
@@ -57,7 +57,7 @@ cmd_smol = 'seg_maths {} -smol 1 {}'.format(pfi_input_segmentation_noisy, pfi_in
 
 # ---- PROCESS ----
 
-lt = LT()
+lt = NiL()
 
 # get the report before cleaning
 lt.check.number_connected_components_per_label(pfi_input_segmentation_noisy,

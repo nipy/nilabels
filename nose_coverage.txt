@@ -1,44 +1,59 @@
 .......................................................................................................
-Coverage.py warning: Module LABelsToolkit was never imported. (module-not-imported)
-/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/dateutil/parser.py   NoSource: No source for code: '/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/dateutil/parser.py'.
-Aborting report output, consider using -i.
-Traceback (most recent call last):
-  File "/Applications/python_virtualenvs/clean2_7/bin/nosetests", line 11, in <module>
-    sys.exit(run_exit())
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/core.py", line 121, in __init__
-    **extra_args)
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/unittest/main.py", line 95, in __init__
-    self.runTests()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/core.py", line 207, in runTests
-    result = self.testRunner.run(self.test)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/core.py", line 66, in run
-    result.printErrors()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/result.py", line 110, in printErrors
-    self.config.plugins.report(self.stream)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/plugins/manager.py", line 99, in __call__
-    return self.call(*arg, **kw)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/plugins/manager.py", line 167, in simple
-    result = meth(*arg, **kw)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/nose/plugins/cover.py", line 183, in report
-    self.coverInstance.stop()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/control.py", line 1036, in report
-    return reporter.report(morfs, outfile=file)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/summary.py", line 46, in report
-    analysis = self.coverage._analyze(fr)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/control.py", line 959, in _analyze
-    return Analysis(self.data, it)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/results.py", line 19, in __init__
-    self.statements = self.file_reporter.lines()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/python.py", line 186, in lines
-    return self.parser.statements
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/python.py", line 181, in parser
-    self._parser.parse_source()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/parser.py", line 237, in parse_source
-    self._raw_parse()
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/parser.py", line 138, in _raw_parse
-    tokgen = generate_tokens(self.text)
-  File "/Applications/python_virtualenvs/clean2_7/lib/python2.7/site-packages/coverage/phystokens.py", line 148, in generate_tokens
-    self.last_tokens = list(tokenize.generate_tokens(readline))
-  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/tokenize.py", line 384, in generate_tokens
-    elif token in triple_quoted:
-KeyboardInterrupt
+Name                                                               Stmts   Miss  Cover
+--------------------------------------------------------------------------------------
+nilabel/__init__.py                                                    1      0   100%
+nilabel/agents/__init__.py                                             0      0   100%
+nilabel/agents/checker.py                                             25     14    44%
+nilabel/agents/fuser.py                                               32     22    31%
+nilabel/agents/header_controller.py                                   63     50    21%
+nilabel/agents/intensities_manipulator.py                             45     28    38%
+nilabel/agents/labels_manipulator.py                                 132    108    18%
+nilabel/agents/measurer.py                                           117     87    26%
+nilabel/agents/propagator.py                                          22     15    32%
+nilabel/agents/segmenter.py                                           37     25    32%
+nilabel/agents/shape_manipulator.py                                   55     39    29%
+nilabel/agents/symmetrizer.py                                         89     76    15%
+nilabel/main.py                                                       40      7    83%
+nilabel/tools/__init__.py                                              0      0   100%
+nilabel/tools/aux_methods/__init__.py                                  0      0   100%
+nilabel/tools/aux_methods/label_descriptor_manager.py                146     44    70%
+nilabel/tools/aux_methods/morpological_operations.py                  38     16    58%
+nilabel/tools/aux_methods/sanity_checks.py                            35     17    51%
+nilabel/tools/aux_methods/utils.py                                   112     55    51%
+nilabel/tools/aux_methods/utils_nib.py                               126     49    61%
+nilabel/tools/aux_methods/utils_path.py                               15      0   100%
+nilabel/tools/aux_methods/utils_rotations.py                          98     49    50%
+nilabel/tools/caliber/__init__.py                                      0      0   100%
+nilabel/tools/caliber/distances.py                                   146     16    89%
+nilabel/tools/caliber/volumes_and_values.py                           69      6    91%
+nilabel/tools/cleaning/__init__.py                                     0      0   100%
+nilabel/tools/cleaning/labels_cleaner.py                              44      0   100%
+nilabel/tools/defs.py                                                  7      0   100%
+nilabel/tools/detections/__init__.py                                   0      0   100%
+nilabel/tools/detections/check_imperfections.py                       42     36    14%
+nilabel/tools/detections/contours.py                                  24     13    46%
+nilabel/tools/detections/get_segmentation.py                          77     56    27%
+nilabel/tools/detections/island_detection.py                          17      1    94%
+nilabel/tools/icv/__init__.py                                          0      0   100%
+nilabel/tools/icv/icv_estimator.py                                    74     13    82%
+nilabel/tools/image_colors_manipulations/__init__.py                   0      0   100%
+nilabel/tools/image_colors_manipulations/cutter.py                    26     15    42%
+nilabel/tools/image_colors_manipulations/normaliser.py                47     40    15%
+nilabel/tools/image_colors_manipulations/relabeller.py                66     32    52%
+nilabel/tools/image_colors_manipulations/segmentation_to_rgb.py       16     13    19%
+nilabel/tools/image_shape_manipulations/__init__.py                    0      0   100%
+nilabel/tools/image_shape_manipulations/merger.py                     47     22    53%
+nilabel/tools/image_shape_manipulations/splitter.py                   13      2    85%
+nilabel/tools/phantoms_generator/__init__.py                           0      0   100%
+nilabel/tools/phantoms_generator/generate_phantom_multi_atlas.py      63     52    17%
+nilabel/tools/phantoms_generator/generate_simple_phantoms.py         187    177     5%
+nilabel/tools/phantoms_generator/local_data_generator.py              13      4    69%
+nilabel/tools/phantoms_generator/shapes_for_headlike_phantoms.py      43     39     9%
+nilabel/tools/phantoms_generator/shapes_for_phantoms.py              118     92    22%
+nilabel/tools/visualiser/__init__.py                                   0      0   100%
+--------------------------------------------------------------------------------------
+TOTAL                                                               2367   1330    44%
+----------------------------------------------------------------------
+Ran 103 tests in 3.488s
+
+OK

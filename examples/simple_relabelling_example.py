@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from nilabel.main import Nilabel
+from nilabel.main import Nilabel as NiL
 from nilabel.tools.defs import root_dir
 
 if __name__ == '__main__':
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     os.system(cmd)
 
     # instantiate a label manager:
-    lt = Nilabel(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
+    lt = NiL(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
 
     # data:
     fin_punt_seg_original = 'mes_seg.nii.gz'

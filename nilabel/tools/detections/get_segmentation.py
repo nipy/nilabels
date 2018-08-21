@@ -5,11 +5,12 @@ from matplotlib import pyplot as plt
 from sklearn.mixture import GaussianMixture
 from scipy.signal import medfilt
 
-from nilabel.tools.image_colors_manipulations.relabeller import relabeller
 try:
     from skimage import filters
 except ImportError:
     from skimage import filter as filters
+
+from nilabel.tools.image_colors_manipulations.relabeller import relabeller
 
 
 def intensity_segmentation(in_array, num_levels=5):

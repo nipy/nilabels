@@ -9,7 +9,6 @@ from nilabel.tools.caliber.volumes_and_values import get_values_below_labels_lis
 from nilabel.tools.caliber.distances import dice_score, covariance_distance, \
     hausdorff_distance, global_outline_error, global_dice_score, normalised_symmetric_contour_distance
 from nilabel.tools.defs import definition_label
-from nilabel.tools.caliber import distances as dist
 
 
 class LabelsMeasure(object):

@@ -2,7 +2,7 @@ import os
 from os.path import join as jph
 
 from nilabel.tools.defs import root_dir
-from nilabel.main import Nilabel as LaB
+from nilabel.main import Nilabel as NiL
 
 import a_generate_phantoms_for_examples as gen
 
@@ -42,17 +42,17 @@ pfi_mog_segmentation_prob    = jph(pfo_output_folder, 'ellipsoids_segm_mog_prob.
 
 print('---- PROCESS 1: intensities segmentation ----')
 
-la = LaB()
+la = NiL()
 la.segment.simple_intensities_thresholding(pfi_input_anatomy, pfi_intensities_segmentation, number_of_levels=5)
 
 print('---- PROCESS 2: Otsu ----')
 
-la = LaB()
+la = NiL()
 la.segment.otsu_thresholding(pfi_input_anatomy, pfi_otsu_segmentation, side='above', return_as_mask=False)
 
 print('---- PROCESS 2: MoG ----')
 
-la = LaB()
+la = NiL()
 la.segment.mixture_of_gaussians(pfi_input_anatomy, pfi_mog_segmentation_crisp, pfi_mog_segmentation_prob,
                                 K=5, see_histogram=True)
 

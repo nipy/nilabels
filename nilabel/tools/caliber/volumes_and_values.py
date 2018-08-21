@@ -2,7 +2,7 @@
 This module is divided into two parts.
 First one -> essential functions, input are nibabel objects, output are reals or arrays.
              The first part refers to the number of voxels.
-Second one -> uses the first one, to plot volumes, normalisation outputs values in pandas arrays or dataframes.
+Second one -> it uses the first part, to plot volumes, normalisation outputs values in pandas arrays or dataframes.
 """
 import numpy as np
 import pandas as pa

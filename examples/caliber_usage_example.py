@@ -2,7 +2,7 @@ import os
 from os.path import join as jph
 import numpy as np
 
-from nilabel.main import Nilabel as LT
+from nilabel.main import Nilabel as NiL
 from nilabel.tools.defs import root_dir
 
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
             raise IOError('Run lm.tools.benchmarking.generate_images_examples.py to create the images examples before this, please.')
 
     # total volume:
-    m = LT()
+    m = NiL()
     print('The image contains 4 cubes of sides 11, 17, 19 and 9:\n')
     print('11**3 +  17**3 + 19**3 + 9**3   = {} '.format(11**3 +  17**3 + 19**3 + 9**3))
     print('sa.get_total_volume()           = {} '.format(m.measure.get_total_volume(pfi_im)['Volume'].values))

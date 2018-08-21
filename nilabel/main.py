@@ -55,4 +55,3 @@ class Nilabel(object):
         self.header                 = HeaderController(self._pfo_in, self._pfo_out)
         self.segment                = LabelsSegmenter(self._pfo_in, self._pfo_out)
         self.icv                    = ICV_estimator
-

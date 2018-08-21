@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from nilabel.main import Nilabel as LT
+from nilabel.main import Nilabel as NiL
 from nilabel.tools.defs import root_dir
 
 import a_generate_phantoms_for_examples as gen
@@ -55,7 +55,7 @@ labels_sym_right = labels_right + labels_central
 # --- EXECUTE ----
 
 
-lt = LT()
+lt = NiL()
 lt.symmetrize.symmetrise_with_registration(pfi_input_anatomy,
                                            pfi_input_segmentation,
                                            labels_sym_left,
