@@ -5,7 +5,7 @@ Python 2.7 (upgrading in progress)
 Nilabel is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
 
-## Warm up example
+## Introductory example
 
 Let's say you need to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 3, 4, 5, 6, 7] in a list of 10 
 segmentations `file{1..10}.nii.gz`. You can then apply the tool `relabel` under `tools.manipulations.relabel` as:
