@@ -11,7 +11,7 @@ from LABelsToolkit.tools.phantoms_generator.shapes_for_phantoms import ellipsoid
     cube_shape
 
 
-def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, foreground=10):
+def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, foreground=10, noise=5000):
     print(creation_list)
     print('\n.\n.\n\nGenerating figures for examples, may take some seconds and approx 150MB for the whole '
           'dataset.\n.\n.')
@@ -131,7 +131,7 @@ def generate_figures(creation_list, segmentation_levels=7, sigma_smoothing=6, fo
         nib.save(nib_ellipsoids_seg_half, filename=jph(pfo_examples, 'ellipsoids_seg_half.nii.gz'))
 
         salt_and_pepper = np.zeros_like(two_ellipsoids_segmentation)
-        for x, y, z in zip(*[np.random.randint(1, k, size=5000) for k in salt_and_pepper.shape]):
+        for x, y, z in zip(*[np.random.randint(1, k, size=noise) for k in salt_and_pepper.shape]):
             salt_and_pepper[x, y, z] = np.random.uniform(1, 4)
         nib_ellipsoids_seg_salt_and_pepper = nib.Nifti1Image(two_ellipsoids_segmentation + salt_and_pepper, affine=np.eye(4))
         nib.save(nib_ellipsoids_seg_salt_and_pepper, filename=jph(pfo_examples, 'ellipsoids_seg_noisy.nii.gz'))

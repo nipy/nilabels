@@ -45,12 +45,10 @@ pfi_output_segmentation = jph(root_dir, 'data_examples', 'ellipsoids_seg_symmetr
 
 
 labels_central = []
+labels_left    = [1, 2, 3, 4, 5, 6]
+labels_right   = [a + 10 for a in labels_left]
 
-labels_left       = [1, 2, 3, 4, 5, 6]
-
-labels_right = [a + 10 for a in labels_left]
-
-labels_sym_left = labels_left + labels_central
+labels_sym_left  = labels_left + labels_central
 labels_sym_right = labels_right + labels_central
 
 
