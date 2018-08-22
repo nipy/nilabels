@@ -33,7 +33,7 @@ def test_check_missing_labels_paired():
                        [0, 0, 0, 5, 0, 0, 2, 0, 0],
                        [0, 0, 0, 0, 0, 0, 2, 0, 0]]
                       ])
-    im = nib.Nifti1Image(array, np.eye(1))
+    im = nib.Nifti1Image(array, np.eye(4))
 
 
 def test_check_missing_labels_unpaired():

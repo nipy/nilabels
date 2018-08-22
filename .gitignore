@@ -14,3 +14,5 @@ z_*
 a_experiments
 .coverage
 paper
+.pytest_cache
+htmlcov
