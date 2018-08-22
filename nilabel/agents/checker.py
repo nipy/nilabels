@@ -18,7 +18,9 @@ class LabelsChecker(object):
     def missing_labels(self, pfi_segmentation, pfi_labels_descriptor, pfi_where_to_save_the_log_file=None):
         ldm = LabelsDescriptorManager(pfi_labels_descriptor)
         im_se = nib.load(pfi_segmentation)
-        check_missing_labels(im_se, ldm, pfi_where_log=pfi_where_to_save_the_log_file)
+        in_descriptor_not_delineated, delineated_not_in_descriptor = \
+            check_missing_labels(im_se, ldm, pfi_where_log=pfi_where_to_save_the_log_file)
+        return in_descriptor_not_delineated, delineated_not_in_descriptor
 
     def number_connected_components_per_label(self, input_segmentation, where_to_save_the_log_file=None):
         pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)

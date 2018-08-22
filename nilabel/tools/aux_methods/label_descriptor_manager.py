@@ -78,20 +78,19 @@ def generate_dummy_label_descriptor(pfi_output, list_labels=range(5),
     :return: label descriptor as a dictionary.
     """
     d = collections.OrderedDict()
-    num_labels = len(list_labels)
-    visibility = [(1.0, 1, 1)] * num_labels
+    visibility = [(1.0, 1, 1)] * len(list_labels)
     if list_roi_names is None:
         list_roi_names = ["label {}".format(j) for j in list_labels]
     else:
         if not len(list_labels) == len(list_roi_names):
             raise IOError('Wrong input data')
     if list_colors_triplets is None:
-        list_colors_triplets = [list(np.random.choice(range(256), 3)) for _ in range(num_labels)]
+        list_colors_triplets = [list(np.random.choice(range(256), 3)) for _ in list_labels]
     else:
         if not len(list_labels) == len(list(list_colors_triplets)):
             raise IOError('Wrong input data')
-    for j in range(num_labels):
-        up_d = {str(j): [list_colors_triplets[j], visibility[j], list_roi_names[j]]}
+    for j_in, j in enumerate(list_labels):
+        up_d = {str(j): [list_colors_triplets[j_in], visibility[j_in], list_roi_names[j_in]]}
         d.update(up_d)
     f = open(pfi_output, 'w+')
     f.write(descriptor_standard_header)

@@ -14,21 +14,25 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
     number of voxels, volume and number of connected components per label, all in a log file.
     """
     assert isinstance(labels_descriptor, LabelsDescriptorManager)
-    labels_dict = labels_descriptor.get_dict_itk_snap(as_string=False)
-    labels_list = labels_dict.keys()
+    labels_dict = labels_descriptor.get_dict_itk_snap()
+    labels_list_from_descriptor = labels_dict.keys()
 
     labels_in_the_image = set(im_segm.get_data().astype(np.int).flatten())
-    intersection = labels_in_the_image & set(labels_list)
-    msg = 'Labels in the descriptor not delineated: \n{}\n'.format(set(labels_list) - intersection)
-    msg += 'Labels delineated not in the descriptor: \n{}'.format(labels_in_the_image - intersection)
+    intersection = labels_in_the_image & set(labels_list_from_descriptor)
+
+    in_descriptor_not_delineated = set(labels_list_from_descriptor) - intersection
+    delineated_not_in_descriptor = labels_in_the_image - intersection
+
+    msg = 'Labels in the descriptor not delineated: \n{}\n'.format(in_descriptor_not_delineated)
+    msg += 'Labels delineated not in the descriptor: \n{}'.format(delineated_not_in_descriptor)
     print(msg)
 
     if pfi_where_log is not None:
-        labels_names = [labels_dict[l][2] for l in labels_list]
+        labels_names = [labels_dict[l][2] for l in labels_list_from_descriptor]
 
         num_voxels_per_label = []
         num_connected_components_per_label = []
-        for label_k in labels_list:
+        for label_k in labels_list_from_descriptor:
             all_places = im_segm.get_data() == label_k
 
             cc_l = len(set(list(measure.label(all_places, background=0).flatten()))) - 1
@@ -61,3 +65,5 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
         f.close()
 
         print('Log status saved in {}'.format(pfi_where_log))
+
+    return in_descriptor_not_delineated, delineated_not_in_descriptor

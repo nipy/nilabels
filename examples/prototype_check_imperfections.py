@@ -1,20 +1,43 @@
+import os
+from os.path import join as jph
 import nibabel as nib
 
-
-from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
 from nilabel.main import Nilabel as NiL
+from nilabel.tools.defs import root_dir
+from nilabel.tools.aux_methods.label_descriptor_manager import generate_dummy_label_descriptor
+
+import a_generate_phantoms_for_examples as gen
 
 
-pfi_segm = '/Users/sebastiano/Desktop/test_segmentation.nii.gz'
-pfi_ld = '/Users/sebastiano/Desktop/labels_descriptor.txt'
+# ---- GENERATE DATA ----
 
-pfi_output_msg = '/Users/sebastiano/Desktop/output.txt'
 
-ldm = LabelsDescriptorManager(pfi_ld)
+if not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids_seg.nii.gz')):
 
-im_se = nib.load(pfi_segm)
+    creation_list = {'Examples folder'    : True,
+                      'Punt e mes'        : False,
+                      'C'                 : False,
+                      'Planetaruim'       : False,
+                      'Buckle ellipsoids' : True,
+                      'Ellipsoids family' : False,
+                      'Cubes in the sky'  : False,
+                      'Sandwich'          : False,
+                      'Four-folds'        : False}
+
+    gen.generate_figures(creation_list)
+
+# ---- PATH MANAGER ----
+
+pfi_input_segm = jph(root_dir, 'data_examples', 'ellipsoids_seg.nii.gz')
+
+# ---- CREATE LABELS DESCRIPTOR FOR PHANTOM ellipsoids with 0 to 6 labels ----
+
+pfi_labels_descriptor = jph(root_dir, 'data_examples', 'labels_descriptor_ellipsoids.txt')
+generate_dummy_label_descriptor(pfi_labels_descriptor, list_labels=[0, 1, 4, 5, 6, 7, 8])  # add extra labels to test
+
+# ---- PERFORM the check ----
+
 la = NiL()
+in_descriptor_not_delineated, delineated_not_in_descriptor = la.check.missing_labels(pfi_input_segm, pfi_labels_descriptor, pfi_where_to_save_the_log_file=None)
 
-# TODO
-la.check.missing_labels()
-# check_missing_labels(im_se, ldm, pfi_output_msg)
+# Print expected to be seen in the terminal: set([8, 7]) set([2, 3])
