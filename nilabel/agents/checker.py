@@ -26,12 +26,18 @@ class LabelsChecker(object):
         pfi_segm = connect_path_tail_head(self.pfo_in, input_segmentation)
         im = nib.load(pfi_segm)
         msg = 'Labels check number of connected components for segmentation {} \n\n'.format(pfi_segm)
-        for l in sorted(list(set(im.get_data().flat))):
-            msg_l = 'Label {} has {} connected components'.format(l, ndimage.label(im.get_data() == l)[1])
+        labs_list, cc_list = [], []
+        for lab in sorted(list(set(im.get_data().flat))):
+            cc = ndimage.label(im.get_data() == lab)[1]
+            msg_l = 'Label {} has {} connected components'.format(lab, cc)
             print(msg_l)
             msg += msg_l + '\n'
+            labs_list.append(lab)
+            cc_list. append(cc)
 
         if where_to_save_the_log_file is not None:
             f = open(where_to_save_the_log_file, 'w')
             f.write(msg)
             f.close()
+
+        return labs_list, cc_list

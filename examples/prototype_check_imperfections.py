@@ -1,6 +1,5 @@
 import os
 from os.path import join as jph
-import nibabel as nib
 
 from nilabel.main import Nilabel as NiL
 from nilabel.tools.defs import root_dir
