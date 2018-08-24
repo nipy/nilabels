@@ -27,11 +27,11 @@ for i in range(1, 11):
 
 ## Further infos
 
-+ [Motivations](https://github.com/SebastianoF/nilabel/wiki/Motivations)
++ [Motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations)
 
-+ [What you can do with nilabel](https://github.com/SebastianoF/nilabel/wiki/What-you-can-do-with-LABelsToolkit)
++ [What you can do with NiLabels](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
 
-+ [Design pattern](https://github.com/SebastianoF/nilabel/wiki/Design-Pattern)
++ [Design pattern](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern)
 
 ## How to install (in development mode) 
 
