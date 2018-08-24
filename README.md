@@ -35,13 +35,13 @@ segmentations in nifti format.
 
 ### Introductory example
 
-Given a segmentation `my_data/my_segm.nii.gz` you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]. Then:
+Given a segmentation `my_input_data/my_segm.nii.gz` you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]. Then:
 
 ```python
 import nilabels as nis
 
 
-nis_app = nis.App()
+nis_app = nis.App('my_input_data')
 nis_app.manipulate.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 ```
 
