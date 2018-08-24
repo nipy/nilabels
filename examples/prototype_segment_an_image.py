@@ -2,7 +2,7 @@ import os
 from os.path import join as jph
 
 from nilabels.tools.defs import root_dir
-from nilabels.main import NiLabels as NiL
+from nilabels.main import NiLabelsApp as NiL
 
 import a_generate_phantoms_for_examples as gen
 

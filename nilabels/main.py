@@ -13,7 +13,7 @@ from nilabels.agents.segmenter import LabelsSegmenter
 from nilabels.tools.icv.icv_estimator import ICV_estimator
 
 
-class NiLabels(object):
+class NiLabelsApp(object):
 
     def __init__(self, input_data_folder=None, output_data_folder=None):
         """

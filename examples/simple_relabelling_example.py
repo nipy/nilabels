@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from nilabels.main import NiLabels as NiL
+from nilabels.main import NiLabelsApp as NiL
 from nilabels.tools.defs import root_dir
 
 if __name__ == '__main__':

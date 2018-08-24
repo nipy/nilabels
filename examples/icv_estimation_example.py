@@ -4,7 +4,7 @@ import numpy as np
 
 from examples.a_generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
 from nilabels.tools.defs import root_dir
-from nilabels.main import NiLabels as NiL
+from nilabels.main import NiLabelsApp as NiL
 
 
 if __name__ == '__main__':

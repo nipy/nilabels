@@ -4,7 +4,7 @@ import numpy as np
 import nibabel as nib
 
 
-from nilabels.main import NiLabels as NiL
+from nilabels.main import NiLabelsApp as NiL
 from nilabels.tools.defs import root_dir
 from nilabels.tools.aux_methods.utils import print_and_run
 

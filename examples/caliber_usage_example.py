@@ -2,7 +2,7 @@ import os
 from os.path import join as jph
 import numpy as np
 
-from nilabels.main import NiLabels as NiL
+from nilabels.main import NiLabelsApp as NiL
 from nilabels.tools.defs import root_dir
 
 
