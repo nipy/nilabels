@@ -8,9 +8,7 @@ segmentations in nifti format.
 ### Features
 
 + Written in Python 2.7
-
 + Simplify the access to a range of tools and algorithms for the manipulation of medical image segmentations (see more under [motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations))
-
 + After importing NiLabels, you can quickly: 
     + check if there are missing labels in a segmentation. 
     + counts the number of connected components.
@@ -21,7 +19,6 @@ segmentations in nifti format.
     + get the array of values at the voxel below a given label 
     + symmetrise a segmentation 
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
-
 + Facade design pattern to make it easily extendible (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
 
 
@@ -56,8 +53,6 @@ nis_app.manipulate.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', [1, 2, 3, 4, 
 + Install python requirements in requirements.txt with
     `pip install -r requirements.txt`
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
-
-
 + Install NiLabels: the current version is not (yet) pip installable. It can be installed in development mode.
 To proceede, initialise a virtual environment and execute the following instructions:
 ```
