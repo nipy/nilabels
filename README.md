@@ -2,7 +2,7 @@
 
 (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
 
-NiLabels is a set of tools to automatise simple manipulations and measurements of medical images 
+NiLabels is a set of tools to automatise simple manipulations and measurements of medical image 
 segmentations in nifti format.
 
 ### Features
@@ -51,7 +51,7 @@ nis_app.manipulate.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', [1, 2, 3, 4, 
 + Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
 + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
 
-**Note:** NiftySeg, NiftySeg and ITK-Snap are required only for advanced functions.
+**Note:** NiftySeg, NiftyReg and ITK-Snap are required only for advanced functions.
 
 + Install python requirements in requirements.txt with
     `pip install -r requirements.txt`
