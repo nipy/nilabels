@@ -1,10 +1,10 @@
 import os
 from os.path import join as jph
+
 import numpy as np
 
-from nilabels.main import NiLabelsApp as NiL
+from nilabels.agents.agents_controller import AgentsController as NiL
 from nilabels.tools.defs import root_dir
-
 
 if __name__ == '__main__':
 

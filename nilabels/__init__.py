@@ -1,3 +1,3 @@
 __version__ = '1.0.0dev'
 
-from main import NiLabelsApp as App
+from agents.agents_controller import AgentsController as App

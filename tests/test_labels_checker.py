@@ -1,13 +1,10 @@
-import os
 from os.path import join as jph
 
 import numpy as np
 import nibabel as nib
-from nose.tools import assert_raises, assert_almost_equal, assert_equal, assert_equals
 from numpy.testing import assert_array_equal
 
 from nilabels.tools.defs import root_dir
-from nilabels.main import NiLabelsApp as NiL
 from nilabels.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
 from nilabels.tools.detections.check_imperfections import check_missing_labels
 

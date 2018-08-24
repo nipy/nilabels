@@ -1,7 +1,7 @@
 import os
 from os.path import join as jph
 
-from nilabels.main import NiLabelsApp as LT
+from nilabels.agents.agents_controller import AgentsController as LT
 from nilabels.tools.caliber.distances import dice_score, covariance_distance, hausdorff_distance
 from nilabels.tools.defs import root_dir
 
