@@ -13,16 +13,16 @@ Let's say you need to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 3,
 segmentations `file{1..10}.nii.gz`. You can then apply the tool `relabel` under `tools.manipulations.relabel` as:
 
 ```python
-from nilabels.main import NiLabels as NiS
+import nilabels as nis
 
+my_nis = nis.NiLabels(<input_folder>, <output_folder>)
 
-nis = NiS(<input_folder>, <output_folder>)
 
 for i in range(1, 11):
     input_file_name  = 'file{}.nii.gz'.format(i)
     output_file_name = 'file{}.nii.gz'.format(i)
-    nis.manipulate.relabel(input_file_name, output_file_name,
-                           [1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
+    my_nis.manipulate.relabel(input_file_name, output_file_name,
+                              [1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
 ```
 
 ## Further infos
