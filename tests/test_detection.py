@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from nilabel.tools.detections.island_detection import island_for_label
-from nilabel.tools.detections.get_segmentation import intensity_segmentation, otsu_threshold, MoG_array
+from nilabels.tools.detections.island_detection import island_for_label
+from nilabels.tools.detections.get_segmentation import intensity_segmentation, otsu_threshold, MoG_array
 
 
 def test_island_for_label_ok_input():

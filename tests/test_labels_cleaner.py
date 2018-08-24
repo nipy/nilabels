@@ -2,7 +2,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 from scipy import ndimage
 
-from nilabel.tools.cleaning.labels_cleaner import multi_lab_segmentation_dilate_1_above_selected_label, \
+from nilabels.tools.cleaning.labels_cleaner import multi_lab_segmentation_dilate_1_above_selected_label, \
     holes_filler, clean_semgentation
 
 

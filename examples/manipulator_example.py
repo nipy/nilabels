@@ -4,11 +4,11 @@ from os.path import join as jph
 import nibabel as nib
 import numpy as np
 
-import nilabel.tools.image_colors_manipulations.relabeller as rel
-import nilabel.tools.image_shape_manipulations.splitter as sp
-from nilabel.main import Nilabel
-from nilabel.tools.aux_methods.utils_nib import set_new_data
-from nilabel.tools.defs import root_dir
+import nilabels.tools.image_colors_manipulations.relabeller as rel
+import nilabels.tools.image_shape_manipulations.splitter as sp
+from nilabels.main import NiLabels
+from nilabels.tools.aux_methods.utils_nib import set_new_data
+from nilabels.tools.defs import root_dir
 
 if __name__ == '__main__':
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     os.system(cmd)
 
     # Instantiate a manager from the class LabelsManager
-    lt = Nilabel(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
+    lt = NiLabels(jph(root_dir, 'data_examples'), jph(root_dir, 'data_output'))
     print('Input folder: ' + lt._pfo_in)
     print('Output folder: ' + lt._pfo_out)
 

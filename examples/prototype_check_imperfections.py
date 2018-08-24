@@ -1,9 +1,9 @@
 import os
 from os.path import join as jph
 
-from nilabel.main import Nilabel as NiL
-from nilabel.tools.defs import root_dir
-from nilabel.tools.aux_methods.label_descriptor_manager import generate_dummy_label_descriptor
+from nilabels.main import NiLabels as NiL
+from nilabels.tools.defs import root_dir
+from nilabels.tools.aux_methods.label_descriptor_manager import generate_dummy_label_descriptor
 
 import a_generate_phantoms_for_examples as gen
 

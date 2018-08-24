@@ -4,9 +4,9 @@ from os.path import join as jph
 
 from nose.tools import assert_raises
 
-from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager, \
+from nilabels.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager, \
     generate_dummy_label_descriptor
-from nilabel.tools.phantoms_generator import local_data_generator as ldg
+from nilabels.tools.phantoms_generator import local_data_generator as ldg
 
 
 # AUXILIARY
@@ -64,7 +64,7 @@ def test_generate_labels_descriptor_general():
                                         list_roi_names=list_roi_names,
                                         list_colors_triplets=list_color_triplets)
     for k_num, k in enumerate(d.keys()):
-        assert k == list_roi_names[k_num]
+        assert int(k) == list_labels[k_num]
         assert d[k][0]  == list_color_triplets[k_num]
         assert d[k][-1] == list_roi_names[k_num]
 

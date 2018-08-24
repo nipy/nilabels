@@ -1,10 +1,10 @@
-# nilabel 
+# NiLabels 
 
 (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
 
 Python 2.7 (upgrading to Python 3 in progress)
 
-Nilabel is a set of tools to automatise simple manipulations and measurements of medical images and images 
+NiLabels is a set of tools to automatise simple manipulations and measurements of medical images and images 
 segmentations in nifti format.
 
 ## Introductory example
@@ -13,15 +13,15 @@ Let's say you need to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 3,
 segmentations `file{1..10}.nii.gz`. You can then apply the tool `relabel` under `tools.manipulations.relabel` as:
 
 ```python
-from nilabel.main import Nilabel as NiL
+from nilabels.main import NiLabels as NiS
 
 
-nil = NiL(<input_folder>, <output_folder>)
+nis = NiS(<input_folder>, <output_folder>)
 
 for i in range(1, 11):
     input_file_name  = 'file{}.nii.gz'.format(i)
     output_file_name = 'file{}.nii.gz'.format(i)
-    nil.manipulate.relabel(input_file_name, output_file_name,
+    nis.manipulate.relabel(input_file_name, output_file_name,
                            [1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6, 7])
 ```
 
@@ -45,11 +45,11 @@ for i in range(1, 11):
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 
-+ Install nilabel: the current version is not (yet) pip installable. It can be installed in development mode.
++ Install NiLabels: the current version is not (yet) pip installable. It can be installed in development mode.
 To proceede, initialise a virtual environment and execute the following instructions:
 ```
 cd <folder where to clone the code>
-git clone https://github.com/SebastianoF/nilabel.git
+git clone https://github.com/SebastianoF/nilabels.git
 cd nilabel
 pip install -e .
 ```
@@ -58,7 +58,7 @@ without the need of reinstalling.
 
 ## Documentations
 
-+ [Wiki-pages documentation](https://github.com/SebastianoF/nilabel/wiki)
++ [Wiki-pages documentation](https://github.com/SebastianoF/nilabels/wiki)
 
 
 ## Code testing
@@ -75,7 +75,7 @@ The first time the test a run a dummy dataset is created. This may take some min
 
 Copyright (c) 2017, Sebastiano Ferraris. nilabel  (ex. LABelsToolkit ex. LabelsManager) is provided as it is and 
 it is available as free open-source software under 
-[MIT License](https://github.com/SebastianoF/nilabel/blob/master/LICENCE.txt)
+[MIT License](https://github.com/SebastianoF/nilabels/blob/master/LICENCE.txt)
 
 
 ## Acknowledgements

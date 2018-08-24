@@ -5,9 +5,9 @@ import nibabel as nib
 import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-from nilabel.tools.defs import root_dir
-from nilabel.tools.phantoms_generator.generate_simple_phantoms import generate_figures
-from nilabel.tools.aux_methods.utils_nib import replace_translational_part, remove_nan_from_im
+from nilabels.tools.defs import root_dir
+from nilabels.tools.phantoms_generator.generate_simple_phantoms import generate_figures
+from nilabels.tools.aux_methods.utils_nib import replace_translational_part, remove_nan_from_im
 
 
 def test_adjust_nifti_replace_translational_part_F_F():

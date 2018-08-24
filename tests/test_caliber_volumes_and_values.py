@@ -6,9 +6,9 @@ import nibabel as nib
 from nose.tools import assert_raises, assert_almost_equal, assert_equal, assert_equals
 from numpy.testing import assert_array_equal
 
-from nilabel.tools.caliber.volumes_and_values import get_total_num_nonzero_voxels, get_num_voxels_from_labels_list, \
+from nilabels.tools.caliber.volumes_and_values import get_total_num_nonzero_voxels, get_num_voxels_from_labels_list, \
     get_values_below_labels_list
-from nilabel.tools.phantoms_generator.shapes_for_phantoms import cube_shape
+from nilabels.tools.phantoms_generator.shapes_for_phantoms import cube_shape
 
 
 def test_volumes_and_values_total_num_voxels():

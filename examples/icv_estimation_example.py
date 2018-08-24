@@ -3,8 +3,8 @@ from os.path import join as jph
 import numpy as np
 
 from examples.a_generate_headlike_phantoms import example_generate_multi_atlas_at_specified_folder
-from nilabel.tools.defs import root_dir
-from nilabel.main import Nilabel as NiL
+from nilabels.tools.defs import root_dir
+from nilabels.main import NiLabels as NiL
 
 
 if __name__ == '__main__':
