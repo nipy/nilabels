@@ -9,7 +9,7 @@ from nilabel.tools.image_colors_manipulations.relabeller import relabeller
 from nilabel.tools.aux_methods.utils_rotations import flip_data, symmetrise_data
 
 
-class SegmentationSymmetrize(object):
+class SegmentationSymmetrizer(object):
     """
     Facade of the methods in tools. symmetrizer, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general

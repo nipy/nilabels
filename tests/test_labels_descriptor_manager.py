@@ -9,6 +9,9 @@ from nilabel.tools.aux_methods.label_descriptor_manager import LabelsDescriptorM
 from nilabel.tools.phantoms_generator import local_data_generator as ldg
 
 
+# AUXILIARY
+
+
 def _create_data_set_for_tests():
     if not os.path.exists(jph(ldg.pfo_target_atlas, 'label_descriptor.txt')):
         print('Generating testing dataset. May take a while, but it is done only once!')
@@ -17,6 +20,57 @@ def _create_data_set_for_tests():
 
 def check_list_equal(l1, l2):
     return len(l1) == len(l2) and sorted(l1) == sorted(l2)
+
+
+# TESTING: Generate dummy descriptor - generate_dummy_label_descriptor
+
+
+def test_generate_dummy_labels_descriptor_wrong_input1():
+    with assert_raises(IOError):
+        generate_dummy_label_descriptor(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'), list_labels=range(5),
+                                        list_roi_names=['1', '2'])
+
+
+def test_generate_dummy_labels_descriptor_wrong_input2():
+    with assert_raises(IOError):
+        generate_dummy_label_descriptor(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'), list_labels=range(5),
+                                        list_roi_names=['1', '2', '3', '4', '5'],
+                                        list_colors_triplets=[[0,0,0], [1,1,1]])
+
+
+def test_generate_labels_descriptor_list_roi_names_None():
+    d = generate_dummy_label_descriptor(jph(ldg.pfo_examples, 'dummy_label_descriptor.txt'), list_labels=range(5),
+                                        list_roi_names=None,
+                                        list_colors_triplets=[[1, 1, 1],] * 5)
+
+    for k in d.keys():
+        assert d[k][-1] == 'label {}'.format(k)
+
+
+def test_generate_labels_descriptor_list_colors_triplets_None():
+    d = generate_dummy_label_descriptor(jph(ldg.pfo_examples, 'dummy_label_descriptor.txt'), list_labels=range(5),
+                                        list_roi_names=None,
+                                        list_colors_triplets=[[1, 1, 1], ] * 5)
+    for k in d.keys():
+        assert len(d[k][1]) == 3
+
+
+def test_generate_labels_descriptor_general():
+    list_labels         = [1, 2, 3, 4, 5]
+    list_color_triplets = [[1,1,1], [2,2,2], [3,3,3], [4,4,4], [5,5,5]]
+    list_roi_names      = ['one', 'two', 'three', 'four', 'five']
+
+    d = generate_dummy_label_descriptor(jph(ldg.pfo_examples, 'dummy_label_descriptor.txt'), list_labels=list_labels,
+                                        list_roi_names=list_roi_names,
+                                        list_colors_triplets=list_color_triplets)
+    for k_num, k in enumerate(d.keys()):
+        assert k == list_roi_names[k_num]
+        assert d[k][0]  == list_color_triplets[k_num]
+        assert d[k][-1] == list_roi_names[k_num]
+
+
+
+# TESTING basics labels descriptor
 
 
 def test_basics_methods_labels_descriptor_manager_wrong_input_path():
@@ -228,19 +282,3 @@ def test_keep_one_label():
     check_list_equal(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
         check_list_equal(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
-
-
-# TESTING: Generate dummy descriptor - generate_dummy_label_descriptor
-
-
-def test_generate_dummy_labels_descriptor_wrong_input1():
-    with assert_raises(IOError):
-        generate_dummy_label_descriptor(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'), list_labels=range(5),
-                                        list_roi_names=['1', '2'])
-
-
-def test_generate_dummy_labels_descriptor_wrong_input2():
-    with assert_raises(IOError):
-        generate_dummy_label_descriptor(jph(ldg.pfo_target_atlas, 'label_descriptor.txt'), list_labels=range(5),
-                                        list_roi_names=['1', '2', '3', '4', '5'],
-                                        list_colors_triplets=[[0,0,0], [1,1,1]])

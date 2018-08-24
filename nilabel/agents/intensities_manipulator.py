@@ -9,7 +9,7 @@ from nilabel.tools.image_shape_manipulations.merger import grafting
 from nilabel.tools.image_colors_manipulations.cutter import apply_a_mask_nib
 
 
-class IntensitiesManipulate(object):
+class IntensitiesManipulator(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general

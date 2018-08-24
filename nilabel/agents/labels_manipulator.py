@@ -14,7 +14,7 @@ from nilabel.tools.image_colors_manipulations.segmentation_to_rgb import \
 from nilabel.tools.image_shape_manipulations.merger import from_segmentations_stack_to_probabilistic_segmentation
 
 
-class LabelsManipulate(object):
+class LabelsManipulator(object):
     """
     Facade of the methods in tools, for work with paths to images rather than
     with data. Methods under LabelsManagerManipulate are taking in general
