@@ -15,8 +15,8 @@ segmentations `file{1..10}.nii.gz`. You can then apply the tool `relabel` under 
 ```python
 import nilabels as nis
 
-my_nis = nis.NiLabels(<input_folder>, <output_folder>)
 
+my_nis = nis.NiLabels(<input_folder>, <output_folder>)
 
 for i in range(1, 11):
     input_file_name  = 'file{}.nii.gz'.format(i)
