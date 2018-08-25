@@ -8,18 +8,18 @@ segmentations in nifti format.
 ### Features
 
 + Written in Python 2.7
-+ Simplify the access to a range of tools and algorithms for the manipulation of medical image segmentations (see more under [motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations))
++ Simplifies the access to a range of tools and algorithms for the manipulation of medical image segmentations (see more under [motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations))
 + After importing NiLabels, you can quickly: 
-    + check if there are missing labels in a segmentation. 
-    + counts the number of connected components.
+    + check if there are missing labels in a segmentation 
+    + count the number of connected components
     + get the corresponding 4D RGB image (with colors provided in ITK-snap or fsl labels descriptor format) 
     + apply rotations and translations to the image header
-    + change the segmentation numbering, erase or merge labels 
+    + permute or change the segmentation numbering, erase or merge labels 
     + compute Dice's score, covariance distance, Hausdorff distance and normalised symmetric contour distance between segmentations 
     + get the array of values at the voxel below a given label 
     + symmetrise a segmentation 
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
-+ Facade design pattern to make it easily extendible (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
++ Facade design pattern to make it easily extendible with new methods (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
 
 
 ### Non-features (work in progress)
