@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pa
 from scipy import ndimage as nd
 
-from nilabels.tools.detections.contours import contour_from_array_at_label_l
+from nilabels.tools.detections.contours import contour_from_array_at_label
 
 
 # --- Auxiliaries
@@ -186,8 +186,8 @@ def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='nor
     if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
         return np.nan
 
-    arr1_contour = contour_from_array_at_label_l(arr1, 1)
-    arr2_contour = contour_from_array_at_label_l(arr2, 1)
+    arr1_contour = contour_from_array_at_label(arr1, 1)
+    arr2_contour = contour_from_array_at_label(arr2, 1)
 
     if return_mm3:
         dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))

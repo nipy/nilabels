@@ -3,11 +3,11 @@ import numpy as np
 from nilabels.tools.aux_methods.utils_nib import set_new_data
 
 
-def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0):
+def contour_from_array_at_label(im_arr, lab, thr=0.3, omit_axis=None, verbose=0):
     """
     Get the contour of a single label
     :param im_arr: input array with segmentation
-    :param l: considered label
+    :param lab: considered label
     :param thr: threshold (default 0.3) increase to increase the contour thickness.
     :param omit_axis: a directional axis preference for the contour creation, to avoid "walls" when scrolling
     the 3d image in a particular direction. None if no preference axis is expected.
@@ -15,8 +15,8 @@ def contour_from_array_at_label_l(im_arr, l, thr=0.3, omit_axis=None, verbose=0)
     :return:
     """
     if verbose > 0:
-        print('eroding label {}'.format(l))
-    array_label_l = im_arr == l
+        print('eroding label {}'.format(lab))
+    array_label_l = im_arr == lab
     assert isinstance(array_label_l, np.ndarray)
     gra = np.gradient(array_label_l.astype(np.bool).astype(np.float64))
     if omit_axis is None:
@@ -46,6 +46,6 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
     output_arr = np.zeros_like(im_segm.get_data(), dtype=im_segm.get_data_dtype())
 
     for la in list_labels:
-        output_arr += contour_from_array_at_label_l(im_segm.get_data(), la, omit_axis=omit_axis, verbose=verbose)
+        output_arr += contour_from_array_at_label(im_segm.get_data(), la, omit_axis=omit_axis, verbose=verbose)
 
     return set_new_data(im_segm, output_arr.astype(np.bool) * im_segm.get_data(), new_dtype=im_segm.get_data_dtype())

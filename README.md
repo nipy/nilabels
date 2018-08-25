@@ -32,14 +32,21 @@ segmentations in nifti format.
 
 ### Introductory example
 
-Given a segmentation `my_input_data/my_segm.nii.gz` you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]. Then:
+Given a segmentation `my_input_folder_path/my_segm.nii.gz` imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
+and save the result in `my_output_folder_path/my_new_segm.nii.gz`. Then:
 
 ```python
 import nilabels as nis
 
+# option 1
+nis_app = nis.App('my_input_folder_path', 'my_output_folder_path')
+nis_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', 
+                                  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 
-nis_app = nis.App('my_input_data')
-nis_app.manipulate.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
+# option 2
+nis_app = nis.App()
+nis_app.manipulate_labels.relabel('my_input_folder_path/my_segm.nii.gz', 'my_output_folder_path/my_new_segm.nii.gz', 
+                                  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 ```
 
 ### How to install (in development mode) 

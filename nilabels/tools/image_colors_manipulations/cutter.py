@@ -49,6 +49,7 @@ def apply_a_mask_nib(im_input, im_mask):
     """
     assert len(im_mask.shape) == 3
 
+    # TODO correct this: make the cut_4d_volume_with_a_1_slice_mask merged hrer
     if not im_mask.shape == im_input.shape[:3]:
         msg = 'Provided mask and image does not have compatible dimension: {0} and {1}'.format(
             im_input.shape, im_mask.shape)

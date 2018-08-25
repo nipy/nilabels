@@ -4,7 +4,7 @@ import os
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 info = {
-        "name": "LABelsToolkit",
+        "name": "NiLabels",
         "version": "0.1",
         "description": "",
         "repository": {

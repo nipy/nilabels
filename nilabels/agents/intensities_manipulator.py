@@ -21,7 +21,6 @@ class IntensitiesManipulator(object):
         self.pfo_out = output_data_folder
         self.path_label_descriptor = path_label_descriptor
 
-    # TODO embed path label descriptors.
     def normalise_below_label(self, filename_image_in, filename_image_out, filename_segm, labels, stats=np.median):
         """
 

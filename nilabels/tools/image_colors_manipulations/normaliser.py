@@ -74,7 +74,6 @@ def intensities_normalisation_linear(im_input, im_segm, im_mask_foreground=None,
     return set_new_data(im_input, im_mask_foreground_data * (a * im_input.get_data() + b))
 
 
-
 def mahalanobis_distance_map(im, im_mask=None, trim=False):
     """
     From an image to its Mahalanobis distance map

@@ -139,7 +139,7 @@ class LabelsMeasure(object):
         return se_global_distances
 
     def topology(self):
-        # WIP: island detections, graph detections, cc detections from detector tools
+        # TODO: island detections, graph detections, cc detections from detector tools
         print('topology for {} is in the TODO list!'.format(self.__class__))
 
     def groupwise_global_measures_comparisons(self, list_path_A, list_path_B, pfo_where_to_save,
