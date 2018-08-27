@@ -10,7 +10,6 @@ from nilabels.agents.symmetrizer import SegmentationSymmetrizer
 from nilabels.agents.checker import LabelsChecker
 from nilabels.agents.header_controller import HeaderController
 from nilabels.agents.segmenter import LabelsSegmenter
-from nilabels.tools.icv.icv_estimator import ICV_estimator
 
 
 class AgentsController(object):
@@ -54,4 +53,3 @@ class AgentsController(object):
         self.check                  = LabelsChecker(self._pfo_in, self._pfo_out)
         self.header                 = HeaderController(self._pfo_in, self._pfo_out)
         self.segment                = LabelsSegmenter(self._pfo_in, self._pfo_out)
-        self.icv                    = ICV_estimator
