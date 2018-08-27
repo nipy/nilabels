@@ -15,19 +15,14 @@ class LabelsFuser(object):
         self.pfo_in = input_data_folder
         self.pfo_out = output_data_folder
 
-    def seg_LabFusion(self, pfi_target, pfi_result, list_pfi_segmentations, list_pfi_warped=None, options='-MV',
-                      prepare_data_only=False, seg_output_name='res_4d_seg', warp_output_name='res_4d_warp',
-                      output_tag=''):
+    def create_stack_for_labels_fusion(self, pfi_target, pfi_result, list_pfi_segmentations, list_pfi_warped=None,
+                                       seg_output_name='res_4d_seg', warp_output_name='res_4d_warp', output_tag=''):
         """
         Stack and fuse anatomical images and segmentations in a single command.
-        Based on NiftySeg if prepare_data_only is False.
         :param pfi_target: path to file to the target of the segmentation
         :param pfi_result: path to file where to store the result.
         :param list_pfi_segmentations: list of the segmentations to fuse
         :param list_pfi_warped: list of the warped images to fuse
-        :param options: simple option of NiftySeg, can be -MV -SBA or -STAPLE
-        :param prepare_data_only: Return the paths to the stack images, and does not call seg_LabFusion.
-             This can be set as True when some more sophistication on the methods is required.
         :param seg_output_name:
         :param warp_output_name:
         :param output_tag: additional tag output.
@@ -61,9 +56,5 @@ class LabelsFuser(object):
             pfi_4d_warp = connect_path_tail_head(self.pfo_out, '{0}_{1}.nii.gz'.format(warp_output_name, output_tag))
             nib.save(im_4d_warp, pfi_4d_warp)
 
-        if not prepare_data_only:
-            cmd = 'seg_LabFusion -in {0} -out {1} {2}'.format(pfi_4d_seg, pfi_result, options)
-            os.system(cmd)
 
-        else:
-            return pfi_target, pfi_result, pfi_4d_seg, pfi_4d_warp
+        return pfi_target, pfi_result, pfi_4d_seg, pfi_4d_warp

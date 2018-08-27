@@ -5,7 +5,6 @@ from nilabels.agents.shape_manipulator import ShapeManipulator
 from nilabels.agents.intensities_manipulator import IntensitiesManipulator
 from nilabels.agents.measurer import LabelsMeasure
 from nilabels.agents.fuser import LabelsFuser
-from nilabels.agents.propagator import LabelsPropagator
 from nilabels.agents.symmetrizer import SegmentationSymmetrizer
 from nilabels.agents.checker import LabelsChecker
 from nilabels.agents.header_controller import HeaderController
@@ -48,7 +47,6 @@ class AgentsController(object):
         self.manipulate_shape       = ShapeManipulator(self._pfo_in, self._pfo_out)
         self.measure                = LabelsMeasure(self._pfo_in, self._pfo_out)
         self.fuse                   = LabelsFuser(self._pfo_in, self._pfo_out)
-        self.propagate              = LabelsPropagator(self._pfo_in, self._pfo_out)
         self.symmetrize             = SegmentationSymmetrizer(self._pfo_in, self._pfo_out)
         self.check                  = LabelsChecker(self._pfo_in, self._pfo_out)
         self.header                 = HeaderController(self._pfo_in, self._pfo_out)

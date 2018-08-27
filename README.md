@@ -51,15 +51,11 @@ nis_app.manipulate_labels.relabel('my_input_folder_path/my_segm.nii.gz', 'my_out
 
 ### How to install (in development mode) 
 
-+ Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)
-+ Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
-+ Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
-
-**Note:** NiftySeg, NiftyReg and ITK-Snap are required only for advanced functions.
 
 + Install python requirements in requirements.txt with
     `pip install -r requirements.txt`
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+
 + Install NiLabels: the current version is not (yet) pip installable. It can be installed in development mode.
 To proceede, initialise a virtual environment and execute the following instructions:
 ```
@@ -70,6 +66,12 @@ pip install -e .
 ```
 In development mode every change made to your local code will be directly affecting the libray installed in the python distribution
 without the need of reinstalling.
+
++ For advanced method `symmetrise_wit_registration`, extra examples and quick arrays visualisation with ITK-snap you must
+    + Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)
+    + Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
+    + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
+
 
 
 ### Documentations

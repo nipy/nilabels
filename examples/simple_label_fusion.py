@@ -65,12 +65,12 @@ if __name__ == '__main__':
         list_pfi_segmentations = [jph(pfo_results_propagation, 'seg_nrig_ellipsoid' + str(k) + '_on_target.nii.gz') for k in range(1, 11)]
         list_pfi_warped = [jph(pfo_results_propagation, 'seg_nrig_ellipsoid' + str(k) + '_on_target.nii.gz') for k in range(1, 11)]
 
-        lm.fuse.seg_LabFusion('target.nii.gz', jph('results_label_fusion', 'output' + options_seg + '.nii.gz'),
-                              list_pfi_segmentations, options=options_seg)
+        lm.fuse.create_stack_for_labels_fusion('target.nii.gz', jph('results_label_fusion', 'output' + options_seg + '.nii.gz'),
+                                               list_pfi_segmentations, options=options_seg)
 
         # If something more sophisticated needs to be done, it returns the paths to the stacks of images:
         options_seg = '_test2'
-        list_paths = lm.fuse.seg_LabFusion('target.nii.gz', jph('results_label_fusion', 'output' + options_seg + '.nii.gz'),
-                              list_pfi_segmentations, list_pfi_warped, options=options_seg, prepare_data_only=True)
+        list_paths = lm.fuse.create_stack_for_labels_fusion('target.nii.gz', jph('results_label_fusion', 'output' + options_seg + '.nii.gz'),
+                                                            list_pfi_segmentations, list_pfi_warped, options=options_seg, prepare_data_only=True)
 
         print(list_paths)

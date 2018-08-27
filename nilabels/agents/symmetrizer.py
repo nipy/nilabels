@@ -63,6 +63,8 @@ class SegmentationSymmetrizer(object):
         labels value, it will spare you some time when set to True.
         :param coord: coordinate of the registration: in RAS, 'z' will symmetrise Left on Right.
         :return: symmetrised segmentation.
+        ---
+        NOTE: requires niftyreg.
         """
 
         pfi_in_anatomy = connect_path_tail_head(self.pfo_in, filename_anatomy)

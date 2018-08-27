@@ -43,6 +43,7 @@ log_file_after_cleaning           = jph(pfo_output_folder, 'log_after_cleaning.t
 pfi_differece_cleaned_non_cleaned = jph(pfo_output_folder, 'difference_half_cleaned_uncleaned.nii.gz')
 
 # ---- PRE-PROCESS ---- Malice for real manual segmentation input. Keep commented for the provided phantom examples.
+# Based on NiftySeg.
 
 cmd_ero  = 'seg_maths {} -ero 1 {}'.format(pfi_input_segmentation_noisy, pfi_input_segmentation_noisy)
 cmd_dil  = 'seg_maths {} -dil 1 {}'.format(pfi_input_segmentation_noisy, pfi_input_segmentation_noisy)
