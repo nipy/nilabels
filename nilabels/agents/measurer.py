@@ -1,14 +1,15 @@
 import os
-import nibabel as nib
-import pandas as pa
-import numpy as np
 
+import nibabel as nib
+import numpy as np
+import pandas as pa
+
+from nilabels.defs import definition_label
 from nilabels.tools.aux_methods.utils import labels_query
 from nilabels.tools.aux_methods.utils_path import connect_path_tail_head
-from nilabels.tools.caliber.volumes_and_values import get_values_below_labels_list, get_volumes_per_label
 from nilabels.tools.caliber.distances import dice_score, covariance_distance, \
     hausdorff_distance, global_outline_error, global_dice_score, normalised_symmetric_contour_distance
-from nilabels.tools.defs import definition_label
+from nilabels.tools.caliber.volumes_and_values import get_values_below_labels_list, get_volumes_per_label
 
 
 class LabelsMeasure(object):

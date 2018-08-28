@@ -7,8 +7,8 @@ import numpy as np
 import nilabels.tools.image_colors_manipulations.relabeller as rel
 import nilabels.tools.image_shape_manipulations.splitter as sp
 from nilabels.agents.agents_controller import AgentsController
+from nilabels.defs import root_dir
 from nilabels.tools.aux_methods.utils_nib import set_new_data
-from nilabels.tools.defs import root_dir
 
 if __name__ == '__main__':
 

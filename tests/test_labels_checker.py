@@ -1,12 +1,5 @@
-from os.path import join as jph
-
-import numpy as np
 import nibabel as nib
-from numpy.testing import assert_array_equal
-
-from nilabels.tools.defs import root_dir
-from nilabels.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager
-from nilabels.tools.detections.check_imperfections import check_missing_labels
+import numpy as np
 
 
 def test_check_missing_labels_paired():

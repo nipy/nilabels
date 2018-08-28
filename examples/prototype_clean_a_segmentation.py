@@ -1,12 +1,12 @@
 import os
 from os.path import join as jph
 
-import a_generate_phantoms_for_examples as gen
 import nibabel as nib
 import numpy as np
 
+import a_generate_phantoms_for_examples as gen
 from nilabels.agents.agents_controller import AgentsController as NiL
-from nilabels.tools.defs import root_dir
+from nilabels.defs import root_dir
 
 # ---- GENERATE DATA ----
 

@@ -52,10 +52,6 @@ nis_app.manipulate_labels.relabel('my_input_folder_path/my_segm.nii.gz', 'my_out
 ### How to install (in development mode) 
 
 
-+ Install python requirements in requirements.txt with
-    `pip install -r requirements.txt`
-in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
-
 + Install NiLabels: the current version is not (yet) pip installable. It can be installed in development mode.
 To proceede, initialise a virtual environment and execute the following instructions:
 ```
@@ -66,6 +62,11 @@ pip install -e .
 ```
 In development mode every change made to your local code will be directly affecting the libray installed in the python distribution
 without the need of reinstalling.
+
+
++ Install python requirements in requirements.txt with
+    `pip install -r requirements.txt`
+in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 + For advanced method `symmetrise_wit_registration`, extra examples and quick arrays visualisation with ITK-snap you must
     + Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)

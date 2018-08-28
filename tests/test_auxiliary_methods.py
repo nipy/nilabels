@@ -5,13 +5,12 @@ import numpy as np
 from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
-from nilabels.tools.defs import root_dir
+from nilabels.defs import root_dir
 from nilabels.tools.aux_methods.sanity_checks import check_pfi_io
-from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
 from nilabels.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
     permutation_from_disjoint_cycles_to_cauchy
-
+from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 
 ''' Test aux_methods.morphological.py'''
 from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \

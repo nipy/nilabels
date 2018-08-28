@@ -1,12 +1,11 @@
-# Contributing to nilabel
+# Contributing to NiLabels
 
 Thank you for being there!
 
-Nilabel (ex LABelsToolkit) started as a python package containing a range of heterogeneous imaging tools to perform
+NiLabels (ex LABelsToolkit) started as a python package containing a range of heterogeneous imaging tools to perform
 quick manipulations and measurement on segmentations from ipython or jupyter notebook. 
 Initially planned to support several projects undertook by the initial author, after some development and refactoring 
- it is not intended to be part of the Nipy ecosystem, to provide the community with another hopefully helpful tool 
-  in neuroimaging research.
+ it is now intended to be part of the Nipy ecosystem, to provide the neuroimaging developer community with another tool.
 
 ## Code of Conduct
 
