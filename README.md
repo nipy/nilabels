@@ -19,16 +19,14 @@ segmentations in nifti format.
     + get the array of values at the voxel below a given label 
     + symmetrise a segmentation 
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
-+ Facade design pattern to make it easily extendible with new methods (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
++ Facade design pattern (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
 
-
-### Non-features (work in progress)
+### Not-features (work in progress)
 
 + Not yet Python 3, back compatible python 2.7
 + Not yet 80% coverage
 + Not yet pip-installable
 + [... and more](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
-
 
 ### Introductory example
 
@@ -37,6 +35,7 @@ and save the result in `my_output_folder_path/my_new_segm.nii.gz`. Then:
 
 ```python
 import nilabels as nis
+
 
 # option 1
 nis_app = nis.App('my_input_folder_path', 'my_output_folder_path')
@@ -53,11 +52,11 @@ nis_app.manipulate_labels.relabel('my_input_folder_path/my_segm.nii.gz', 'my_out
 
 
 + Install NiLabels: the current version is not (yet) pip installable. It can be installed in development mode.
-To proceede, initialise a virtual environment and execute the following instructions:
+To proceed, initialise a virtual environment and execute the following instructions:
 ```
 cd <folder where to clone the code>
 git clone https://github.com/SebastianoF/nilabels.git
-cd nilabel
+cd nilabels
 pip install -e .
 ```
 In development mode every change made to your local code will be directly affecting the libray installed in the python distribution
