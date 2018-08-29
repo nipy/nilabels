@@ -73,7 +73,6 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
     + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
 
 
-
 ### Documentations
 
 + [Wiki-pages documentation](https://github.com/SebastianoF/nilabels/wiki)

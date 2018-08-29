@@ -4,9 +4,8 @@ import os
 from scipy import ndimage as nd
 
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
-from nilabels.tools.aux_methods.utils_nib import set_new_data
-from nilabels.tools.detections.contours import contour_from_segmentation
 
+from nilabels.tools.detections.contours import contour_from_segmentation
 
 from nilabels.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
@@ -17,7 +16,7 @@ from nilabels.tools.caliber.distances import centroid_array, centroid, dice_scor
 # --- Auxiliaries
 
 
-def test_centroid_array():
+def test_centroid_array_1():
     test_arr = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0],
                          [0, 1, 1, 1, 0, 0, 0, 0, 0],
@@ -716,96 +715,9 @@ def test_hausdorff_distance():
     assert_almost_equal(hd_1_void['label2'], np.nan)
 
 
-
-# test symmetric_contour_distance
-
-
-def test_normalised_symetric_contour_distance(save_data_path='/Users/aaabbbccc/Desktop', verbose=False):
-    o1 = o_shape(omega=(19, 19, 19), radius=7, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
-    o2 = 2 * o1
-    arr1 = np.concatenate([o1, o2], axis=2)
-
-    half_o1 = np.zeros_like(o1)
-    half_o1[:, :10, :] = o1[:, :10, :]
-    half_o2 = 2 * half_o1
-    arr2 = np.concatenate([half_o1, half_o2], axis=2)
-
-    c1 = cube_shape(omega=(19, 19, 19), center=(9, 9, 9), side_length=13, background_intensity=0, foreground_intensity=1, dtype=np.uint8)
-    c2 = 2 * c1
-    arr3 = np.concatenate([c1, c2], axis=2)
-
-    arr_void = np.zeros_like(arr1)
-
-    im1 = nib.Nifti1Image(arr1, np.eye(4))
-    im2 = nib.Nifti1Image(arr2, np.eye(4))
-    im3 = nib.Nifti1Image(arr3, np.eye(4))
-
-    im_void = nib.Nifti1Image(arr_void, np.eye(4))
-
-    if os.path.exists(save_data_path):
-
-        nib.save(im1, os.path.join(save_data_path, 'zzz1.nii.gz'))
-        nib.save(im2, os.path.join(save_data_path, 'zzz2.nii.gz'))
-        nib.save(im3, os.path.join(save_data_path, 'zzz3.nii.gz'))
-
-        im1_cont = contour_from_segmentation(im1)
-        im2_cont = contour_from_segmentation(im2)
-        im3_cont = contour_from_segmentation(im3)
-
-        nib.save(im1_cont, os.path.join(save_data_path, 'zzz1_contour.nii.gz'))
-        nib.save(im2_cont, os.path.join(save_data_path, 'zzz2_contour.nii.gz'))
-        nib.save(im3_cont, os.path.join(save_data_path, 'zzz3_contour.nii.gz'))
-
-        im_dtb1_l1 = set_new_data(im1_cont, nd.distance_transform_edt(1 - (im1_cont.get_data() == 1)))
-        im_dtb2_l1 = set_new_data(im2_cont, nd.distance_transform_edt(1 - (im2_cont.get_data() == 1)))
-        im_dtb3_l1 = set_new_data(im3_cont, nd.distance_transform_edt(1 - (im3_cont.get_data() == 1)))
-
-        im_dtb1_l2 = set_new_data(im1_cont, nd.distance_transform_edt(1 - (im1_cont.get_data() == 2)))
-        im_dtb2_l2 = set_new_data(im2_cont, nd.distance_transform_edt(1 - (im2_cont.get_data() == 2)))
-        im_dtb3_l2 = set_new_data(im3_cont, nd.distance_transform_edt(1 - (im3_cont.get_data() == 2)))
-
-        nib.save(im_dtb1_l1, os.path.join(save_data_path, 'zzz1_contour_dist_label1.nii.gz'))
-        nib.save(im_dtb2_l1, os.path.join(save_data_path, 'zzz2_contour_dist_label1.nii.gz'))
-        nib.save(im_dtb3_l1, os.path.join(save_data_path, 'zzz3_contour_dist_label1.nii.gz'))
-
-        nib.save(im_dtb1_l2, os.path.join(save_data_path, 'zzz1_contour_dist_label2.nii.gz'))
-        nib.save(im_dtb2_l2, os.path.join(save_data_path, 'zzz2_contour_dist_label2.nii.gz'))
-        nib.save(im_dtb3_l2, os.path.join(save_data_path, 'zzz3_contour_dist_label2.nii.gz'))
-
-        print('Images testing saved in {}'.format(save_data_path))
-
-    ascd_1_1       = normalised_symmetric_contour_distance(im1, im1, [1, 2], ['label1', 'label2'])
-    ascd_1_2       = normalised_symmetric_contour_distance(im1, im2, [1, 2], ['label1', 'label2'])
-    ascd_1_3       = normalised_symmetric_contour_distance(im1, im3, [1, 2], ['label1', 'label2'])
-    ascd_1_2_extra = normalised_symmetric_contour_distance(im1, im2, [1, 2, 3], ['label1', 'label2', 'label3'])
-    ascd_1_void    = normalised_symmetric_contour_distance(im1, im_void, [1, 2], ['label1', 'label2'])
-
-    if verbose:
-        print('\n 1 1')
-        print(ascd_1_1)
-        print('\n 1 2')
-        print(ascd_1_2)
-        print('\n 1 3')
-        print(ascd_1_3)
-        print('\n 1 2 extra')
-        print(ascd_1_2_extra)
-        print('\n 1 void')
-        print(ascd_1_void)
-
-    assert_almost_equal(ascd_1_1['label1'], 0)
-    assert_almost_equal(ascd_1_1['label2'], 0)
-
-    assert_almost_equal(ascd_1_2['label1'], 1.01226261459, decimal=4)
-    assert_almost_equal(ascd_1_2['label2'], 1.01226261459, decimal=4)
-
-    assert_almost_equal(ascd_1_3['label1'], 0.866793279546 , decimal=4)
-    assert_almost_equal(ascd_1_3['label2'], 0.866793279546, decimal=4)
-
-    assert_almost_equal(ascd_1_2_extra['label3'], np.nan)
-
-    assert_almost_equal(ascd_1_void['label1'], np.nan)
-    assert_almost_equal(ascd_1_void['label2'], np.nan)
-
+def test_normalised_symmetric_contour_distance():
+    # TODO
+    pass
 
 # --- extra:
 
@@ -840,3 +752,25 @@ def test_box_side_lenght():
     assert_array_equal(se_answer['2'], [1., 2., 4.])
     assert_equal(se_answer['3'], np.nan)
 
+
+if __name__ == '__main__':
+    test_centroid_array_1()
+    test_centroid_array_2()
+    test_centroid()
+    test_covariance_matrices()
+    test_covariance_distance_between_matrices_simple_case()
+
+    test_dice_score()
+    test_global_dice_score()
+    test_global_outline_error()
+
+    test_dice_score_one_label()
+    test_asymmetric_component_Hausdorff_distance_H_d_and_Hausdorff_distance()
+    test_dice_score_multiple_labels()
+    test_covariance_distance()
+    test_covariance_distance_range()
+    test_hausdorff_distance()
+
+    test_normalised_symmetric_contour_distance()
+
+    test_box_side_lenght()

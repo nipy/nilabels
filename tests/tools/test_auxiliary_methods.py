@@ -84,7 +84,7 @@ def test_set_new_data_simple_modifications():
     # see if the infos are the same as in the modified header
     assert_array_equal(im_1.get_data()[:], np.ones([3, 3, 3]))
     assert_equals(im_1_header['intent_code'], 5)
-    assert_array_equal(im_1.get_affine(), aff)
+    assert_array_equal(im_1.affine, aff)
 
 
 def test_compare_two_nib_equals():
@@ -181,7 +181,7 @@ def test_from_permutation_to_disjoints_cycles_single_cycle():
     cauchy_perm = [[1, 2, 3, 4, 5, 6, 7],
                    [3, 4, 5, 1, 2, 7, 6]]
     cycles_perm = permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
-    expected_ans = [[1, 3, 5, 2, 4], [6,7]]
+    expected_ans = [[1, 3, 5, 2, 4], [6, 7]]
 
     print expected_ans
     print cycles_perm
@@ -202,11 +202,28 @@ def test_from_disjoint_cycles_to_permutation_single_cycle():
         assert_array_equal(c1, c2)
 
 
-test_from_permutation_to_disjoints_cycles_single_cycle()
-test_from_disjoint_cycles_to_permutation_single_cycle()
+if __name__ == '__main__':
+    test_get_morpological_patch()
+    test_get_patch_values_simple()
+    test_get_shell_for_given_radius()
+    test_check_pfi_io()
 
-test_from_disjoint_cycles_to_permutation()
-test_from_permutation_to_disjoints_cycles()
+    test_set_new_data_simple_modifications()
+    test_compare_two_nib_equals()
+    test_compare_two_nib_different_nifti_version()
+    test_compare_two_nib_different_affine()
 
-#
-# permutation_from_cauchy_to_disjoints_cycles,
+    test_eliminates_consecutive_duplicates()
+    test_lift_list_1()
+    test_lift_list_2()
+    test_lift_list_3()
+
+    test_labels_query_int_input()
+    test_labels_query_list_input1()
+    test_labels_query_list_input2()
+    test_labels_query_all_or_tot_input()
+
+    test_from_permutation_to_disjoints_cycles()
+    test_from_disjoint_cycles_to_permutation()
+    test_from_permutation_to_disjoints_cycles_single_cycle()
+    test_from_disjoint_cycles_to_permutation_single_cycle()

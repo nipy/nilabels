@@ -142,25 +142,29 @@ def test_intensity_segmentation_2():
 
 
 def test_otsu_threshold_bad_input():
+    # TODO
     pass
 
-
-
 def test_otsu_threshold_1():
+    # TODO
     pass
 
 
 def test_otsu_threshold_2():
+    # TODO
     pass
 
 
 def test_MoG_array_bad_input():
+    # TODO
     pass
 
 
 def test_MoG_array_1():
+    # TODO
     pass
 
 
 def test_MoG_array_2():
+    # TODO
     pass

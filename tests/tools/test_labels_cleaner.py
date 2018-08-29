@@ -289,3 +289,9 @@ def test_clean_segmentation_simple_example():
 
     for l in sorted(list(set(c.flat))):
         assert ndimage.label(b == l)[1] == 1
+
+
+if __name__ == '__main__':
+    test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_1()
+    test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_2()
+    test_multi_lab_segmentation_dilate_1_above_selected_label_on_input_3()
