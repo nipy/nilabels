@@ -202,6 +202,9 @@ class LabelsDescriptorManager(object):
                     mld_tmp_keys.remove(right_key)
                     if combine_right_left:
                         mld.update({left_key.replace('Left', '').strip(): mld_tmp[left_key] + mld_tmp[right_key]})
+                else:
+                    print('Warning: Right key for {} not present'.format(left_key))
+                    mld.update({left_key: mld_tmp[left_key]})
             else:
                 mld.update({mld_tmp_keys[0]: mld_tmp[mld_tmp_keys[0]]})
 
@@ -281,13 +284,13 @@ class LabelsDescriptorManager(object):
         """
         ldm_new = copy.deepcopy(self)
         for k in list_old_labels:
+            if k not in ldm_new.dict_label_descriptor.keys():
+                raise IOError('Label {} in the input list not present'.format(k))
             del ldm_new.dict_label_descriptor[k]
         for k_new in list_new_labels:
             k_old = list_old_labels[list_new_labels.index(k_new)]
             if k_old in self.dict_label_descriptor.keys():
                 ldm_new.dict_label_descriptor.update({k_new : self.dict_label_descriptor[k_old]})
-            else:
-                ldm_new.dict_label_descriptor.update({k_new: [[255, 0, 255], [1.0, 1.0, 1.0], 'NewLabel']})
         if sort:
             d_sorted = collections.OrderedDict()
             for k in sorted(ldm_new.dict_label_descriptor.keys()):
@@ -317,6 +320,7 @@ class LabelsDescriptorManager(object):
     def erase_labels(self, labels_to_erase, verbose=True):
         """
         :param labels_to_erase: is a list of labels that will be erased.
+        :param verbose: raise warning message if label to erase is not present
         """
         ldm_new = copy.deepcopy(self)
         for lab in labels_to_erase:

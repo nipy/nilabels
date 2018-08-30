@@ -86,15 +86,15 @@ def write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor(tes
         os.system('mkdir {}'.format(pfo_tmp_test))
         # 1bis) Then, generate summy descriptor left right in the generated folder
         d = collections.OrderedDict()
-        d.update({0: [[0, 0, 0], [0, 0, 0], 'background']})
-        d.update({1: [[255, 0, 0], [1, 1, 1], 'label A Left']})
-        d.update({2: [[204, 0, 0], [1, 1, 1], 'label A Right']})
-        d.update({3: [[51, 51, 255], [1, 1, 1], 'label B Left']})
+        d.update({0: [[0, 0, 0],       [0, 0, 0], 'background']})
+        d.update({1: [[255, 0, 0],     [1, 1, 1], 'label A Left']})
+        d.update({2: [[204, 0, 0],     [1, 1, 1], 'label A Right']})
+        d.update({3: [[51, 51, 255],   [1, 1, 1], 'label B Left']})
         d.update({4: [[102, 102, 255], [1, 1, 1], 'label B Right']})
-        d.update({5: [[0, 204, 51], [1, 1, 1], 'label C']})
-        d.update({6: [[51, 255, 102], [1, 1, 1], 'label D']})
-        d.update({7: [[255, 255, 0], [1, 1, 1], 'label E Left']})
-        d.update({8: [[255, 50, 50], [1, 1, 1], 'label E Right']})
+        d.update({5: [[0, 204, 51],    [1, 1, 1], 'label C']})
+        d.update({6: [[51, 255, 102],  [1, 1, 1], 'label D']})
+        d.update({7: [[255, 255, 0],   [1, 1, 1], 'label E Left']})
+        d.update({8: [[255, 50, 50],   [1, 1, 1], 'label E Right']})
         with open(jph(pfo_tmp_test, 'labels_descriptor_RL.txt'), 'w+') as f:
             for j in d.keys():
                 line = '{0: >5}{1: >6}{2: >6}{3: >6}{4: >9}{5: >6}{6: >6}    "{7}"\n'.format(
@@ -452,8 +452,8 @@ def test_save_multi_labels_descriptor_custom_test_robustness():
     d.update({4: [[102, 102, 255], [1, 1, 1], 'label B Right']})
     d.update({5: [[0, 204, 51],    [1, 1, 1], 'label C ']})
     d.update({6: [[51, 255, 102],  [1, 1, 1], 'label D Right']})  # unpaired label
-    d.update({7: [[255, 255, 0],   [1, 1, 1], 'label E   right  ']})  # small r and spaces
-    d.update({8: [[255, 50, 50],   [1, 1, 1], 'label E left  ']})  # ... paired with small l and spaces
+    d.update({7: [[255, 255, 0],   [1, 1, 1], 'label E right  ']})  # small r and spaces
+    d.update({8: [[255, 50, 50],   [1, 1, 1], 'label E Left  ']})  # ... paired with small l and spaces
 
     with open(jph(pfo_tmp_test, 'labels_descriptor_RL.txt'), 'w+') as f:
         for j in d.keys():
@@ -465,27 +465,59 @@ def test_save_multi_labels_descriptor_custom_test_robustness():
     ldm_lr = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor_RL.txt'))
     multi_labels_dict_from_ldm = ldm_lr.get_multi_label_dict(combine_right_left=True)
 
-
-    print multi_labels_dict_from_ldm
-
     expected_multi_labels_dict = collections.OrderedDict()
     expected_multi_labels_dict.update({'background': [0]})
     expected_multi_labels_dict.update({'label A Right': [1]})
     expected_multi_labels_dict.update({'label A Left': [2]})
-    expected_multi_labels_dict.update({'label A left': [1, 2]})
-    expected_multi_labels_dict.update({'label B Left': [3]})
+    expected_multi_labels_dict.update({'label A': [1, 2]})
+    expected_multi_labels_dict.update({'label B left': [3]})
     expected_multi_labels_dict.update({'label B Right': [4]})
     expected_multi_labels_dict.update({'label C': [5]})
     expected_multi_labels_dict.update({'label D Right': [6]})
-    expected_multi_labels_dict.update({'label E': [7]})
-    expected_multi_labels_dict.update({'label E left': [8]})
+    expected_multi_labels_dict.update({'label E right': [7]})
+    expected_multi_labels_dict.update({'label E Left': [8]})
 
-    # for k1, k2 in zip(multi_labels_dict_from_ldm.keys(), expected_multi_labels_dict.keys()):
-    #     assert cmp(k1, k2) == 0
-    #     assert cmp(multi_labels_dict_from_ldm[k1], expected_multi_labels_dict[k2]) == 0
+    for k1, k2 in zip(multi_labels_dict_from_ldm.keys(), expected_multi_labels_dict.keys()):
+        assert cmp(k1, k2) == 0
+        assert cmp(multi_labels_dict_from_ldm[k1], expected_multi_labels_dict[k2]) == 0
 
 
 # -> erase, assign and keep only one label relabeller.
+
+
+@write_and_erase_temporary_folder_with_dummy_labels_descriptor
+def test_relabel_standard():
+    dict_expected = collections.OrderedDict()
+    dict_expected.update({0: [[0, 0, 0], [0, 0, 0], 'background']})
+    dict_expected.update({1: [[255, 0, 0], [1, 1, 1], 'label one (l1)']})
+    dict_expected.update({9: [[204, 0, 0], [1, 1, 1], 'label two (l2)']})
+    dict_expected.update({3: [[51, 51, 255], [1, 1, 1], 'label three']})
+    dict_expected.update({10: [[102, 102, 255], [1, 1, 1], 'label four']})
+    dict_expected.update({5: [[0, 204, 51], [1, 1, 1], 'label five (l5)']})
+    dict_expected.update({6: [[51, 255, 102], [1, 1, 1], 'label six']})
+    dict_expected.update({7: [[255, 255, 0], [1, 1, 1], 'label seven']})
+    dict_expected.update({8: [[255, 50, 50], [1, 1, 1], 'label eight']})
+
+    ldm_original = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'))
+    old_labels = [2, 4]
+    new_labels = [9, 10]
+    ldm_relabelled = ldm_original.relabel(old_labels, new_labels)
+
+    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
+    for k in dict_expected.keys():
+        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+
+
+@write_and_erase_temporary_folder_with_dummy_labels_descriptor
+def test_relabel_bad_input():
+
+    ldm_original = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'))
+    old_labels = [2, 4, 180]
+    new_labels = [9, 10, 12]
+
+    with assert_raises(IOError):
+        ldm_original.relabel(old_labels, new_labels)
+
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
 def test_erase_labels_unexisting_labels():
@@ -540,26 +572,26 @@ def test_keep_one_label():
 
 
 if __name__ == '__main__':
-    # test_generate_dummy_labels_descriptor_wrong_input1()
-    # test_generate_dummy_labels_descriptor_wrong_input2()
-    # test_generate_labels_descriptor_list_roi_names_None()
-    # test_generate_labels_descriptor_list_colors_triplets_None()
-    # test_generate_none_list_colour_triples()
-    # test_generate_labels_descriptor_general()
-    #
-    # test_basics_methods_labels_descriptor_manager_wrong_input_path()
-    # test_basics_methods_labels_descriptor_manager_wrong_input_convention()
-    # test_basic_dict_input()
-    # test_load_save_and_compare()
-    # test_save_in_fsl_convention_reload_as_dict_and_compare()
-    # test_signature_for_variable_convention_wrong_input()
-    # test_signature_for_variable_convention_wrong_input_after_initialisation()
-    #
-    # test_relabel_labels_descriptor()
-    # test_relabel_labels_descriptor_with_merging()
-    # test_permute_labels_from_descriptor_wrong_input_permutation()
-    # test_permute_labels_from_descriptor_check()
-    # test_erase_labels()
+    test_generate_dummy_labels_descriptor_wrong_input1()
+    test_generate_dummy_labels_descriptor_wrong_input2()
+    test_generate_labels_descriptor_list_roi_names_None()
+    test_generate_labels_descriptor_list_colors_triplets_None()
+    test_generate_none_list_colour_triples()
+    test_generate_labels_descriptor_general()
+
+    test_basics_methods_labels_descriptor_manager_wrong_input_path()
+    test_basics_methods_labels_descriptor_manager_wrong_input_convention()
+    test_basic_dict_input()
+    test_load_save_and_compare()
+    test_save_in_fsl_convention_reload_as_dict_and_compare()
+    test_signature_for_variable_convention_wrong_input()
+    test_signature_for_variable_convention_wrong_input_after_initialisation()
+
+    test_relabel_labels_descriptor()
+    test_relabel_labels_descriptor_with_merging()
+    test_permute_labels_from_descriptor_wrong_input_permutation()
+    test_permute_labels_from_descriptor_check()
+    test_erase_labels()
 
     test_save_multi_labels_descriptor_custom()
 
@@ -567,7 +599,8 @@ if __name__ == '__main__':
     test_get_multi_label_dict_standard_not_combine()
     test_save_multi_labels_descriptor_custom_test_robustness()
 
-
-    # test_erase_labels_unexisting_labels()
-    # test_assign_all_other_labels_the_same_value()
-    # test_keep_one_label()
+    test_relabel_standard()
+    test_relabel_bad_input()
+    test_erase_labels_unexisting_labels()
+    test_assign_all_other_labels_the_same_value()
+    test_keep_one_label()
