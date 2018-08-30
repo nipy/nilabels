@@ -1,0 +1,8 @@
+[run]
+omit = tests/*
+       tools/visualiser/*
+
+[report]
+omit = tests/*
+       nilabels/tools/visualiser/*
+       */__init__.py

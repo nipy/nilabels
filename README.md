@@ -76,9 +76,10 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 ### Code testing
 
 Code testing is a work in progress. We are aiming at reaching the 80% of coverage for the methods acting on numpy arrays and nibabel images, below the facade.
-To run the test, `pip install -U pytest-cov` followed by:
+To run the test, `pip install -U pytest` and `pip install coverage` followed by:
 ```bash
-py.test --cov-report html --cov nilabels --verbose
+pytest
+coverage html
 open htmlcov/index.html
 ```
 The first time the test a run a dummy dataset is created. This may take some minutes of computations and 150MB of space.
