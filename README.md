@@ -30,22 +30,17 @@ segmentations in nifti format.
 
 ### Introductory example
 
-Given a segmentation `my_input_folder_path/my_segm.nii.gz` imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
-and save the result in `my_output_folder_path/my_new_segm.nii.gz`. Then:
+Given a segmentation `my_segm.nii.gz` imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
+and save the result in `my_new_segm.nii.gz`. Then:
 
 ```python
 import nilabels as nis
 
 
-# option 1
-nis_app = nis.App('my_input_folder_path', 'my_output_folder_path')
+nis_app = nis.App()
 nis_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', 
                                   [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 
-# option 2
-nis_app = nis.App()
-nis_app.manipulate_labels.relabel('my_input_folder_path/my_segm.nii.gz', 'my_output_folder_path/my_new_segm.nii.gz', 
-                                  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 ```
 
 ### How to install (in development mode) 
@@ -59,8 +54,8 @@ git clone https://github.com/SebastianoF/nilabels.git
 cd nilabels
 pip install -e .
 ```
-In development mode every change made to your local code will be directly affecting the libray installed in the python distribution
-without the need of reinstalling.
+In development mode every change made to your local code will be directly affecting the installed library
+without reinstalling.
 
 
 + Install python requirements in requirements.txt with
