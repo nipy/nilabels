@@ -164,37 +164,48 @@ class LabelsDescriptorManager(object):
                 label_descriptor_dict.update({int(parsed_line[0]): args})
         return label_descriptor_dict
 
-    def get_multi_label_dict(self, keep_duplicate=False, combine_right_left=True):
+    def get_multi_label_dict(self, combine_right_left=True):
         """
-        Different data structure to allow for multiple labels.
-        :param keep_duplicate:
+        Different data structure to allow for multiple labels with the same name Left/Right (capital letters)
         :param combine_right_left:
         :return:
         """
         mld = collections.OrderedDict()
         mld_tmp = collections.OrderedDict()
-        # first round, fill mld_tmp, with the same values in the label descriptor switching the label name with
+        # Fill mld_tmp, with the same values in the label descriptor switching the label name with
         # the label id - note: possible abbreviations gets lost.
-        for k in self.dict_label_descriptor.keys():
-            if combine_right_left:
-                mld_tmp.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
-                # second round, add the left right in dictionary entry.
-                for k1 in mld_tmp.keys():
-                    if keep_duplicate:
-                        mld.update({k1: mld_tmp[k1]})
-                    if 'Right' in k1:
-                        left_key = k1.replace('Right', 'Left')
-                        key = k1.replace('Right', '').strip()
-                        if key.startswith('-'):
-                            key = key[1:]
-                        mld.update({key : mld_tmp[left_key] + mld_tmp[k1]})
-                    elif 'Left' in k1:
-                        pass
-                    else:
-                        if not keep_duplicate:
-                            mld.update({k1: mld_tmp[k1]})
+
+        for k_label_id in self.dict_label_descriptor.keys():
+            mld_tmp.update({self.dict_label_descriptor[k_label_id][2].replace('"', '').strip(): [int(k_label_id)]})
+
+        mld_tmp_keys = mld_tmp.keys()
+        while len(mld_tmp_keys) > 0:
+            if 'Right' in mld_tmp_keys[0]:
+                right_key = mld_tmp_keys[0]
+                left_key = right_key.replace('Right', 'Left')
+                if left_key in mld_tmp_keys:
+                    mld.update({right_key: mld_tmp[right_key]})
+                    mld.update({left_key: mld_tmp[left_key]})
+                    mld_tmp_keys.remove(left_key)
+                    if combine_right_left:
+                        mld.update({right_key.replace('Right', '').strip(): mld_tmp[right_key] + mld_tmp[left_key]})
+                else:
+                    print('Warning: Left key for {} not present'.format(right_key))
+                    mld.update({right_key: mld_tmp[right_key]})
+
+            elif 'Left' in mld_tmp_keys[0]:
+                left_key = mld_tmp_keys[0]
+                right_key = left_key.replace('Left', 'Right')
+                if right_key in mld_tmp_keys:
+                    mld.update({left_key: mld_tmp[left_key]})
+                    mld.update({right_key: mld_tmp[right_key]})
+                    mld_tmp_keys.remove(right_key)
+                    if combine_right_left:
+                        mld.update({left_key.replace('Left', '').strip(): mld_tmp[left_key] + mld_tmp[right_key]})
             else:
-                mld.update({self.dict_label_descriptor[k][2].replace('"', ''): [int(k)]})
+                mld.update({mld_tmp_keys[0]: mld_tmp[mld_tmp_keys[0]]})
+
+            mld_tmp_keys = mld_tmp_keys[1:]
 
         return mld
 
@@ -224,24 +235,27 @@ class LabelsDescriptorManager(object):
                         self.dict_label_descriptor[j][0][2],
                         self.dict_label_descriptor[j][1][0])
             else:
-                return
+                raise IOError("Assigned variable for **convention** can be only 'itk-snap' or 'fsl'.")
             f.write(line)
         f.close()
 
     def save_as_multi_label_descriptor(self, pfi_destination):
         """
-        Multi label descriptor looks like:
+        Multi label descriptor is a custom file. It shows labels name and labels number keeping the Left and Right
+        joined together in an additional line. It looks like:
         ---
         Clear Label          &     0
         Prefrontal Left      &     5
         Prefrontal Right     &     6
         Prefrontal           &     5  &     6
-        ...
+        Corona Left          &     7
+        Corona Right         &     8
+        Prefrontal           &     7  &     8
         ----
         :param pfi_destination: where to save the multi label descriptor in .txt or compatible format.
         :return: a saved multi label descriptor
         """
-        mld = self.get_multi_label_dict()
+        mld = self.get_multi_label_dict(combine_right_left=True)
         f = open(pfi_destination, 'w+')
         for k in mld.keys():
             line  = '{0: <40}'.format(k)
