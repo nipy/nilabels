@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 
 from nilabels.definitions import root_dir
 from nilabels.tools.aux_methods.sanity_checks import check_pfi_io, check_path_validity, is_valid_permutation
-from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
+from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query, print_and_run
 from nilabels.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
     permutation_from_disjoint_cycles_to_cauchy
 from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
@@ -23,7 +23,19 @@ pfo_tmp_test = jph(test_dir, 'z_tmp_test')
 # DECORATORS
 
 
-def write_and_erase_temporary_folder_with_a_dummy_nifti_image(test_func):
+def create_and_erase_temporary_folder(test_func):
+    def wrap(*args, **kwargs):
+        # 1) Before: create folder
+        os.system('mkdir {}'.format(pfo_tmp_test))
+        # 2) Run test
+        test_func(*args, **kwargs)
+        # 3) After: delete folder and its content
+        os.system('rm -r {}'.format(pfo_tmp_test))
+
+    return wrap
+
+
+def create_and_erase_temporary_folder_with_a_dummy_nifti_image(test_func):
     def wrap(*args, **kwargs):
         # 1) Before: create folder
         os.system('mkdir {}'.format(pfo_tmp_test))
@@ -192,7 +204,7 @@ def test_check_path_validity_not_existing_path():
         check_path_validity('/Spammer/path_to_spam')
 
 
-@write_and_erase_temporary_folder_with_a_dummy_nifti_image
+@create_and_erase_temporary_folder_with_a_dummy_nifti_image
 def test_check_path_validity_for_a_nifti_image():
     assert check_path_validity(jph(pfo_tmp_test, 'dummy_image.nii.gz'))
 
@@ -210,56 +222,7 @@ def test_is_valid_permutation():
     assert is_valid_permutation([[1.2, 2, 3], [2, 1.2, 3]], for_labels=False)
     assert is_valid_permutation([[1, 2, 3], [3, 1, 2]])
 
-
-''' Test aux_methods.utils_nib.py '''
-
-
-def test_set_new_data_simple_modifications():
-    aff = np.eye(4)
-    aff[2, 1] = 42.0
-
-    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff)
-    im_0_header = im_0.header
-    # default intent_code
-    assert_equals(im_0_header['intent_code'], 0)
-    # change intento code
-    im_0_header['intent_code'] = 5
-
-    # generate new nib from the old with new data
-    im_1 = set_new_data(im_0, np.ones([3, 3, 3]))
-    im_1_header = im_1.header
-    # see if the infos are the same as in the modified header
-    assert_array_equal(im_1.get_data()[:], np.ones([3, 3, 3]))
-    assert_equals(im_1_header['intent_code'], 5)
-    assert_array_equal(im_1.affine, aff)
-
-
-def test_compare_two_nib_equals():
-    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    assert_equals(compare_two_nib(im_0, im_1), True)
-
-
-def test_compare_two_nib_different_nifti_version():
-    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    im_1 = nib.Nifti2Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    assert_equals(compare_two_nib(im_0, im_1), False)
-
-
-def test_compare_two_nib_different_affine():
-    aff_1 = np.eye(4)
-    aff_1[3, 3] = 5
-    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff_1)
-    assert_equals(compare_two_nib(im_0, im_1), False)
-
-
-''' Test tools.aux_methods.utils.py'''
-
-
-def test_eliminates_consecutive_duplicates():
-    l_in, l_out = [0, 0, 0, 1, 1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9], range(10)
-    assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
+# TEST tools.aux_methods.utils.py'''
 
 
 def test_lift_list_1():
@@ -275,6 +238,35 @@ def test_lift_list_2():
 def test_lift_list_3():
     l_in, l_out = [], []
     assert_array_equal(lift_list(l_in), l_out)
+
+
+def test_eliminates_consecutive_duplicates():
+    l_in, l_out = [0, 0, 0, 1, 1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9], range(10)
+    assert_array_equal(eliminates_consecutive_duplicates(l_in), l_out)
+
+
+@create_and_erase_temporary_folder
+def test_print_and_run_create_file():
+    cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    output_msg = print_and_run(cmd)
+    assert os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    assert cmp(output_msg, 'touch tmp.txt') == 0
+
+
+@create_and_erase_temporary_folder
+def test_print_and_run_create_file_safety_on():
+    cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    output_msg = print_and_run(cmd, safety_on=True)
+    assert not os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    assert cmp(output_msg, 'touch tmp.txt') == 0
+
+
+@create_and_erase_temporary_folder
+def test_print_and_run_create_file_safety_on():
+    cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    output_msg = print_and_run(cmd, safety_on=False, short_path_output=False)
+    assert os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
+    assert cmp(output_msg, 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))) == 0
 
 
 def test_labels_query_int_input():
@@ -337,16 +329,64 @@ def test_from_permutation_to_disjoints_cycles_single_cycle():
         assert_array_equal(c1, c2)
 
 
+def test_from_permutation_to_disjoints_cycles_single_cycle_no_valid_permutation():
+    cauchy_perm = [[1, 2, 3, 4, 5, 6, 7],
+                   [3, 4, 5, 1, 2, 7]]
+    with assert_raises(IOError):
+        permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
+
+
 def test_from_disjoint_cycles_to_permutation_single_cycle():
     cycles_perm = [[1, 3, 5, 2, 4]]
     cauchy_perm = permutation_from_disjoint_cycles_to_cauchy(cycles_perm)
     expected_ans = [[1, 2, 3, 4, 5], [3, 4, 5, 1, 2]]
 
-    print expected_ans
-    print cauchy_perm
-
     for c1, c2 in zip(cauchy_perm, expected_ans):
         assert_array_equal(c1, c2)
+
+
+
+# TEST aux_methods.utils_nib.py
+
+
+def test_set_new_data_simple_modifications():
+    aff = np.eye(4)
+    aff[2, 1] = 42.0
+
+    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff)
+    im_0_header = im_0.header
+    # default intent_code
+    assert_equals(im_0_header['intent_code'], 0)
+    # change intento code
+    im_0_header['intent_code'] = 5
+
+    # generate new nib from the old with new data
+    im_1 = set_new_data(im_0, np.ones([3, 3, 3]))
+    im_1_header = im_1.header
+    # see if the infos are the same as in the modified header
+    assert_array_equal(im_1.get_data()[:], np.ones([3, 3, 3]))
+    assert_equals(im_1_header['intent_code'], 5)
+    assert_array_equal(im_1.affine, aff)
+
+
+def test_compare_two_nib_equals():
+    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
+    im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
+    assert_equals(compare_two_nib(im_0, im_1), True)
+
+
+def test_compare_two_nib_different_nifti_version():
+    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
+    im_1 = nib.Nifti2Image(np.zeros([3, 3, 3]), affine=np.eye(4))
+    assert_equals(compare_two_nib(im_0, im_1), False)
+
+
+def test_compare_two_nib_different_affine():
+    aff_1 = np.eye(4)
+    aff_1[3, 3] = 5
+    im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
+    im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff_1)
+    assert_equals(compare_two_nib(im_0, im_1), False)
 
 
 if __name__ == '__main__':
@@ -355,36 +395,39 @@ if __name__ == '__main__':
     # test_get_morphological_mask_not_allowed_input()
     # test_get_morphological_mask_with_morpho_patch()
     # test_get_morphological_mask_with_zero_radius()
-    test_get_morphological_mask_without_morpho_patch()
-    test_get_values_below_patch_no_morpho_mask()
-    test_get_patch_values_simple()
-    test_get_shell_for_given_radius()
-    get_circle_shell_for_given_radius_2d()
-    get_circle_shell_for_given_radius_3_2d()
-    get_circle_shell_for_given_radius_wrong_input_nd()
-
-    test_check_pfi_io()
-    test_check_path_validity_not_existing_path()
-    test_check_path_validity_for_a_nifti_image()
-    test_check_path_validity_root()
-    test_is_valid_permutation()
-
-    # test_set_new_data_simple_modifications()
-    # test_compare_two_nib_equals()
-    # test_compare_two_nib_different_nifti_version()
-    # test_compare_two_nib_different_affine()
+    # test_get_morphological_mask_without_morpho_patch()
+    # test_get_values_below_patch_no_morpho_mask()
+    # test_get_patch_values_simple()
+    # test_get_shell_for_given_radius()
+    # get_circle_shell_for_given_radius_2d()
+    # get_circle_shell_for_given_radius_3_2d()
+    # get_circle_shell_for_given_radius_wrong_input_nd()
+    #
+    # test_check_pfi_io()
+    # test_check_path_validity_not_existing_path()
+    # test_check_path_validity_for_a_nifti_image()
+    # test_check_path_validity_root()
+    # test_is_valid_permutation()
     #
     # test_eliminates_consecutive_duplicates()
     # test_lift_list_1()
     # test_lift_list_2()
     # test_lift_list_3()
     #
+    # test_print_and_run_create_file()
+    # test_print_and_run_create_file_safety_on()
     # test_labels_query_int_input()
     # test_labels_query_list_input1()
     # test_labels_query_list_input2()
     # test_labels_query_all_or_tot_input()
     #
     # test_from_permutation_to_disjoints_cycles()
+    # test_from_permutation_to_disjoints_cycles_single_cycle_no_valid_permutation()
     # test_from_disjoint_cycles_to_permutation()
     # test_from_permutation_to_disjoints_cycles_single_cycle()
     # test_from_disjoint_cycles_to_permutation_single_cycle()
+
+    test_set_new_data_simple_modifications()
+    test_compare_two_nib_equals()
+    test_compare_two_nib_different_nifti_version()
+    test_compare_two_nib_different_affine()
