@@ -79,8 +79,6 @@ def get_circle_shell_for_given_radius(radius, dimension=3):
             for yi in range(-radius, radius + 1):
                 if (radius - 1) ** 2 < xi ** 2 + yi ** 2 <= radius ** 2:
                     circle.append((xi, yi))
-
     else:
         raise IOError('Dimensions allowed are 2 or 3.')
-
     return circle

@@ -1,3 +1,4 @@
+import os
 from os.path import join as jph
 
 import nibabel as nib
@@ -6,14 +7,38 @@ from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
 from nilabels.definitions import root_dir
-from nilabels.tools.aux_methods.sanity_checks import check_pfi_io
+from nilabels.tools.aux_methods.sanity_checks import check_pfi_io, check_path_validity, is_valid_permutation
 from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
 from nilabels.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
     permutation_from_disjoint_cycles_to_cauchy
 from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 
 
-''' Test aux_methods.morphological.py'''
+# PATH MANAGER
+
+test_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+pfo_tmp_test = jph(test_dir, 'z_tmp_test')
+
+
+# DECORATORS
+
+
+def write_and_erase_temporary_folder_with_a_dummy_nifti_image(test_func):
+    def wrap(*args, **kwargs):
+        # 1) Before: create folder
+        os.system('mkdir {}'.format(pfo_tmp_test))
+        nib_im = nib.Nifti1Image(np.zeros((30, 30, 30)), affine=np.eye(4))
+        nib.save(nib_im, jph(pfo_tmp_test, 'dummy_image.nii.gz'))
+        # 2) Run test
+        test_func(*args, **kwargs)
+        # 3) After: delete folder and its content
+        os.system('rm -r {}'.format(pfo_tmp_test))
+
+    return wrap
+
+
+# TEST aux_methods.morphological.py
+
 
 from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_morphological_mask, \
     get_values_below_patch, get_circle_shell_for_given_radius
@@ -123,7 +148,7 @@ def test_get_shell_for_given_radius():
                     (1, 1, 0), (1, 1, 1), (2, 0, 0)]
     computed_ans = get_circle_shell_for_given_radius(2)
 
-    assert cmp(expected_ans, computed_ans) == 0
+    assert_array_equal(expected_ans, computed_ans)
 
 
 def get_circle_shell_for_given_radius_2d():
@@ -132,9 +157,18 @@ def get_circle_shell_for_given_radius_2d():
     assert cmp(expected_ans, computed_ans) == 0
 
 
+def get_circle_shell_for_given_radius_3_2d():
+    expected_ans = [(-3, 0), (-2, -2), (-2, -1), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -3), (0, 3), (1, -2),
+                    (1, 2), (2, -2), (2, -1), (2, 1), (2, 2), (3, 0)]
+    computed_ans = get_circle_shell_for_given_radius(3, dimension=2)
+    assert_array_equal(expected_ans, computed_ans)
+
+
 def get_circle_shell_for_given_radius_wrong_input_nd():
     with assert_raises(IOError):
         get_circle_shell_for_given_radius(2, dimension=4)
+    with assert_raises(IOError):
+        get_circle_shell_for_given_radius(2, dimension=1)
 
 
 '''  test methods sanity_checks '''
@@ -151,6 +185,30 @@ def test_check_pfi_io():
         check_pfi_io(non_existing_file, None)
     with assert_raises(IOError):
         check_pfi_io(root_dir, file_in_non_existing_folder)
+
+
+def test_check_path_validity_not_existing_path():
+    with assert_raises(IOError):
+        check_path_validity('/Spammer/path_to_spam')
+
+
+@write_and_erase_temporary_folder_with_a_dummy_nifti_image
+def test_check_path_validity_for_a_nifti_image():
+    assert check_path_validity(jph(pfo_tmp_test, 'dummy_image.nii.gz'))
+
+
+def test_check_path_validity_root():
+    assert check_path_validity(root_dir)
+
+
+def test_is_valid_permutation():
+    assert not is_valid_permutation([1, 2, 3])
+    assert not is_valid_permutation([[1, 2, 3, 4], [3, 1, 2]])
+    assert not is_valid_permutation([[1, 2, 3], [4, 5, 6]])
+    assert not is_valid_permutation([[1, 1, 3], [1, 3, 1]])
+    assert not is_valid_permutation([[1.2, 2, 3], [2, 1.2, 3]])
+    assert is_valid_permutation([[1.2, 2, 3], [2, 1.2, 3]], for_labels=False)
+    assert is_valid_permutation([[1, 2, 3], [3, 1, 2]])
 
 
 ''' Test aux_methods.utils_nib.py '''
@@ -292,20 +350,25 @@ def test_from_disjoint_cycles_to_permutation_single_cycle():
 
 
 if __name__ == '__main__':
-    test_get_morpological_patch()
-    test_get_morpological_patch_not_allowed_input()
-    test_get_morphological_mask_not_allowed_input()
-    test_get_morphological_mask_with_morpho_patch()
-    test_get_morphological_mask_with_zero_radius()
+    # test_get_morpological_patch()
+    # test_get_morpological_patch_not_allowed_input()
+    # test_get_morphological_mask_not_allowed_input()
+    # test_get_morphological_mask_with_morpho_patch()
+    # test_get_morphological_mask_with_zero_radius()
     test_get_morphological_mask_without_morpho_patch()
     test_get_values_below_patch_no_morpho_mask()
     test_get_patch_values_simple()
     test_get_shell_for_given_radius()
     get_circle_shell_for_given_radius_2d()
+    get_circle_shell_for_given_radius_3_2d()
     get_circle_shell_for_given_radius_wrong_input_nd()
 
-    # test_check_pfi_io()
-    #
+    test_check_pfi_io()
+    test_check_path_validity_not_existing_path()
+    test_check_path_validity_for_a_nifti_image()
+    test_check_path_validity_root()
+    test_is_valid_permutation()
+
     # test_set_new_data_simple_modifications()
     # test_compare_two_nib_equals()
     # test_compare_two_nib_different_nifti_version()
