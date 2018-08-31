@@ -1,11 +1,13 @@
 import os
+# from __init__ import __version__
 
 
+# version = __version__
 root_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 info = {
         "name": "NiLabels",
-        "version": "0.1",
+        "version": '0.0.3dev',
         "description": "",
         "repository": {
                        "type": "git",

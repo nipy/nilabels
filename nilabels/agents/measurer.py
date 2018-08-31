@@ -4,7 +4,7 @@ import nibabel as nib
 import numpy as np
 import pandas as pa
 
-from nilabels.defs import definition_label
+from nilabels.definitions import definition_label
 from nilabels.tools.aux_methods.utils import labels_query
 from nilabels.tools.aux_methods.utils_path import connect_path_tail_head
 from nilabels.tools.caliber.distances import dice_score, covariance_distance, \

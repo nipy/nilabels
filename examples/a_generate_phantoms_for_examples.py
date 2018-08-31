@@ -5,7 +5,7 @@ import nibabel as nib
 import numpy as np
 import scipy.ndimage.filters as fil
 
-from nilabels.defs import root_dir
+from nilabels.definitions import root_dir
 from nilabels.tools.detections.get_segmentation import intensity_segmentation
 
 

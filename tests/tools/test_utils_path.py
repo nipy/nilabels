@@ -3,7 +3,7 @@ from os.path import join as jph
 from nose.tools import assert_equals
 from numpy.testing import assert_array_equal
 
-from nilabels.defs import root_dir
+from nilabels.definitions import root_dir
 
 ''' Test aux_methods.sanity_checks.py - NOTE - this is the core of the manager design '''
 from nilabels.tools.aux_methods.utils_path import connect_path_tail_head, get_pfi_in_pfi_out

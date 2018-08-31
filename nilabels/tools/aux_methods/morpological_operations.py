@@ -13,7 +13,7 @@ def get_morphological_patch(dimension, shape):
     elif shape == 'square':
         morpho_patch = ndimage.generate_binary_structure(dimension, 3)
     else:
-        return IOError
+        raise IOError
 
     return morpho_patch
 

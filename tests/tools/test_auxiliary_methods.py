@@ -5,14 +5,16 @@ import numpy as np
 from nose.tools import assert_equals, assert_raises
 from numpy.testing import assert_array_equal
 
-from nilabels.defs import root_dir
+from nilabels.definitions import root_dir
 from nilabels.tools.aux_methods.sanity_checks import check_pfi_io
 from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query
 from nilabels.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
     permutation_from_disjoint_cycles_to_cauchy
 from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 
+
 ''' Test aux_methods.morphological.py'''
+
 from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
     get_circle_shell_for_given_radius
 
@@ -25,6 +27,12 @@ def test_get_morpological_patch():
     expected[2, 2] = False
     assert_array_equal(get_morphological_patch(2, 'circle'), expected)
     assert_array_equal(get_morphological_patch(2, 'square'), np.ones([3, 3]).astype(np.bool))
+
+
+def test_get_morpological_patch_not_allowed_input():
+    with assert_raises(IOError):
+        get_morphological_patch(2, 'spam')
+
 
 
 def test_get_patch_values_simple():
@@ -204,6 +212,7 @@ def test_from_disjoint_cycles_to_permutation_single_cycle():
 
 if __name__ == '__main__':
     test_get_morpological_patch()
+    test_get_morpological_patch_not_allowed_input()
     test_get_patch_values_simple()
     test_get_shell_for_given_radius()
     test_check_pfi_io()

@@ -1,3 +1,3 @@
-__version__ = '1.0.0dev'
+__version__ = '0.0.3pre'
 
-from agents.agents_controller import AgentsController as App
+from .agents.agents_controller import AgentsController as App

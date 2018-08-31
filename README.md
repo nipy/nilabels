@@ -82,7 +82,6 @@ pytest
 coverage html
 open htmlcov/index.html
 ```
-The first time the test a run a dummy dataset is created. This may take some minutes of computations and 150MB of space.
 
 ### Licencing and Copyright
 

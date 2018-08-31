@@ -6,7 +6,7 @@ import numpy as np
 
 import a_generate_phantoms_for_examples as gen
 from nilabels.agents.agents_controller import AgentsController as NiL
-from nilabels.defs import root_dir
+from nilabels.definitions import root_dir
 
 # ---- GENERATE DATA ----
 
