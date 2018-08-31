@@ -1,8 +1,9 @@
 [run]
-omit = tests/*
-       tools/visualiser/*
+source = nilabels
+include = */nilabels/*,
+omit = tools/visualiser/*
 
 [report]
-omit = tests/*
-       nilabels/tools/visualiser/*
+include = */nilabels/*,
+omit = nilabels/tools/visualiser/*
        */__init__.py

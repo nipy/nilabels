@@ -15,8 +15,8 @@ from nilabels.tools.aux_methods.utils_nib import set_new_data, compare_two_nib
 
 ''' Test aux_methods.morphological.py'''
 
-from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_patch_values, \
-    get_circle_shell_for_given_radius
+from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_morphological_mask, \
+    get_values_below_patch, get_circle_shell_for_given_radius
 
 
 def test_get_morpological_patch():
@@ -34,6 +34,67 @@ def test_get_morpological_patch_not_allowed_input():
         get_morphological_patch(2, 'spam')
 
 
+def test_get_morphological_mask_not_allowed_input():
+    with assert_raises(IOError):
+        get_morphological_mask((5, 5), (11, 11), radius=2, shape='spam')
+
+
+def test_get_morphological_mask_with_morpho_patch():
+    morpho_patch = np.array([[[False,  True, False],
+                              [True,  True,  True],
+                              [False,  True, False]],
+
+                             [[True,  True,  True],
+                              [True,  False,  True],
+                              [True,  True,  True]],
+
+                             [[False,  True, False],
+                              [True,  True,  True],
+                              [False,  True, False]]])
+
+    arr_mask = get_morphological_mask((2, 2, 2), (4, 4, 4), radius=1, shape='unused', morpho_patch=morpho_patch)
+
+    expected_arr_mask = np.array([[[False, False,  False, False],
+                                   [False, False,  False, False],
+                                   [False, False,  False,  False],
+                                   [False, False,  False, False]],
+
+                                  [[False, False,  False, False],
+                                   [False, False,  True, False],
+                                   [False, True,  True,  True],
+                                   [False, False,  True, False]],
+
+                                  [[False, False, False, False],
+                                   [False, True,  True,  True],
+                                   [False, True,  False,  True],
+                                   [False, True,  True,  True]],
+
+                                  [[False, False,  False, False],
+                                   [False, False,  True, False],
+                                   [False, True,  True,  True],
+                                   [False, False,  True, False]]])
+
+    assert_array_equal(arr_mask, expected_arr_mask)
+
+
+def test_get_morphological_mask_with_zero_radius():
+    arr_mask = get_morphological_mask((2, 2, 2), (5, 5, 5), radius=0, shape='circle')
+
+    expected_arr_mask = np.zeros((5, 5, 5), dtype=np.bool)
+    expected_arr_mask[2, 2, 2] = 1
+
+    assert_array_equal(arr_mask, expected_arr_mask)
+
+
+def test_get_morphological_mask_without_morpho_patch():
+    arr_mask = get_morphological_mask((2, 2), (5, 5), radius=2, shape='circle')
+    expected_arr_mask = np.array([[False, False,  True, False, False],
+                                  [False,  True,  True,  True, False],
+                                  [True,  True,  True,  True,  True],
+                                  [False,  True,  True,  True, False],
+                                  [False, False,  True, False, False]])
+    assert_array_equal(arr_mask, expected_arr_mask)
+
 
 def test_get_patch_values_simple():
     # toy mask on a simple image:
@@ -44,8 +105,15 @@ def test_get_patch_values_simple():
     patch[3, 2] = True
     patch[3, 3] = True
 
-    vals = get_patch_values([2, 2, 2], image, morfo_mask=patch)
+    vals = get_values_below_patch([2, 2, 2], image, morpho_mask=patch)
     assert_array_equal([image[2, 2], image[2, 3], image[3, 2], image[3, 3]], vals)
+
+
+def test_get_values_below_patch_no_morpho_mask():
+    image = np.ones((7, 7))
+    vals = get_values_below_patch([3, 3], image, radius=1, shape='square')
+
+    assert_array_equal([1.0, ] * 9, vals)
 
 
 def test_get_shell_for_given_radius():
@@ -55,8 +123,21 @@ def test_get_shell_for_given_radius():
                     (1, 1, 0), (1, 1, 1), (2, 0, 0)]
     computed_ans = get_circle_shell_for_given_radius(2)
 
-    assert len(expected_ans) == len(computed_ans)
-    assert set(tuple(expected_ans)) == set(tuple(computed_ans))
+    assert cmp(expected_ans, computed_ans) == 0
+
+
+def get_circle_shell_for_given_radius_2d():
+    expected_ans = [(-2, 0), (-1, -1), (-1, 1), (0, -2), (0, 2), (1, -1), (1, 1), (2, 0)]
+    computed_ans = get_circle_shell_for_given_radius(2, dimension=2)
+    assert cmp(expected_ans, computed_ans) == 0
+
+
+def get_circle_shell_for_given_radius_wrong_input_nd():
+    with assert_raises(IOError):
+        get_circle_shell_for_given_radius(2, dimension=4)
+
+
+'''  test methods sanity_checks '''
 
 
 def test_check_pfi_io():
@@ -213,26 +294,34 @@ def test_from_disjoint_cycles_to_permutation_single_cycle():
 if __name__ == '__main__':
     test_get_morpological_patch()
     test_get_morpological_patch_not_allowed_input()
+    test_get_morphological_mask_not_allowed_input()
+    test_get_morphological_mask_with_morpho_patch()
+    test_get_morphological_mask_with_zero_radius()
+    test_get_morphological_mask_without_morpho_patch()
+    test_get_values_below_patch_no_morpho_mask()
     test_get_patch_values_simple()
     test_get_shell_for_given_radius()
-    test_check_pfi_io()
+    get_circle_shell_for_given_radius_2d()
+    get_circle_shell_for_given_radius_wrong_input_nd()
 
-    test_set_new_data_simple_modifications()
-    test_compare_two_nib_equals()
-    test_compare_two_nib_different_nifti_version()
-    test_compare_two_nib_different_affine()
-
-    test_eliminates_consecutive_duplicates()
-    test_lift_list_1()
-    test_lift_list_2()
-    test_lift_list_3()
-
-    test_labels_query_int_input()
-    test_labels_query_list_input1()
-    test_labels_query_list_input2()
-    test_labels_query_all_or_tot_input()
-
-    test_from_permutation_to_disjoints_cycles()
-    test_from_disjoint_cycles_to_permutation()
-    test_from_permutation_to_disjoints_cycles_single_cycle()
-    test_from_disjoint_cycles_to_permutation_single_cycle()
+    # test_check_pfi_io()
+    #
+    # test_set_new_data_simple_modifications()
+    # test_compare_two_nib_equals()
+    # test_compare_two_nib_different_nifti_version()
+    # test_compare_two_nib_different_affine()
+    #
+    # test_eliminates_consecutive_duplicates()
+    # test_lift_list_1()
+    # test_lift_list_2()
+    # test_lift_list_3()
+    #
+    # test_labels_query_int_input()
+    # test_labels_query_list_input1()
+    # test_labels_query_list_input2()
+    # test_labels_query_all_or_tot_input()
+    #
+    # test_from_permutation_to_disjoints_cycles()
+    # test_from_disjoint_cycles_to_permutation()
+    # test_from_permutation_to_disjoints_cycles_single_cycle()
+    # test_from_disjoint_cycles_to_permutation_single_cycle()

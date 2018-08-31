@@ -38,8 +38,7 @@ import nilabels as nis
 
 
 nis_app = nis.App()
-nis_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz', 
-                                  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
+nis_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 
 ```
 
@@ -78,7 +77,7 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 Code testing is a work in progress. We are aiming at reaching the 80% of coverage for the methods acting on numpy arrays and nibabel images, below the facade.
 To run the test, `pip install -U pytest` and `pip install coverage` followed by:
 ```bash
-pytest
+pytest --cov --cov-report html
 coverage html
 open htmlcov/index.html
 ```

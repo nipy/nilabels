@@ -22,37 +22,37 @@ def get_morphological_mask(point, omega, radius=5, shape='circle', morpho_patch=
     """
     Helper to obtain a morphological mask based on get_morphological_patch
     :param point: centre of the mask
-    :param omega: dimension of the image containing the mask
-    :param radius: radius of the mask
-    :param shape: 'circle' shape of the mask
-    :param morpho_patch: other input shape.
-    :return: binary mask with patch.
+    :param omega: grid dimension of the image domain. E.g. [256, 256, 128].
+    :param radius: radius of the mask if morpho_patch not given.
+    :param shape: 'circle' shape of the mask if morpho_patch not given.
+    :param morpho_patch:To avoid computing the morphological mask at each iteration if this method,
+    this mask can be provided as input. This bypasses the input radius and shape.
     """
     if morpho_patch is None:
-        d = omega.ndim
+        d = len(omega)
         morpho_patch = get_morphological_patch(d, shape=shape)
 
-    mask = np.zeros(omega, dtype=np.bool)
-    mask.itemset(tuple(point), 1)
+    array_mask = np.zeros(omega, dtype=np.bool)
+    array_mask.itemset(tuple(point), 1)
     for _ in range(radius):
-        mask = ndimage.binary_dilation(mask, structure=morpho_patch).astype(mask.dtype)
-    return mask
+        array_mask = ndimage.binary_dilation(array_mask, structure=morpho_patch).astype(array_mask.dtype)
+    return array_mask
 
 
-def get_patch_values(point, target_image, radius=5, shape='circle', morfo_mask=None):
+def get_values_below_patch(point, target_image, radius=5, shape='circle', morpho_mask=None):
     """
     To obtain the list of the values below a maks.
-    :param point:
-    :param target_image:
-    :param radius:
-    :param shape:
-    :param morfo_mask: To avoid computing the morphological mask at each iteration if this method,
-    this mask can be provided as input.
+    :param point: central point of the patch
+    :param target_image: array image whose values we are interested into.
+    :param radius: patch radius if morpho_patch is not given.
+    :param shape: shape patch if morpho_patch is not given.
+    :param morpho_mask: To avoid computing the morphological mask at each iteration if this method,
+    this mask can be provided as input. This bypasses the input radius and shape.
     :return:
     """
-    if morfo_mask is None:
-        morfo_mask = get_morphological_mask(point, target_image.shape, radius=radius, shape=shape)
-    coord = np.nonzero(morfo_mask.flatten())[0]
+    if morpho_mask is None:
+        morpho_mask = get_morphological_mask(point, target_image.shape, radius=radius, shape=shape)
+    coord = np.nonzero(morpho_mask.flatten())[0]
     return np.take(target_image.flatten(), coord)
 
 
