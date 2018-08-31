@@ -136,7 +136,7 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
     :param new_aff: new affine transformation to be multiplied or replaced
     :param q_form: [True] affect q_form
     :param s_form: [True] affect s_form
-    :param multiplication_side: can be lef, right, or replace.
+    :param multiplication_side: can be 'lef', 'right', or 'replace'.
     :param verbose:
 
     :return: None. It creates a new image in pfi_nifti_output with defined translational part.
@@ -163,15 +163,17 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
         new_image = nib.Nifti2Image(im_input.get_data(), new_transf, header=im_input.get_header())
     else:
         raise IOError('Input image header problems in sizeof_hdr.')
-    if q_form:
-        new_image.set_qform(new_transf)
-    else:
-        new_image.set_qform(im_input.get_affine())
+
     if s_form:
         new_image.set_sform(new_transf)
     else:
         new_image.set_sform(im_input.get_affine())
-    new_image.update_header()
+    if q_form:
+        new_image.set_qform(new_transf)
+    else:
+        new_image.set_qform(im_input.get_affine())
+
+    # new_image.update_header()
 
     if verbose > 0:
         # print intermediate results
@@ -180,9 +182,9 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
         print('Affine after update:')
         print(new_image.get_affine())
         print('Q-form after update:')
-        print(new_image.get_qform())
+        print(new_image.get_qform(coded=True))
         print('S-form after update:')
-        print(new_image.get_sform())
+        print(new_image.get_sform(coded=True))
 
     return new_image
 
@@ -220,4 +222,4 @@ def images_are_overlapping(im1, im2):
     :param im2: nibabel image.
     :return: np.array_equal(im1.shape[:3], im2.shape[:3]) * np.array_equal(im1.affine, im2.affine)
     """
-    return np.array_equal(im1.shape[:3], im2.shape[:3]) * np.array_equal(im1.affine, im2.affine)
+    return np.array_equal(im1.shape[:3], im2.shape[:3]) and np.array_equal(im1.affine, im2.affine)

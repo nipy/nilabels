@@ -6,7 +6,8 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_raises
 
 from nilabels.tools.aux_methods.utils_nib import replace_translational_part, remove_nan_from_im, \
-    set_new_data, compare_two_nib, one_voxel_volume, modify_image_data_type
+    set_new_data, compare_two_nib, one_voxel_volume, modify_image_data_type, modify_affine_transformation, \
+    images_are_overlapping
 
 
 # TEST aux_methods.utils_nib.py
@@ -183,46 +184,110 @@ def test_modify_image_type_wrong_input():
     assert flag
 
 
-# TEST HEADER MODIFICATION modify affine transformation
+# TEST HEADER MODIFICATION : modify affine transformation
 
 
-def test_modify_affine_transformation_simple():
-    pass
+def test_modify_affine_transformation_replace():
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
+
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
+
+    aff_new = np.eye(4)
+    aff_new[:3, :3] = np.round(np.random.randn(3, 3), decimals=5)
+    aff_new = np.round(aff_new, decimals=5)
+
+    new_im = modify_affine_transformation(im, new_aff=aff_new, multiplication_side='replace',  q_form=True, s_form=True)
+
+    assert_array_almost_equal(new_im.affine, aff_new, decimal=5)
 
 
 def test_modify_affine_transformation_io_nifti1_nifti2():
-    pass
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
+
+    im1 = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
+    im2 = nib.Nifti2Image(np.zeros([5, 5, 5]), affine=aff)
+
+    im1_new = modify_affine_transformation(im1, new_aff=aff)
+    im2_new = modify_affine_transformation(im2, new_aff=aff)
+
+    assert im1_new.header['sizeof_hdr'] == 348
+    assert im2_new.header['sizeof_hdr'] == 540
 
 
 def test_modify_affine_transformation_left():
-    pass
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
+
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
+
+    aff_new = np.eye(4)
+    aff_new[:3, :3] = np.round(np.random.randn(3, 3), decimals=5)
+    aff_new = np.round(aff_new, decimals=5)
+
+    new_im = modify_affine_transformation(im, new_aff=aff_new, multiplication_side='left',  q_form=True, s_form=True)
+
+    assert_array_almost_equal(new_im.affine, aff_new.dot(aff), decimal=5)
 
 
 def test_modify_affine_transformation_right():
-    pass
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
 
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
 
-def test_modify_affine_transformation_replace_qform():
-    pass
+    aff_new = np.eye(4)
+    aff_new[:3, :3] = np.round(np.random.randn(3, 3), decimals=5)
+    aff_new = np.round(aff_new, decimals=5)
+
+    new_im = modify_affine_transformation(im, new_aff=aff_new, multiplication_side='right',  q_form=True, s_form=True)
+
+    assert_array_almost_equal(new_im.affine, aff.dot(aff_new), decimal=5)
 
 
 def test_modify_affine_transformation_replace_sform():
-    pass
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
+
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
+
+    aff_new = np.eye(4)
+    aff_new[:3, :3] = np.round(np.random.randn(3, 3), decimals=5)
+    aff_new = np.round(aff_new, decimals=5)
+
+    new_im_sform_true = modify_affine_transformation(im, new_aff=aff_new, multiplication_side='replace',
+                                                     q_form=False, s_form=True)
+    new_im_sform_false = modify_affine_transformation(im, new_aff=aff_new, multiplication_side='replace',
+                                                      q_form=False, s_form=False)
+
+    assert_array_almost_equal(new_im_sform_true.get_sform(), aff_new, decimal=5)
+    assert_array_almost_equal(new_im_sform_false.get_sform(), aff, decimal=5)
 
 
 # TEST HEADER MODIFICATION replace translational part
 
 
 def test_replace_translational_part_simple():
-    pass
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff[:3, 3] = [1, 2, 3]
+    aff = np.round(aff, decimals=5)
 
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
 
-def test_replace_translational_part_qform():
-    pass
+    aff_new = np.copy(aff)
+    aff_new[:3, 3] = [3, 1, 2]
 
+    im_new = replace_translational_part(im, new_translation=[3, 1, 2])
 
-def test_replace_translational_part_sform():
-    pass
+    assert_array_equal(im.affine[:3, 3], [1, 2, 3])
+    assert_array_equal(im_new.affine[:3, 3], [3, 1, 2])
 
 
 # TEST remove nan from im
@@ -253,30 +318,45 @@ def test_remove_nan():
 
 
 def test_images_are_overlapping_simple():
-    pass
+    im1 = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=np.eye(4))
+    im2 = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=np.eye(4))
+    im3 = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=0.5 * np.eye(4))
+    im4 = nib.Nifti1Image(np.zeros([5, 5, 4]), affine=np.eye(4))
+
+    assert images_are_overlapping(im1, im2)
+    assert not images_are_overlapping(im1, im3)
+    assert not images_are_overlapping(im1, im4)
 
 
 if __name__ == '__main__':
-    test_set_new_data_simple_modifications()
-    test_set_new_data_new_data_type()
-    test_set_new_data_for_nifti2()
-    test_set_new_data_for_buggy_image_header()
-
-    test_compare_two_nib_equals()
-    test_compare_two_nib_different_nifti_version()
-    test_compare_two_nib_different_nifti_version2()
-    test_compare_two_nib_different_data_dtype()
-    test_compare_two_nib_different_data()
-    test_compare_two_nib_different_affine()
-
-    test_one_voxel_volume()
-    test_one_voxel_volume_decimals()
-
-    test_modify_image_type_simple()
-    test_modify_image_type_update_description_header()
-    test_modify_image_type_remove_nan()
-    test_modify_image_type_wrong_input()
-
+    # test_set_new_data_simple_modifications()
+    # test_set_new_data_new_data_type()
+    # test_set_new_data_for_nifti2()
+    # test_set_new_data_for_buggy_image_header()
     #
+    # test_compare_two_nib_equals()
+    # test_compare_two_nib_different_nifti_version()
+    # test_compare_two_nib_different_nifti_version2()
+    # test_compare_two_nib_different_data_dtype()
+    # test_compare_two_nib_different_data()
+    # test_compare_two_nib_different_affine()
+    #
+    # test_one_voxel_volume()
+    # test_one_voxel_volume_decimals()
+    #
+    # test_modify_image_type_simple()
+    # test_modify_image_type_update_description_header()
+    # test_modify_image_type_remove_nan()
+    # test_modify_image_type_wrong_input()
+    #
+    # test_modify_affine_transformation_replace()
+    # test_modify_affine_transformation_io_nifti1_nifti2()
+    # test_modify_affine_transformation_left()
+    # test_modify_affine_transformation_right()
+    # test_modify_affine_transformation_replace_sform()
+
+    test_replace_translational_part_simple()
 
     test_remove_nan()
+
+    test_images_are_overlapping_simple()
