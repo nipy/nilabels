@@ -40,15 +40,8 @@ def compare_two_nib(im1, im2):
     :param im2: another nibabel image (or another str with path to a nifti image)
     :return: true false and plot to console if the images are the same or not (up to a tollerance in the data)
     """
-    if isinstance(im1, str):
-        assert os.path.exists(im1), im1
-        im1 = nib.load(im1)
-    if isinstance(im2, str):
-        assert os.path.exists(im2), im2
-        im2 = nib.load(im2)
-
-    im1_name = 'First argument'
-    im2_name = 'Second argument'
+    im1_name = 'First image'
+    im2_name = 'Second image'
     msg = ''
 
     hd1 = im1.header
@@ -104,8 +97,8 @@ def compare_two_nib(im1, im2):
     return images_are_equal
 
 
-def one_voxel_volume(im):
-    return np.round(np.abs(np.prod(np.diag(im.get_affine()))), decimals=6)
+def one_voxel_volume(im, decimals=6):
+    return np.round(np.abs(np.prod(np.diag(im.get_affine())[:3])), decimals=decimals)
 
 
 # ---------- Header modifications ---------------

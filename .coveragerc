@@ -2,8 +2,10 @@
 source = nilabels
 include = */nilabels/*,
 omit = tools/visualiser/*
+       nilabels/agents/*
 
 [report]
 include = */nilabels/*,
 omit = nilabels/tools/visualiser/*
+       nilabels/agents/*
        */__init__.py
