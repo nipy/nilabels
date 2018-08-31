@@ -3,7 +3,7 @@ import numpy as np
 
 from nilabels.tools.aux_methods.utils_rotations import get_small_orthogonal_rotation
 from nilabels.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
-from nilabels.tools.aux_methods.utils_nib import modify_image_type, \
+from nilabels.tools.aux_methods.utils_nib import modify_image_data_type, \
     modify_affine_transformation, replace_translational_part
 
 
@@ -33,7 +33,7 @@ class HeaderController(object):
         pfi_in, pfi_out = get_pfi_in_pfi_out(filename_in, filename_out, self.pfo_in, self.pfo_out)
 
         im = nib.load(pfi_in)
-        new_im = modify_image_type(im, new_dtype=new_dtype, update_description=update_description, verbose=verbose)
+        new_im = modify_image_data_type(im, new_dtype=new_dtype, update_descrip_field_header=update_description, verbose=verbose)
         nib.save(new_im, pfi_out)
 
     def modify_affine(self, filename_in, affine_in, filename_out, q_form=True, s_form=True,

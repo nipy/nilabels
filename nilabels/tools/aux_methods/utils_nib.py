@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import nibabel as nib
 
@@ -16,12 +15,6 @@ def set_new_data(image, new_data, new_dtype=None, remove_nan=True):
     hd = image.header
     if remove_nan:
         new_data = np.nan_to_num(new_data)
-
-    # update data type:
-    if new_dtype is not None:
-        new_data = new_data.astype(new_dtype)
-        image.set_data_dtype(new_dtype)
-
     # if nifty1
     if hd['sizeof_hdr'] == 348:
         new_image = nib.Nifti1Image(new_data, image.affine, header=hd)
@@ -29,13 +22,18 @@ def set_new_data(image, new_data, new_dtype=None, remove_nan=True):
     elif hd['sizeof_hdr'] == 540:
         new_image = nib.Nifti2Image(new_data, image.affine, header=hd)
     else:
-        raise IOError('Input image header problem')
-
-    return new_image
+        raise IOError('Input image header problems in sizeof_hdr.')
+    if new_dtype is None:
+        new_image.set_data_dtype(new_data.dtype)
+        return new_image
+    else:
+        new_image.set_data_dtype(new_dtype)
+        return new_image
 
 
 def compare_two_nib(im1, im2):
     """
+    Comparison between two nibabel imagse.
     :param im1: one nibabel image (or str with path to a nifti image)
     :param im2: another nibabel image (or another str with path to a nifti image)
     :return: true false and plot to console if the images are the same or not (up to a tollerance in the data)
@@ -48,7 +46,6 @@ def compare_two_nib(im1, im2):
     hd2 = im2.header
 
     images_are_equal = True
-
     # compare nifty version:
     if not hd1['sizeof_hdr'] == hd2['sizeof_hdr']:
 
@@ -58,7 +55,6 @@ def compare_two_nib(im1, im2):
             msg += '{0} is nifti2\n{1} is nifti1.'.format(im1_name, im2_name)
 
         images_are_equal = False
-
     # Compare headers:
     else:
         for k in hd1.keys():
@@ -77,7 +73,6 @@ def compare_two_nib(im1, im2):
                 images_are_equal = False
                 msg += 'Header Key {0} for {1} is {2} - for {3} is {4}  \n'.format(
                     k, im1_name, hd1[k], im2_name, hd2[k])
-
     # Compare values and type:
     if not im1.get_data_dtype() == im2.get_data_dtype():
         msg += 'Dtype are different consistent {0} {1} - {2} {3} \n'.format(
@@ -98,20 +93,36 @@ def compare_two_nib(im1, im2):
 
 
 def one_voxel_volume(im, decimals=6):
+    """
+    Volume of a single voxel of the given nifti image
+    :param im: nibabel image
+    :param decimals: number of decimals rouding the volume
+    :return: volume of a single voxel of the input image.
+    """
     return np.round(np.abs(np.prod(np.diag(im.get_affine())[:3])), decimals=decimals)
 
 
 # ---------- Header modifications ---------------
 
 
-def modify_image_type(im_input, new_dtype, update_description=None, verbose=1):
-    if update_description is not None:
-        if not isinstance(update_description, str):
+def modify_image_data_type(im_input, new_dtype, update_descrip_field_header=None, verbose=1, remove_nan=True):
+    """
+    Change the data dtype of an input image with the specified new dtype.
+    The new data dtype must be from numpy data dtype.
+    :param im_input: input image
+    :param new_dtype: new data dtype
+    :param update_descrip_field_header: string to update the 'descrip' parameter of the image header.
+    :param verbose: if True, it prompts data dtype before and after.
+    :param remove_nan: to remove the nan to the image data if any.
+    :return: input image with new data dtype.
+    """
+    if update_descrip_field_header is not None:
+        if not isinstance(update_descrip_field_header, str):
             raise IOError('update_description must be a string')
         hd = im_input.header
-        hd['descrip'] = update_description
+        hd['descrip'] = update_descrip_field_header
         im_input.update_header()
-    new_im = set_new_data(im_input, im_input.get_data().astype(new_dtype), new_dtype=new_dtype, remove_nan=True)
+    new_im = set_new_data(im_input, im_input.get_data(), new_dtype=new_dtype, remove_nan=remove_nan)
     if verbose > 0:
         print('Data type before {}'.format(im_input.get_data_dtype()))
         print('Data type after {}'.format(new_im.get_data_dtype()))
@@ -151,18 +162,15 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
     elif im_input.header['sizeof_hdr'] == 540:
         new_image = nib.Nifti2Image(im_input.get_data(), new_transf, header=im_input.get_header())
     else:
-        raise IOError
-
+        raise IOError('Input image header problems in sizeof_hdr.')
     if q_form:
         new_image.set_qform(new_transf)
     else:
         new_image.set_qform(im_input.get_affine())
-
     if s_form:
         new_image.set_sform(new_transf)
     else:
         new_image.set_sform(im_input.get_affine())
-
     new_image.update_header()
 
     if verbose > 0:
@@ -197,28 +205,19 @@ def replace_translational_part(im_input, new_translation, q_form=True, s_form=Tr
 
 
 def remove_nan_from_im(im_input):
+    """
+    Returns the same input images without nan
+    :param im_input: nibabel input image
+    :return: set_new_data(im_input, np.nan_to_num(im_input.get_data()))
+    """
     return set_new_data(im_input, np.nan_to_num(im_input.get_data()))
 
 
-def get_xyz_borders_of_a_label(segm_data, label):
-    """
-    :param segm_data:
-    :param label:
-    :return:
-    """
-    assert segm_data.ndim == 3
-
-    if label not in segm_data:
-        return None
-
-    X, Y, Z = np.where(segm_data == label)
-    return [np.min(X), np.max(X), np.min(Y), np.max(Y), np.min(Z), np.max(Z)]
-
-
 def images_are_overlapping(im1, im2):
-    ans = True
-    if np.array_equal(im1.shape, im2.shape):
-        ans = False
-    if np.array_equal(im1.affine, im2.affine):
-        ans = False
-    return ans
+    """
+    Check if two images have overlapping (congruent domain) in the real space (same data and same shape)
+    :param im1: nibabel image.
+    :param im2: nibabel image.
+    :return: np.array_equal(im1.shape[:3], im2.shape[:3]) * np.array_equal(im1.affine, im2.affine)
+    """
+    return np.array_equal(im1.shape[:3], im2.shape[:3]) * np.array_equal(im1.affine, im2.affine)

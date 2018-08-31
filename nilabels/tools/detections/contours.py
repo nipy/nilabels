@@ -49,3 +49,18 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
         output_arr += contour_from_array_at_label(im_segm.get_data(), la, omit_axis=omit_axis, verbose=verbose)
 
     return set_new_data(im_segm, output_arr.astype(np.bool) * im_segm.get_data(), new_dtype=im_segm.get_data_dtype())
+
+
+def get_xyz_borders_of_a_label(segm_data, label):
+    """
+    :param segm_data:
+    :param label:
+    :return:
+    """
+    assert segm_data.ndim == 3
+
+    if label not in segm_data:
+        return None
+
+    X, Y, Z = np.where(segm_data == label)
+    return [np.min(X), np.max(X), np.min(Y), np.max(Y), np.min(Z), np.max(Z)]

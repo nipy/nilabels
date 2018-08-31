@@ -1,4 +1,5 @@
-from nilabels.tools.aux_methods.utils_nib import set_new_data, get_xyz_borders_of_a_label, images_are_overlapping
+from nilabels.tools.detections.contours import get_xyz_borders_of_a_label, set_new_data
+from nilabels.tools.aux_methods.utils_nib import images_are_overlapping
 
 
 def crop_with_passepartout(im_input, passepartout_values):

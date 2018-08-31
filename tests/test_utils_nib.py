@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_raises
 
 from nilabels.tools.aux_methods.utils_nib import replace_translational_part, remove_nan_from_im, \
-    set_new_data, compare_two_nib, one_voxel_volume
+    set_new_data, compare_two_nib, one_voxel_volume, modify_image_data_type
 
 
 # TEST aux_methods.utils_nib.py
@@ -37,13 +37,21 @@ def test_set_new_data_new_data_type():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3], dtype=np.uint8), affine=np.eye(4))
     assert im_0.get_data_dtype() == 'uint8'
 
+    # check again the original had not changed
     new_data = np.zeros([3, 3, 3], dtype=np.float64)
     new_im = set_new_data(im_0, new_data)
-    assert new_im.get_data_dtype() == 'uint8'
+    assert new_im.get_data_dtype() == '<f8'
+
+    new_data = np.zeros([3, 3, 3], dtype=np.uint8)
+    new_im_update_data = set_new_data(im_0, new_data, new_dtype=np.float64)
+    assert new_im_update_data.get_data_dtype() == '<f8'
 
     new_data = np.zeros([3, 3, 3], dtype=np.float64)
     new_im_update_data = set_new_data(im_0, new_data, new_dtype=np.float64)
     assert new_im_update_data.get_data_dtype() == '<f8'
+
+    # check again the original had not changed
+    assert im_0.get_data_dtype() == 'uint8'
 
 
 def test_set_new_data_for_nifti2():
@@ -132,14 +140,93 @@ def test_one_voxel_volume_decimals():
     assert voxel_vol == voxel_vol_expected
 
 
-# TEST replace translational part
+# TEST HEADER MODIFICATION modify image type
 
 
-def test_replace_translational_part():
+def test_modify_image_type_simple():
+    im = nib.Nifti1Image(np.ones([5, 5, 5], dtype=np.float64), affine=np.eye(4))
+    assert im.get_data_dtype() == 'float64'
+    im_new = modify_image_data_type(im, np.uint8, verbose=False)
+    assert im_new.get_data_dtype() == 'uint8'
+    assert im.get_data_dtype() == 'float64'
+
+
+def test_modify_image_type_update_description_header():
+    im = nib.Nifti1Image(np.ones([5, 5, 5], dtype=np.float64), affine=np.eye(4))
+    im_new = modify_image_data_type(im, np.uint8, update_descrip_field_header='spam')
+    hd = im_new.header
+    assert hd['descrip'] == 'spam'
+    assert im_new.get_data_dtype() == 'uint8'
+    assert im.get_data_dtype() == 'float64'
+
+
+def test_modify_image_type_remove_nan():
+    data = np.ones([5, 5, 5], dtype=np.float64)
+    data[1, 1, 1] = np.nan
+    data[1, 2, 1] = np.nan
+    im = nib.Nifti1Image(data, affine=np.eye(4))
+    im_new = modify_image_data_type(im, np.uint8, remove_nan=True)
+    assert im_new.get_data_dtype() == 'uint8'
+    assert im.get_data_dtype() == 'float64'
+    assert np.nan not in im_new.get_data()
+
+
+def test_modify_image_type_wrong_input():
+    im = nib.Nifti1Image(np.ones([5, 5, 5], dtype=np.float64), affine=np.eye(4))
+    flag = False
+
+    # noinspection PyBroadException
+    try:
+        modify_image_data_type(im, 'fake_type')
+    except Exception:
+        flag = True
+    assert flag
+
+
+# TEST HEADER MODIFICATION modify affine transformation
+
+
+def test_modify_affine_transformation_simple():
     pass
 
 
-# TEST remove nan
+def test_modify_affine_transformation_io_nifti1_nifti2():
+    pass
+
+
+def test_modify_affine_transformation_left():
+    pass
+
+
+def test_modify_affine_transformation_right():
+    pass
+
+
+def test_modify_affine_transformation_replace_qform():
+    pass
+
+
+def test_modify_affine_transformation_replace_sform():
+    pass
+
+
+# TEST HEADER MODIFICATION replace translational part
+
+
+def test_replace_translational_part_simple():
+    pass
+
+
+def test_replace_translational_part_qform():
+    pass
+
+
+def test_replace_translational_part_sform():
+    pass
+
+
+# TEST remove nan from im
+
 
 def test_remove_nan():
     data_ts = np.array([[[0, 1, 2, 3],
@@ -162,23 +249,34 @@ def test_remove_nan():
     assert_array_equal(im_no_nan.get_data(), data_no_nan_expected)
 
 
+# TEST images are overlapping
+
+
+def test_images_are_overlapping_simple():
+    pass
+
+
 if __name__ == '__main__':
-    # test_set_new_data_simple_modifications()
-    # test_set_new_data_new_data_type()
-    # test_set_new_data_for_nifti2()
-    # test_set_new_data_for_buggy_image_header()
-    #
-    # test_compare_two_nib_equals()
-    # test_compare_two_nib_different_nifti_version()
-    # test_compare_two_nib_different_nifti_version2()
-    # test_compare_two_nib_different_data_dtype()
-    # test_compare_two_nib_different_data()
-    # test_compare_two_nib_different_affine()
+    test_set_new_data_simple_modifications()
+    test_set_new_data_new_data_type()
+    test_set_new_data_for_nifti2()
+    test_set_new_data_for_buggy_image_header()
+
+    test_compare_two_nib_equals()
+    test_compare_two_nib_different_nifti_version()
+    test_compare_two_nib_different_nifti_version2()
+    test_compare_two_nib_different_data_dtype()
+    test_compare_two_nib_different_data()
+    test_compare_two_nib_different_affine()
 
     test_one_voxel_volume()
     test_one_voxel_volume_decimals()
 
+    test_modify_image_type_simple()
+    test_modify_image_type_update_description_header()
+    test_modify_image_type_remove_nan()
+    test_modify_image_type_wrong_input()
 
-
+    #
 
     test_remove_nan()
