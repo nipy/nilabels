@@ -33,7 +33,7 @@ def test_volumes_and_values_total_num_voxels():
     im_segm = nib.Nifti1Image(sky, affine=np.eye(4))
 
     num_voxels = get_total_num_nonzero_voxels(im_segm)
-    assert (num_voxels, 11 ** 3 + 17 ** 3 + 19 ** 3 + 9 **3)
+    assert num_voxels == 11 ** 3 + 17 ** 3 + 19 ** 3 + 9 **3
 
     num_voxels = get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=[2, 4])
     assert_equal(num_voxels, 11 ** 3 + 19 ** 3)

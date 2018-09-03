@@ -115,6 +115,7 @@ def test_crop_with_passepartout_based_on_label_segmentation_with_im():
 
     assert_array_equal(arr_expected, im_cropped.get_data())
 
+
 if __name__ == '__main__':
     test_crop_with_passepartout_simple()
     test_crop_with_passepartout_based_on_label_segmentation_simple()
