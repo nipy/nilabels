@@ -49,7 +49,7 @@ def test_print_and_run_create_file_safety_on():
 
 
 @create_and_erase_temporary_folder
-def test_print_and_run_create_file_safety_on():
+def test_print_and_run_create_file_safety_off():
     cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
     output_msg = print_and_run(cmd, safety_on=False, short_path_output=False)
     assert os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
@@ -82,3 +82,17 @@ def test_labels_query_all_or_tot_input():
     assert_array_equal(lab, np.arange(10))
     lab, lab_names = labels_query('tot', v, remove_zero=True)
     assert_array_equal(lab, np.arange(10)[1:])
+
+
+if __name__ == '__main__':
+    test_lift_list_1()
+    test_lift_list_2()
+    test_lift_list_3()
+    test_eliminates_consecutive_duplicates()
+    test_print_and_run_create_file()
+    test_print_and_run_create_file_safety_on()
+    test_print_and_run_create_file_safety_off()
+    test_labels_query_int_input()
+    test_labels_query_list_input1()
+    test_labels_query_list_input2()
+    test_labels_query_all_or_tot_input()
