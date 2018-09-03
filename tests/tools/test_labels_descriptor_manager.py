@@ -2,7 +2,7 @@ import collections
 import os
 from os.path import join as jph
 
-from nose.tools import assert_raises
+import pytest
 
 from nilabels.tools.aux_methods.label_descriptor_manager import LabelsDescriptorManager, \
     generate_dummy_label_descriptor
@@ -114,14 +114,14 @@ def write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor(tes
 
 @write_and_erase_temporary_folder
 def test_generate_dummy_labels_descriptor_wrong_input1():
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         generate_dummy_label_descriptor(jph(pfo_tmp_test, 'labels_descriptor.txt'), list_labels=range(5),
                                         list_roi_names=['1', '2'])
 
 
 @write_and_erase_temporary_folder
 def test_generate_dummy_labels_descriptor_wrong_input2():
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         generate_dummy_label_descriptor(jph(pfo_tmp_test, 'labels_descriptor.txt'), list_labels=range(5),
                                         list_roi_names=['1', '2', '3', '4', '5'],
                                         list_colors_triplets=[[0, 0, 0], [1, 1, 1]])
@@ -176,7 +176,7 @@ def test_generate_labels_descriptor_general():
 def test_basics_methods_labels_descriptor_manager_wrong_input_path():
 
     pfi_unexisting_label_descriptor_manager = 'zzz_path_to_spam'
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         LabelsDescriptorManager(pfi_unexisting_label_descriptor_manager)
 
 
@@ -184,7 +184,7 @@ def test_basics_methods_labels_descriptor_manager_wrong_input_path():
 def test_basics_methods_labels_descriptor_manager_wrong_input_convention():
 
     not_allowed_convention_name = 'just_spam'
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'), not_allowed_convention_name)
 
 
@@ -242,7 +242,7 @@ def test_save_in_fsl_convention_reload_as_dict_and_compare():
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
 def test_signature_for_variable_convention_wrong_input():
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'),
                                     labels_descriptor_convention='spam')
 
@@ -252,7 +252,7 @@ def test_signature_for_variable_convention_wrong_input_after_initialisation():
     my_ldm = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'),
                                      labels_descriptor_convention='itk-snap')
 
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         my_ldm.convention = 'spam'
         my_ldm.save_label_descriptor(jph(pfo_tmp_test, 'labels_descriptor_again.txt'))
 
@@ -315,8 +315,7 @@ def test_relabel_labels_descriptor_with_merging():
 def test_permute_labels_from_descriptor_wrong_input_permutation():
     ldm = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'))
     perm = [[1, 2, 3], [1, 1]]
-
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         ldm.permute_labels(perm)
 
 
@@ -515,7 +514,7 @@ def test_relabel_bad_input():
     old_labels = [2, 4, 180]
     new_labels = [9, 10, 12]
 
-    with assert_raises(IOError):
+    with pytest.raises(IOError):
         ldm_original.relabel(old_labels, new_labels)
 
 

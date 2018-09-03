@@ -1,6 +1,6 @@
 # Contributing to NiLabels
 
-Thank you for being there!
+Thank you your help!
 
 NiLabels (ex LABelsToolkit) started as a python package containing a range of heterogeneous imaging tools to perform
 quick manipulations and measurement on segmentations from ipython or jupyter notebook. 
@@ -36,7 +36,7 @@ encountered a similar problem.
 
 + If you forked the repository and made some contributions that you would like to integrate in the git master branch, 
 you can do a [git pull request](https://yangsu.github.io/pull-request-tutorial/). Please **check tests are all passed** 
-before this (type nosetests in the code root folder).
+before this.
 
   
 ## Styleguides

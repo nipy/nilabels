@@ -1,6 +1,6 @@
 import nibabel as nib
 import numpy as np
-from nose.tools import assert_raises
+import pytest
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
 
@@ -11,7 +11,7 @@ from nilabels.tools.image_shape_manipulations.merger import stack_images, merge_
 def test_merge_labels_from_4d_fake_input():
 
     data = np.zeros([3,3,3])
-    with assert_raises(AssertionError):
+    with pytest.raises(AssertionError):
         merge_labels_from_4d(data)
 
 

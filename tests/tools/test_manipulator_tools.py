@@ -1,6 +1,6 @@
 import nibabel as nib
 import numpy as np
-from nose.tools import assert_raises
+import pytest
 from numpy.testing import assert_array_equal
 
 
@@ -24,9 +24,9 @@ def test_relabeller_one_element():
 
 
 def test_permute_label_invalid_permutation():
-    with assert_raises(AssertionError):
-        invalid_permutation = [[3, 3, 3], [1, 1, 1]]
-        permute_labels(np.zeros([3,3]), invalid_permutation)
+    invalid_permutation = [[3, 3, 3], [1, 1, 1]]
+    with pytest.raises(IOError):
+        permute_labels(np.zeros([3, 3]), invalid_permutation)
 
 
 def test_erase_label_simple():
@@ -219,22 +219,21 @@ def test_symmetrise_data_():
     assert_array_equal(symmetrise_data(cube_id, axis_direction='x', plane_intercept=3, side_to_copy='below', keep_in_data_dimensions=True), cube_sym_x3_ab_T)
 
 
-''' From manipulations.cutter.py '''
-from nilabels.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask
+if __name__ == '__main__':
+    test_permute_label_invalid_permutation()
 
-
-def test_cut_4d_volume_with_a_1_slice_mask():
-
-    data_0 = np.stack([np.array(range(5*5*5)).reshape(5, 5, 5)] * 4, axis=3)
-    mask = np.zeros([5,5,5])
-    for k in range(5):
-        mask[k, k, k] = 1
-    expected_answer_for_each_slice = np.zeros([5, 5, 5])
-    for k in range(5):
-        expected_answer_for_each_slice[k, k, k] = 30 * k + k
-    ans = cut_4d_volume_with_a_1_slice_mask(data_0, mask)
-
-    for k in range(4):
-        assert_array_equal(ans[..., k], expected_answer_for_each_slice)
+# def test_cut_4d_volume_with_a_1_slice_mask():
+#
+#     data_0 = np.stack([np.array(range(5*5*5)).reshape(5, 5, 5)] * 4, axis=3)
+#     mask = np.zeros([5,5,5])
+#     for k in range(5):
+#         mask[k, k, k] = 1
+#     expected_answer_for_each_slice = np.zeros([5, 5, 5])
+#     for k in range(5):
+#         expected_answer_for_each_slice[k, k, k] = 30 * k + k
+#     ans = cut_4d_volume_with_a_1_slice_mask(data_0, mask)
+#
+#     for k in range(4):
+#         assert_array_equal(ans[..., k], expected_answer_for_each_slice)
 
 

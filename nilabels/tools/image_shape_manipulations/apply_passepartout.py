@@ -5,7 +5,8 @@ from nilabels.tools.aux_methods.utils_nib import images_are_overlapping
 def crop_with_passepartout(im_input, passepartout_values):
     """
     :param im_input:
-    :param passepartout_values: in the form [x_min, x_max, y_min, y_max, z_min, z_max].
+    :param passepartout_values: in the form [x_min, -x_max, y_min, -y_max, z_min, -z_max]. where -x_max is the
+    thickness of the border from the border.
     :return:
     """
     x_min, x_max, y_min, y_max, z_min, z_max = passepartout_values
@@ -28,10 +29,13 @@ def crop_with_passepartout_based_on_label_segmentation(im_input_to_crop, im_segm
 
     v = get_xyz_borders_of_a_label(im_segm.get_data(), label)
 
+    print v
+
     if v is None:
         return im_input_to_crop
     else:
-        x_min, x_max = v[0] - margins[0], v[1] + margins[0]
-        y_min, y_max = v[2] - margins[1], v[3] + margins[1]
-        z_min, z_max = v[4] - margins[2], v[5] + margins[2]
-        return crop_with_passepartout(im_input_to_crop, [x_min, x_max, y_min, y_max, z_min, z_max])
+        x_min, x_max = v[0] - margins[0], v[1] + margins[0] + 1
+        y_min, y_max = v[2] - margins[1], v[3] + margins[1] + 1
+        z_min, z_max = v[4] - margins[2], v[5] + margins[2] + 1
+        print [x_min, x_max, y_min, y_max, z_min, z_max]
+        return crop_with_passepartout(im_input_to_crop, [x_min, -x_max, y_min, -y_max, z_min, -z_max])

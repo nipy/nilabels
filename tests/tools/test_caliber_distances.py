@@ -1,11 +1,7 @@
 import numpy as np
 import nibabel as nib
-import os
-from scipy import ndimage as nd
 
 from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
-
-from nilabels.tools.detections.contours import contour_from_segmentation
 
 from nilabels.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \

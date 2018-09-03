@@ -161,6 +161,12 @@ def test_modify_image_type_update_description_header():
     assert im.get_data_dtype() == 'float64'
 
 
+def test_modify_image_type_update_description_header_no_string_input():
+    im = nib.Nifti1Image(np.ones([5, 5, 5], dtype=np.float64), affine=np.eye(4))
+    with assert_raises(IOError):
+        modify_image_data_type(im, np.uint8, update_descrip_field_header=123)
+
+
 def test_modify_image_type_remove_nan():
     data = np.ones([5, 5, 5], dtype=np.float64)
     data[1, 1, 1] = np.nan
@@ -270,6 +276,25 @@ def test_modify_affine_transformation_replace_sform():
     assert_array_almost_equal(new_im_sform_false.get_sform(), aff, decimal=5)
 
 
+def test_modify_affine_transformation_wrong_input_parameter():
+    aff = np.eye(4)
+    aff[:3, :3] = np.random.randn(3, 3)
+    aff = np.round(aff, decimals=5)
+
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=aff)
+
+    with assert_raises(IOError):
+        modify_affine_transformation(im, new_aff=aff, multiplication_side='spam')
+
+
+def test_modify_affine_transformation_dumb_input_header_nifti_version():
+    im = nib.Nifti1Image(np.zeros([5, 5, 5]), affine=0.4 * np.eye(4))
+    im.header['sizeof_hdr'] = 42
+
+    with assert_raises(IOError):
+        modify_affine_transformation(im, new_aff=np.eye(4))
+
+
 # TEST HEADER MODIFICATION replace translational part
 
 
@@ -329,34 +354,35 @@ def test_images_are_overlapping_simple():
 
 
 if __name__ == '__main__':
-    # test_set_new_data_simple_modifications()
-    # test_set_new_data_new_data_type()
-    # test_set_new_data_for_nifti2()
-    # test_set_new_data_for_buggy_image_header()
-    #
-    # test_compare_two_nib_equals()
-    # test_compare_two_nib_different_nifti_version()
-    # test_compare_two_nib_different_nifti_version2()
-    # test_compare_two_nib_different_data_dtype()
-    # test_compare_two_nib_different_data()
-    # test_compare_two_nib_different_affine()
-    #
-    # test_one_voxel_volume()
-    # test_one_voxel_volume_decimals()
-    #
-    # test_modify_image_type_simple()
-    # test_modify_image_type_update_description_header()
-    # test_modify_image_type_remove_nan()
-    # test_modify_image_type_wrong_input()
-    #
-    # test_modify_affine_transformation_replace()
-    # test_modify_affine_transformation_io_nifti1_nifti2()
-    # test_modify_affine_transformation_left()
-    # test_modify_affine_transformation_right()
-    # test_modify_affine_transformation_replace_sform()
+    test_set_new_data_simple_modifications()
+    test_set_new_data_new_data_type()
+    test_set_new_data_for_nifti2()
+    test_set_new_data_for_buggy_image_header()
+
+    test_compare_two_nib_equals()
+    test_compare_two_nib_different_nifti_version()
+    test_compare_two_nib_different_nifti_version2()
+    test_compare_two_nib_different_data_dtype()
+    test_compare_two_nib_different_data()
+    test_compare_two_nib_different_affine()
+
+    test_one_voxel_volume()
+    test_one_voxel_volume_decimals()
+
+    test_modify_image_type_simple()
+    test_modify_image_type_update_description_header()
+    test_modify_image_type_update_description_header_no_string_input()
+    test_modify_image_type_remove_nan()
+    test_modify_image_type_wrong_input()
+
+    test_modify_affine_transformation_replace()
+    test_modify_affine_transformation_io_nifti1_nifti2()
+    test_modify_affine_transformation_left()
+    test_modify_affine_transformation_right()
+    test_modify_affine_transformation_replace_sform()
+    test_modify_affine_transformation_wrong_input_parameter()
+    test_modify_affine_transformation_dumb_input_header_nifti_version()
 
     test_replace_translational_part_simple()
-
     test_remove_nan()
-
     test_images_are_overlapping_simple()

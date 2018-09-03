@@ -44,7 +44,8 @@ def permute_labels(in_data, permutation):
     :param permutation:
     :return:
     """
-    assert is_valid_permutation(permutation), 'Input permutation not valid.'
+    if not is_valid_permutation(permutation):
+        raise IOError('Input permutation not valid.')
     return relabeller(in_data, permutation[0], permutation[1])
 
 
