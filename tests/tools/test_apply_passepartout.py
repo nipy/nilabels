@@ -2,7 +2,6 @@ import nibabel as nib
 import numpy as np
 from numpy.testing import assert_array_equal
 
-
 from nilabels.tools.image_shape_manipulations.apply_passepartout import crop_with_passepartout, \
     crop_with_passepartout_based_on_label_segmentation
 
