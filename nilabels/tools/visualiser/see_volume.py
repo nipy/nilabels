@@ -48,10 +48,9 @@ def see_array(in_array, pfo_tmp='./z_tmp', in_array_segm=None, pfi_label_descrip
         pfi_im_segm = jph(pfo_tmp, 'im_segm_0.nii.gz')
         nib.save(im_segm, pfi_im_segm)
         cmd += ' -s {} '.format(pfi_im_segm)
-    if pfi_label_descriptor:
-        if os.path.exists(pfi_label_descriptor):
-            cmd += ' -l {} '.format(pfi_im_segm)
-
+        if pfi_label_descriptor:
+            if os.path.exists(pfi_label_descriptor):
+                cmd += ' -l {} '.format(pfi_im_segm)
     print_and_run(cmd)
     if block:
         _ = raw_input("Press any key to continue.")

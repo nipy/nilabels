@@ -290,7 +290,7 @@ if __name__ == '__main__':
         #
         # plt.show(block=False)
 
-        multi_data = [range(1,17), list( 0.000000001 * np.array(range(1,17))), list( 0.001 * np.array(range(1,17)))]
+        multi_data = [range(1, 17), list(0.000000001 * np.array(range(1,17))), list( 0.001 * np.array(range(1,17)))]
         print(multi_data)
         multi_bull_eyes(multi_data, raidal_subdivisions=(3,3,4,6),
                   centered=(True, True, True, True), add_nomenclatures=[True]*3)

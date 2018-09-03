@@ -29,20 +29,20 @@ def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  trans
     :param theta: rotation parameter
     :param rotation_axis: rotation axis (3d vector)
     :param translation: tranlsational part.
-    :return: the conventional nifti header roto-translational matrix [R | T; 0; 1].
+    :return: the conventional nifti header roto-translational matrix [[Rot | Transl][ 0, 0, 0 | 1]].
     """
     n = np.linalg.norm(rotation_axis)
-    assert not np.abs(n) < 0.001, 'rotation axis too close to zero.'
-    rot = rotation_axis / n
+    if np.abs(n) < 0.001:
+        raise IOError('Input rotation axis too close to zero.')
+    rot_versor = rotation_axis / n
 
-    # rodriguez formula:
-    cross_prod = np.array([[0, -rot[2], rot[1]],
-                           [rot[2], 0, -rot[0]],
-                           [-rot[1], rot[0], 0]])
-    rot_part = np.cos(theta) * np.identity(3) + np.sin(theta) * cross_prod + np.tensordot(rot, rot, axes=0)
+    # Rodriguez magic formula for rotation part:
+    skew_rot_versor = np.array([[0, -rot_versor[2], rot_versor[1]],
+                                [rot_versor[2], 0, -rot_versor[0]],
+                                [-rot_versor[1], rot_versor[0], 0]])
+    rot_part = np.eye(3) + np.sin(theta) * skew_rot_versor + (1 - np.cos(theta)) * skew_rot_versor.dot(skew_rot_versor)
 
     # transformations parameters
-
     rot_transl = np.identity(4)
     rot_transl[:3, :3] = rot_part
     rot_transl[:3, 3] = translation
@@ -63,8 +63,8 @@ def basic_90_rot_ax(m, ax=0):
                    [6, 7]]])
 
     axis 0: perpendicular to the face [[0,1],[2,3]] (front-rear)
-    axis 1: perpendicular to the face [[1,5],[3,7]] (lateral right-left)
-    axis 2: perpendicular to the face [[0,1],[5,4]] (top-bottom)
+    axis 1: perpendicular to the face [[0,1],[5,4]] (top-bottom)
+    axis 2: perpendicular to the face [[1,5],[3,7]] (right-left)
     ----------
     Note: the command m[:, ::-1, :].swapaxes(0, 1)[::-1, :, :].swapaxes(0, 2) rotates the cube m
     around the diagonal axis 0-7.
@@ -74,7 +74,6 @@ def basic_90_rot_ax(m, ax=0):
     :param ax: axis of rotation
     :return: rotate the cube around axis ax, perpendicular to the face [[0,1],[2,3]]
     """
-
     ax %= 3
 
     if ax == 0:
@@ -94,7 +93,7 @@ def axial_90_rotations(m, rot=1, ax=2):
     """
 
     if m.ndim is not 3:
-        assert IOError
+        raise IOError('Input matrix must be a 3d volume.')
 
     rot %= 4
 
