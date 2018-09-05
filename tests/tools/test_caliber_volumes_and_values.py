@@ -39,7 +39,7 @@ def test_volumes_and_values_total_num_voxels():
     assert_equal(num_voxels, 11 ** 3 + 19 ** 3)
 
 
-def test_volumes_and_values_total_num_voxels_empthy():
+def test_volumes_and_values_total_num_voxels_empty():
 
     omega = [80, 80, 80]
     im_segm = nib.Nifti1Image(np.zeros(omega), affine=np.eye(4))
@@ -120,6 +120,15 @@ def test_get_num_voxels_from_labels_list_unexisting_labels():
     assert_array_equal(num_voxels, [11 ** 3 + 15 ** 3, 0])
 
 
+def test_get_num_voxels_from_labels_list_wrong_input():
+    omega = [80, 80, 80]
+    cube_a_seg = [[10, 60, 55], 11, 1]
+    sky_s = cube_shape(omega, center=cube_a_seg[0], side_length=cube_a_seg[1], foreground_intensity=cube_a_seg[2])
+    im_segm = nib.Nifti1Image(sky_s, affine=np.eye(4))
+    with assert_raises(IOError):
+        get_num_voxels_from_labels_list(im_segm, [1, [2, 3], '3'])
+
+
 def test_get_values_below_labels_list():
     omega = [80, 80, 80]
 
@@ -157,5 +166,33 @@ def test_get_values_below_labels_list():
     assert_array_equal(vals_below[2], np.array([4.5] * (7 ** 3)))
 
 
-if __name__ == '__main__':
+def test_get_values_below_labels_list_wrong_input():
+    omega = [80, 80, 80]
+    cube_a_seg = [[10, 60, 55], 11, 1]
+    cube_a_anat = [[10, 60, 55], 11, 1.5]
+    sky_a = cube_shape(omega, center=cube_a_anat[0], side_length=cube_a_anat[1], foreground_intensity=cube_a_anat[2], dtype=np.float32)
+    sky_s = cube_shape(omega, center=cube_a_seg[0], side_length=cube_a_seg[1], foreground_intensity=cube_a_seg[2])
+
+    im_segm = nib.Nifti1Image(sky_s, affine=np.eye(4))
+    im_anat = nib.Nifti1Image(sky_a, affine=np.eye(4))
+
+    with assert_raises(IOError):
+        get_values_below_labels_list(im_segm, im_anat, [1, [2, 3], '3', '4'])
+
+
+def test_get_volumes_per_label():
+    # TODO
     pass
+
+
+if __name__ == '__main__':
+    test_volumes_and_values_total_num_voxels()
+    test_volumes_and_values_total_num_voxels_empty()
+    test_volumes_and_values_total_num_voxels_full()
+
+    test_get_num_voxels_from_labels_list()
+    test_get_num_voxels_from_labels_list_wrong_input()
+
+    test_get_num_voxels_from_labels_list_unexisting_labels()
+    test_get_values_below_labels_list()
+    test_get_values_below_labels_list_wrong_input()

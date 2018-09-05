@@ -10,8 +10,6 @@ import pandas as pa
 from nilabels.tools.aux_methods.utils_nib import one_voxel_volume
 
 
-#  ---- First part ----
-
 def get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=None):
     """
     :param im_segm:
@@ -31,7 +29,7 @@ def get_total_num_nonzero_voxels(im_segm, list_labels_to_exclude=None):
 
 def get_num_voxels_from_labels_list(im_segm, labels_list):
     """
-    :param im_seg: image segmentation
+    :param im_segm: image segmentation
     :param labels_list: integer, list of labels [l1, l2, ..., ln], or list of list of labels if labels needs to be
     considered together.
     e.g. labels_list = [1,2,[3,4]] -> values below label 1, values below label 2, values below label 3 and 4.
@@ -54,35 +52,33 @@ def get_num_voxels_from_labels_list(im_segm, labels_list):
     return num_voxels_per_label
 
 
-def get_values_below_labels_list(im_seg, im_anat, labels_list):
+def get_values_below_labels_list(im_segm, im_anat, labels_list):
     """
-    :param im_seg: image segmentation
+    :param im_segm: image segmentation
     :param im_anat: anatomical image, corresponding to the segmentation.
     :param labels_list: integer, list of labels [l1, l2, ..., ln], or list of list of labels if labels needs to be
     considered together.
     e.g. labels_list = [1,2,[3,4]] -> values belows label 1, values below label 2, values below label 3 and 4.
     :return: list of np.arrays. Each containing all the values below the corresponding labels.
     """
-    assert im_seg.shape == im_anat.shape
+    assert im_segm.shape == im_anat.shape
 
     values_below_each_label = []
 
     for label_k in labels_list:
         if isinstance(label_k, int):
-            coords = np.where(im_seg.get_data() == label_k)
+            coords = np.where(im_segm.get_data() == label_k)
             values_below_each_label.append(im_anat.get_data()[coords].flatten())
         elif isinstance(label_k, list):
             vals = np.array([])
             for label_k_j in label_k:
-                coords = np.where(im_seg.get_data() == label_k_j)
+                coords = np.where(im_segm.get_data() == label_k_j)
                 vals = np.concatenate((vals, im_anat.get_data()[coords].flatten()), axis=0)
             values_below_each_label.append(vals)
         else:
             raise IOError('Labels list must be like [1,2,[3,4]], where [3, 4] are considered as a single label.')
 
     return values_below_each_label
-
-#  ---- Second part ----
 
 
 def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
@@ -104,7 +100,8 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
         data_frame = pa.DataFrame({'Labels': pa.Series(labels, index=[labels_names]),
                                    'Num voxels': pa.Series(num_non_zero_voxels, index=[labels_names]),
                                    'Volume': pa.Series(vol_non_zero_voxels_mm3, index=[labels_names]),
-                                   'Vol over Tot': pa.Series(vol_non_zero_voxels_mm3 / tot_volume_prior, index=[labels_names])})
+                                   'Vol over Tot': pa.Series(vol_non_zero_voxels_mm3 / tot_volume_prior,
+                                                             index=[labels_names])})
 
     else:
         non_zero_voxels_list = []
