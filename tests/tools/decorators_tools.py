@@ -128,3 +128,17 @@ def write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor(tes
         os.system('rm -r {}'.format(pfo_tmp_test))
 
     return wrap
+
+
+def create_and_erase_temporary_folder_with_a_dummy_b_vectors_list(test_func):
+    def wrap(*args, **kwargs):
+        # 1) Before: create folder
+        os.system('mkdir {}'.format(pfo_tmp_test))
+        # noinspection PyTypeChecker
+        np.savetxt(jph(pfo_tmp_test, 'b_vects_file.txt'), np.random.randn(10, 3))
+        # 2) Run test
+        test_func(*args, **kwargs)
+        # 3) After: delete folder and its content
+        os.system('rm -r {}'.format(pfo_tmp_test))
+
+    return wrap

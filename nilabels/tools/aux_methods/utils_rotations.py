@@ -113,11 +113,9 @@ def flip_data(in_data, axis_direction='x'):
     :param axis_direction: axis for the flipping
     :return: in_data flipped respect to the axis_direction.
     """
-    msg = 'Input array must be 3-dimensional.'
-    assert in_data.ndim == 3, msg
-
-    msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-    assert axis_direction in ['x', 'y', 'z'], msg
+    if not in_data.ndim == 3:
+        msg = 'Input array must be 3-dimensional.'
+        raise IOError(msg)
 
     if axis_direction == 'x':
         out_data = in_data[:, ::-1, :]
@@ -126,12 +124,14 @@ def flip_data(in_data, axis_direction='x'):
     elif axis_direction == 'z':
         out_data = in_data[::-1, :, :]
     else:
-        raise IOError
+        msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
+        raise IOError(msg)
 
     return out_data
 
 
-def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_copy='below', keep_in_data_dimensions=True):
+def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_copy='below',
+                    keep_in_data_dimensions_boundaries=True):
     """
     Symmetrise the input_array according to the axial plane
       axis = plane_intercept
@@ -141,26 +141,26 @@ def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_cop
     :param axis_direction:
     :param plane_intercept:
     :param side_to_copy:
-    :param keep_in_data_dimensions:
+    :param keep_in_data_dimensions_boundaries:
     :return:
     """
 
     # Sanity check:
 
-    msg = 'Input array must be 3-dimensional.'
-    assert in_data.ndim == 3, msg
+    if not in_data.ndim == 3:
+        raise IOError('Input array must be 3-dimensional.')
 
-    msg = 'side_to_copy must be one of the two {}.'.format(['below', 'above'])
-    assert side_to_copy in ['below', 'above'], msg
+    if side_to_copy not in ['below', 'above']:
+        raise IOError('side_to_copy must be one of the two {}.'.format(['below', 'above']))
 
-    msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-    assert axis_direction in ['x', 'y', 'z'], msg
+    if axis_direction not in ['x', 'y', 'z']:
+        raise IOError('axis variable must be one of the following: {}.'.format(['x', 'y', 'z']))
 
     # step 1: find the block to symmetrise.
     # step 2: create the symmetric and glue it to the block.
     # step 3: add or remove a patch of slices if required to keep the in_data dimension.
 
-    out_data = 0
+    out_data = None
 
     if axis_direction == 'x':
 
@@ -198,22 +198,40 @@ def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_cop
             s_block_symmetric = s_block[::-1, :, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=0)
 
-    if keep_in_data_dimensions:
-        out_data = out_data[:in_data.shape[0], :in_data.shape[1], :in_data.shape[2]]
+    if keep_in_data_dimensions_boundaries:
+
+        if side_to_copy == 'below':
+            out_data = out_data[:in_data.shape[0], :in_data.shape[1], :in_data.shape[2]]
+
+        if side_to_copy == 'above':
+            out_data = out_data[out_data.shape[0] - in_data.shape[0]:,
+                                out_data.shape[1] - in_data.shape[1]:,
+                                out_data.shape[2] - in_data.shape[2]:]
 
     return out_data
 
 
-def reorient_b_vect(pfi_input, pfi_output, transform, fmt='%.14f'):
+def reorient_b_vect(bvect_array, transform):
     """
     Reorient b-vectors of a DWI scan.
+    :param bvect_array: array of b-vectors column convention n x 3.
+    :param transform: transformation to be applied to each b-vector.
+    :return:
+    """
+    return np.einsum('...kl,...l->...k', bvect_array, transform).T
+
+
+def reorient_b_vect_from_files(pfi_input, pfi_output, transform, fmt='%.14f'):
+    """
+    Reorient b-vectors of a DWI scan from textfiles.
     :param pfi_input: input to txt data with b-vectors column convention 'x y z \\'.
     :param pfi_output: output b-vectors after transformation in a new .txt file.
-    :param transform: trasnformation applied to the vectors.
+    :param transform: transformation to be applied to each b-vector.
     :param fmt:
     :return:
     """
-    transformed_vect = np.einsum('...kl,...l->...k', np.loadtxt(pfi_input), transform)
+    transformed_vect = reorient_b_vect(np.loadtxt(pfi_input), transform)
+    # noinspection PyTypeChecker
     np.savetxt(pfi_output, transformed_vect, fmt=fmt)
 
 
@@ -226,7 +244,7 @@ def matrix_vector_field_product(j_input, v_input):
 
     In tensor notation for n = 1: R_{i,j,k} = \sum_{l=0}^{2} M_{i,j,l+3k} v_{i,j,l}
 
-    ### equivalent code in a more readable version:
+    ### equivalent code, more readable and less efficient:
 
     # dimensions of the problem:
     d = v_input.shape[-1]
@@ -242,7 +260,10 @@ def matrix_vector_field_product(j_input, v_input):
     return np.sum(j_times_v.reshape(vol + [d, d]), axis=d+1).reshape(vol + [d])
 
     """
-    assert len(j_input.shape) == len(v_input.shape)
+    if not len(j_input.shape) == len(v_input.shape):
+        raise IOError
+    if not cmp(j_input.shape[:-1], v_input.shape[:-1]) == 0:
+        raise IOError
 
     d = v_input.shape[-1]
     vol = list(v_input.shape[:d])

@@ -7,7 +7,7 @@ from nilabels.tools.aux_methods.label_descriptor_manager import LabelsDescriptor
     generate_dummy_label_descriptor
 
 
-from .decorators_tools import write_and_erase_temporary_folder, pfo_tmp_test, \
+from tests.tools.decorators_tools import write_and_erase_temporary_folder, pfo_tmp_test, \
     write_and_erase_temporary_folder_with_dummy_labels_descriptor, is_a_string_number, \
     write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor
 

@@ -32,7 +32,7 @@ class SegmentationSymmetrizer(object):
                                            axis_direction=axis,
                                            plane_intercept=plane_intercept,
                                            side_to_copy=side_to_copy,
-                                           keep_in_data_dimensions=keep_in_data_dimensions)
+                                           keep_in_data_dimensions_boundaries=keep_in_data_dimensions)
 
         im_symmetrised = set_new_data(im_segm, data_symmetrised)
         nib.save(im_symmetrised, pfi_out)

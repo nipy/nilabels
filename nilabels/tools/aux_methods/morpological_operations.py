@@ -65,8 +65,9 @@ def get_circle_shell_for_given_radius(radius, dimension=3):
     >> get_circle_shell_for_given_radius(3,2)
     [(-3, 0), (-2, -2), (-2, -1), (-2, 1), (-2, 2), (-1, -2), (-1, 2), (0, -3), (0, 3), (1, -2), (1, 2), (2, -2),
     (2, -1), (2, 1), (2, 2), (3, 0)]
-    Note: implementation not optimal. Generalise midpoint circle algorithm.
+    Note: implementation not optimal.
     """
+    # Generalise midpoint circle algorithm for future version.
     circle = []
     if dimension == 3:
         for xi in range(-radius, radius + 1):

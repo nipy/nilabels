@@ -4,7 +4,7 @@ from numpy.testing import assert_raises
 from nilabels.definitions import root_dir
 from nilabels.tools.aux_methods.sanity_checks import check_pfi_io, check_path_validity, is_valid_permutation
 
-from .decorators_tools import create_and_erase_temporary_folder_with_a_dummy_nifti_image, pfo_tmp_test
+from tests.tools.decorators_tools import create_and_erase_temporary_folder_with_a_dummy_nifti_image, pfo_tmp_test
 
 
 # TEST: methods sanity_checks

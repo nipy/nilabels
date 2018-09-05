@@ -26,6 +26,3 @@ def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
             out_data[..., l_index] = places_l  # .astype(in_data.dtype)
 
     return out_data
-
-if __name__ == '__main__':
-    pass

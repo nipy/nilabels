@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 
 from nilabels.tools.aux_methods.utils import eliminates_consecutive_duplicates, lift_list, labels_query, print_and_run
 
-from .decorators_tools import create_and_erase_temporary_folder, test_dir
+from tests.tools.decorators_tools import create_and_erase_temporary_folder, test_dir
 
 
 # TEST tools.aux_methods.utils.py'''
