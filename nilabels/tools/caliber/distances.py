@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pa
 from scipy import ndimage as nd
 
-from nilabels.tools.detections.contours import contour_from_array_at_label
+from nilabels.tools.detections.contours import get_internal_contour_with_erosion_at_label
 
 
 # --- Auxiliaries
@@ -81,12 +81,11 @@ def covariance_distance_between_matrices(m1, m2, mul_factor=1):
     :param mul_factor: multiplicative factor for the formula, it equals to the maximal value the distance can reach
     :return: mul_factor * (1 - (np.trace(m1.dot(m2))) / (np.linalg.norm(m1) + np.linalg.norm(m2)))
     """
-    if np.nan not in m1 and np.nan not in m2:
-        return \
-            mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
+    if np.nan in m1 or np.nan in m2:
+        cd = np.nan
     else:
-        return np.nan
-
+        cd = mul_factor * (1 - (np.trace(m1.dot(m2)) / (np.linalg.norm(m1, ord='fro') * np.linalg.norm(m2, ord='fro'))))
+    return cd
 
 # --- global distances: (segm, segm) |-> real
 
@@ -186,8 +185,8 @@ def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='nor
     if np.count_nonzero(arr1) == 0 or np.count_nonzero(arr2) == 0:
         return np.nan
 
-    arr1_contour = contour_from_array_at_label(arr1, 1)
-    arr2_contour = contour_from_array_at_label(arr2, 1)
+    arr1_contour = get_internal_contour_with_erosion_at_label(arr1, 1)
+    arr2_contour = get_internal_contour_with_erosion_at_label(arr2, 1)
 
     if return_mm3:
         dtb1 = nd.distance_transform_edt(1 - arr1_contour, sampling=list(np.diag(im1.affine[:3, :3])))
@@ -199,8 +198,8 @@ def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='nor
     dist_border1_array2 = arr2_contour * dtb1
     dist_border2_array1 = arr1_contour * dtb2
 
-    print dist_border1_array2
-    print dist_border2_array1
+    dist_border1_array2 = dist_border1_array2[dist_border1_array2 > 0]
+    dist_border2_array1 = dist_border2_array1[dist_border2_array1 > 0]
 
     if formula == 'normalised':
         return (np.sum(dist_border1_array2) + np.sum(dist_border2_array1)) / float(np.count_nonzero(arr1_contour) + np.count_nonzero(arr2_contour))
@@ -214,7 +213,7 @@ def symmetric_contour_distance_one_label(im1, im2, lab, return_mm3, formula='nor
         return .5 * (np.mean(dist_border1_array2) + np.mean(dist_border2_array1)), \
                np.sqrt(.5 * (np.std(dist_border1_array2) ** 2 + np.std(dist_border2_array1) ** 2))
     else:
-        raise IOError
+        raise IOError('adf')
 
 
 # --- distances - (segm, segm) |-> pandas.Series (indexed by labels)

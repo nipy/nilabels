@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import ndimage as nd
 
 from nilabels.tools.aux_methods.utils_nib import set_new_data
 
@@ -12,10 +13,10 @@ def contour_from_array_at_label(im_arr, lab, thr=0.3, omit_axis=None, verbose=0)
     :param omit_axis: a directional axis preference for the contour creation, to avoid "walls" when scrolling
     the 3d image in a particular direction. None if no preference axis is expected.
     :param verbose:
-    :return:
+    :return: boolean mask with the array labels.
     """
     if verbose > 0:
-        print('eroding label {}'.format(lab))
+        print('Getting contour for label {}'.format(lab))
     array_label_l = im_arr == lab
     assert isinstance(array_label_l, np.ndarray)
     gra = np.gradient(array_label_l.astype(np.bool).astype(np.float64))
@@ -64,3 +65,16 @@ def get_xyz_borders_of_a_label(segm_data, label):
 
     X, Y, Z = np.where(segm_data == label)
     return [np.min(X), np.max(X), np.min(Y), np.max(Y), np.min(Z), np.max(Z)]
+
+
+def get_internal_contour_with_erosion_at_label(im_arr, lab, thickness=1):
+    """
+    Get the internal contour for a given thickness.
+    :param im_arr: input segmentation where to extract the contour
+    :param lab: label to extract the contour
+    :param thickness: final thickness of the segmentation
+    :return: image with only the contour of the given input image.
+    """
+    im_lab = im_arr == lab
+    return (im_lab ^ nd.morphology.binary_erosion(im_lab, iterations=thickness).astype(np.bool)).astype(im_arr.dtype) * lab
+

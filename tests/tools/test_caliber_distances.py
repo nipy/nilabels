@@ -1,12 +1,13 @@
 import numpy as np
 import nibabel as nib
+from scipy import ndimage as nd
 
-from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_almost_equal, assert_raises
 
 from nilabels.tools.caliber.distances import centroid_array, centroid, dice_score, global_dice_score, \
     global_outline_error, covariance_matrices, covariance_distance, hausdorff_distance, \
-    normalised_symmetric_contour_distance, covariance_distance_between_matrices, dice_score_one_label, \
-    d_H, hausdorff_distance_one_label, box_sides_length
+    normalised_symmetric_contour_distance, symmetric_contour_distance_one_label, covariance_distance_between_matrices, \
+    dice_score_one_label, d_H, hausdorff_distance_one_label, box_sides_length
 
 
 # --- Auxiliaries
@@ -106,7 +107,7 @@ def test_covariance_matrices():
 
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
 
-    cov =  covariance_matrices(im1, [1, 2, 3])
+    cov = covariance_matrices(im1, [1, 2, 3])
     assert len(cov) == 3
     for i in cov:
         assert_array_equal(i.shape, [3, 3])
@@ -127,11 +128,39 @@ def test_covariance_distance_between_matrices_simple_case():
 
     assert_equal(expected_ans, covariance_distance_between_matrices(m1, m2))
 
+
+def test_covariance_distance_between_matrices_with_nan1():
     m3 = np.random.randn(4, 4)
     m4 = np.random.randn(4, 4)
     m3[1, 1] = np.nan
 
     assert_equal(np.nan, covariance_distance_between_matrices(m3, m4))
+
+
+def test_covariance_distance_between_matrices_with_nan2():
+    m3 = np.random.randn(4, 4)
+    m4 = np.random.randn(4, 4)
+    m4[1, 1] = np.nan
+
+    assert_equal(np.nan, covariance_distance_between_matrices(m3, m4))
+
+
+def test_covariance_distance_between_matrices_with_nan3():
+    m3 = np.random.randn(4, 4)
+    m4 = np.random.randn(4, 4)
+    m3[1, 1] = np.nan
+    m4[1, 1] = np.nan
+
+    assert_equal(np.nan, covariance_distance_between_matrices(m3, m4))
+
+
+
+def test_covariance_distance_between_matrices_nan_in_input_matrices():
+    m1 = np.random.randn(4, 4)
+    m2 = np.random.randn(4, 4)
+    m1[2, 2] = np.nan
+    m2[2, 2] = np.nan
+    assert_equal(np.nan, covariance_distance_between_matrices(m1, m2))
 
 
 # --- global distances: (segm, segm) |-> real
@@ -489,11 +518,304 @@ def test_asymmetric_component_Hausdorff_distance_H_d_and_Hausdorff_distance():
     assert_equal(d_H(im2, im1, 2, True), 0)
     assert_equal(d_H(im1, im2, 2, True), np.sqrt(3**2 + 3**2))
 
+    # test not in mm
+    assert_equal(d_H(im2, im1, 2, False), 0)
+    assert_equal(d_H(im1, im2, 2, False), np.sqrt(3 ** 2 + 3 ** 2))
+
     # Test symmetry
     assert_equal(hausdorff_distance_one_label(im1, im2, 2, True), hausdorff_distance_one_label(im1, im2, 2, True))
     assert_equal(hausdorff_distance_one_label(im1, im2, 2, True), np.max((d_H(im2, im1, 2, True),
                                                                           (d_H(im1, im2, 2, True)))))
 
+
+# --- symmetric_contour_distance_one_label
+
+
+def test_symmetric_contour_distance_one_label_normalised():
+    # Build the images:
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    # Build the borders:
+    border1 = (arr1.astype(np.bool) ^ nd.morphology.binary_erosion(arr2.astype(np.bool), iterations=1))
+    border2 = (arr2.astype(np.bool) ^ nd.morphology.binary_erosion(arr2.astype(np.bool), iterations=1))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    expected_answer_normalised = (np.sum(distances_border1_array2) + np.sum(distances_border2_array1)) / \
+                                 float(np.count_nonzero(border1) + np.count_nonzero(border2))
+    obtained_answer_normalised = symmetric_contour_distance_one_label(im1, im2, 1, False, formula='normalised')
+    assert_almost_equal(expected_answer_normalised, obtained_answer_normalised)
+
+
+def test_symmetric_contour_distance_one_label_averaged():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    expected_answer = .5 * (np.mean(distances_border1_array2) + np.mean(distances_border2_array1))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, False, formula='averaged')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_median():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    expected_answer = .5 * (np.median(distances_border1_array2) + np.median(distances_border2_array1))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, False, formula='median')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_std():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    expected_answer = np.sqrt(.5 * (np.std(distances_border1_array2)**2 + np.std(distances_border2_array1)**2))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, False, formula='std')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_average_std():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    expected_answer = .5 * (np.mean(distances_border1_array2) + np.mean(distances_border2_array1)), \
+               np.sqrt(.5 * (np.std(distances_border1_array2) ** 2 + np.std(distances_border2_array1) ** 2))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, False, formula='average_std')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_normalised_return_mm():
+    # Build the images:
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+
+    im1 = nib.Nifti1Image(arr1, 0.5 * np.eye(4))
+    im2 = nib.Nifti1Image(arr2, 0.5 * np.eye(4))
+
+    # Build the borders:
+    border1 = (arr1.astype(np.bool) ^ nd.morphology.binary_erosion(arr2.astype(np.bool), iterations=1))
+    border2 = (arr2.astype(np.bool) ^ nd.morphology.binary_erosion(arr2.astype(np.bool), iterations=1))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    distances_border1_array2 = 0.5 * np.array(distances_border1_array2)
+    distances_border2_array1 = 0.5 * np.array(distances_border2_array1)
+
+    expected_answer_normalised = (np.sum(distances_border1_array2) + np.sum(distances_border2_array1)) / \
+                                 float(np.count_nonzero(border1) + np.count_nonzero(border2))
+    obtained_answer_normalised = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='normalised')
+    assert_almost_equal(expected_answer_normalised, obtained_answer_normalised)
+
+
+def test_symmetric_contour_distance_one_label_averaged_return_mm():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, 0.5 * np.eye(4))
+    im2 = nib.Nifti1Image(arr2, 0.5 * np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    distances_border1_array2 = 0.5 * np.array(distances_border1_array2)
+    distances_border2_array1 = 0.5 * np.array(distances_border2_array1)
+
+    expected_answer = .5 * (np.mean(distances_border1_array2) + np.mean(distances_border2_array1))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='averaged')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_median_return_mm():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, 0.5 * np.eye(4))
+    im2 = nib.Nifti1Image(arr2, 0.5 * np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    distances_border1_array2 = 0.5 * np.array(distances_border1_array2)
+    distances_border2_array1 = 0.5 * np.array(distances_border2_array1)
+
+    expected_answer = .5 * (np.median(distances_border1_array2) + np.median(distances_border2_array1))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='median')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_std_return_mm():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, 0.5 * np.eye(4))
+    im2 = nib.Nifti1Image(arr2, 0.5 * np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    distances_border1_array2 = 0.5 * np.array(distances_border1_array2)
+    distances_border2_array1 = 0.5 * np.array(distances_border2_array1)
+
+    expected_answer = np.sqrt(.5 * (np.std(distances_border1_array2) ** 2 + np.std(distances_border2_array1) ** 2))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='std')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_average_std_return_mm():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, 0.5 * np.eye(4))
+    im2 = nib.Nifti1Image(arr2, 0.5 * np.eye(4))
+
+    distances_border1_array2 = [1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1., 1.41421356, 1.,
+                                1., 1., 1., 1.41421356]
+
+    distances_border2_array1 = [1.41421356, 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1., 1., 1.41421356,
+                                1., 1., 1., 1.]
+
+    distances_border1_array2 = 0.5 * np.array(distances_border1_array2)
+    distances_border2_array1 = 0.5 * np.array(distances_border2_array1)
+
+    expected_answer = .5 * (np.mean(distances_border1_array2) + np.mean(distances_border2_array1)), \
+               np.sqrt(.5 * (np.std(distances_border1_array2) ** 2 + np.std(distances_border2_array1) ** 2))
+    obtained_answer = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='average_std')
+    assert_almost_equal(expected_answer, obtained_answer)
+
+
+def test_symmetric_contour_distance_one_label_wrong_input_formula():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 1
+    arr2[1:5, 3:6, 3:6] = 1
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+    with assert_raises(IOError):
+        symmetric_contour_distance_one_label(im1, im2, 1, True, formula='spam')
+
+
+def test_symmetric_contour_distance_one_label_no_labels_return_nan():
+    arr1 = np.zeros([5, 10, 10])
+    arr2 = np.zeros([5, 10, 10])
+    arr1[1:5, 2:5, 2:5] = 3
+    arr2[1:5, 3:6, 3:6] = 3
+    im1 = nib.Nifti1Image(arr1, np.eye(4))
+    im2 = nib.Nifti1Image(arr2, np.eye(4))
+
+    d = symmetric_contour_distance_one_label(im1, im2, 1, True, formula='average')
+
+    assert np.isnan(d)
 
 # --- distances - (segm, segm) |-> pandas.Series (indexed by labels)
 
@@ -542,7 +864,7 @@ def test_dice_score_multiple_labels():
     im1 = nib.Nifti1Image(arr_1, np.eye(4))
     im2 = nib.Nifti1Image(arr_2, np.eye(4))
 
-    res = dice_score(im1, im2, [0,1,2,3], ['back', 'one', 'two', 'non existing'])
+    res = dice_score(im1, im2, [0, 1, 2, 3], ['back', 'one', 'two', 'non existing'])
 
     assert_almost_equal(res['back'], 0.823970037453)
     assert_almost_equal(res['one'],  0.2857142857142857)
@@ -753,8 +1075,12 @@ if __name__ == '__main__':
     test_centroid_array_1()
     test_centroid_array_2()
     test_centroid()
+
     test_covariance_matrices()
     test_covariance_distance_between_matrices_simple_case()
+    test_covariance_distance_between_matrices_with_nan1()
+    test_covariance_distance_between_matrices_with_nan2()
+    test_covariance_distance_between_matrices_with_nan3()
 
     test_dice_score()
     test_global_dice_score()
@@ -762,6 +1088,22 @@ if __name__ == '__main__':
 
     test_dice_score_one_label()
     test_asymmetric_component_Hausdorff_distance_H_d_and_Hausdorff_distance()
+
+    test_symmetric_contour_distance_one_label_normalised()
+    test_symmetric_contour_distance_one_label_averaged()
+    test_symmetric_contour_distance_one_label_median()
+    test_symmetric_contour_distance_one_label_std()
+    test_symmetric_contour_distance_one_label_average_std()
+
+    test_symmetric_contour_distance_one_label_normalised_return_mm()
+    test_symmetric_contour_distance_one_label_averaged_return_mm()
+    test_symmetric_contour_distance_one_label_median_return_mm()
+    test_symmetric_contour_distance_one_label_std_return_mm()
+    test_symmetric_contour_distance_one_label_average_std_return_mm()
+
+    test_symmetric_contour_distance_one_label_wrong_input_formula()
+    test_symmetric_contour_distance_one_label_no_labels_return_nan()
+
     test_dice_score_multiple_labels()
     test_covariance_distance()
     test_covariance_distance_range()

@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib
 import pytest
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_raises
 
 from nilabels.tools.caliber.volumes_and_values import get_total_num_nonzero_voxels, get_num_voxels_from_labels_list, \
     get_values_below_labels_list
@@ -156,3 +156,6 @@ def test_get_values_below_labels_list():
     assert_array_equal(vals_below[1], np.array([3.5, ] * (13**3) + [4.5] * (7**3)) )
     assert_array_equal(vals_below[2], np.array([4.5] * (7 ** 3)))
 
+
+if __name__ == '__main__':
+    pass
