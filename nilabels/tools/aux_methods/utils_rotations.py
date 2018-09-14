@@ -20,7 +20,7 @@ def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
     else:
         raise IOError('principal_axis parameter can be pitch, roll or yaw')
 
-    return rot  # to be multiplied on the right side as im_input.get_affine().dot(rot)
+    return rot  # to be multiplied on the right side as im_input.affine.dot(rot)
 
 
 def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  translation=np.array([0, 0, 0])):

@@ -83,7 +83,7 @@ def compare_two_nib(im1, im2):
         images_are_equal = False
         if np.array_equal(np.nan_to_num(im1.get_data()), np.nan_to_num(im2.get_data())):
             msg += '(data are different only up to nans)'
-    if not np.array_equal(im1.get_affine(), im2.get_affine()):
+    if not np.array_equal(im1.affine, im2.get_affine()):
         msg += 'Affine transformations are different. \n'
         images_are_equal = False
 
@@ -99,7 +99,7 @@ def one_voxel_volume(im, decimals=6):
     :param decimals: number of decimals rouding the volume
     :return: volume of a single voxel of the input image.
     """
-    return np.round(np.abs(np.prod(np.diag(im.get_affine())[:3])), decimals=decimals)
+    return np.round(np.abs(np.prod(np.diag(im.affine)[:3])), decimals=decimals)
 
 
 # ---------- Header modifications ---------------
@@ -147,9 +147,9 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
     if np.linalg.det(new_aff) < 0 :
         print('WARNING: affine matrix proposed has negative determinant.')
     if multiplication_side is 'left':
-        new_transf = new_aff.dot(im_input.get_affine())
+        new_transf = new_aff.dot(im_input.affine)
     elif multiplication_side is 'right':
-        new_transf = im_input.get_affine().dot(new_aff)
+        new_transf = im_input.affine.dot(new_aff)
     elif multiplication_side is 'replace':
         new_transf = new_aff
     else:
@@ -167,20 +167,20 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
     if s_form:
         new_image.set_sform(new_transf)
     else:
-        new_image.set_sform(im_input.get_affine())
+        new_image.set_sform(im_input.affine)
     if q_form:
         new_image.set_qform(new_transf)
     else:
-        new_image.set_qform(im_input.get_affine())
+        new_image.set_qform(im_input.affine)
 
     # new_image.update_header()
 
     if verbose > 0:
         # print intermediate results
         print('Affine input image:')
-        print(im_input.get_affine())
+        print(im_input.affine)
         print('Affine after update:')
-        print(new_image.get_affine())
+        print(new_image.affine)
         print('Q-form after update:')
         print(new_image.get_qform(coded=True))
         print('S-form after update:')

@@ -109,7 +109,7 @@ class HeaderController(object):
 
             new_aff = rt.dot(im.affine)
         else:
-            new_aff = im.get_affine()[:]
+            new_aff = im.affine[:]
             new_aff[:3, :3] = rot[:3, :3].dot(new_aff[:3, :3])
 
         new_im = modify_affine_transformation(im_input=im, new_aff=new_aff, q_form=True, s_form=True,
