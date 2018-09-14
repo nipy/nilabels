@@ -2,7 +2,11 @@ matplotlib==2.1.1
 nibabel==2.1.0
 numpy==1.14.2
 pandas==0.20.3
+pytest==3.7.2
 scipy==0.19.0
-setuptools==39.0.1
+setuptools==39.2.0
 scikit_image==0.12.3
+sympy==1.0
 tabulate==0.7.7
+skimage==0.0
+scikit_learn==0.19.2
