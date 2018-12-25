@@ -9,6 +9,7 @@ from nilabels.agents.symmetrizer import SegmentationSymmetrizer
 from nilabels.agents.checker import LabelsChecker
 from nilabels.agents.header_controller import HeaderController
 from nilabels.agents.segmenter import LabelsSegmenter
+from nilabels.agents.math import Math
 
 
 class AgentsController(object):
@@ -51,3 +52,4 @@ class AgentsController(object):
         self.check                  = LabelsChecker(self._pfo_in, self._pfo_out)
         self.header                 = HeaderController(self._pfo_in, self._pfo_out)
         self.segment                = LabelsSegmenter(self._pfo_in, self._pfo_out)
+        self.math                   = Math(self._pfo_in, self._pfo_out)
