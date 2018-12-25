@@ -120,7 +120,15 @@ class LabelsManipulator(object):
                                                labels_to_keep=(), same_value_label=255,
                                                path_to_input_labels_descriptor=None,
                                                path_to_output_labels_descriptor=None):
-
+        """
+        :param path_to_input_segmentation:
+        :param path_to_output_segmentation:
+        :param labels_to_keep:
+        :param same_value_label:
+        :param path_to_input_labels_descriptor:
+        :param path_to_output_labels_descriptor:
+        :return:
+        """
         pfi_in, pfi_out = get_pfi_in_pfi_out(path_to_input_segmentation, path_to_output_segmentation,
                                              self.pfo_in, self.pfo_out)
 

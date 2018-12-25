@@ -27,7 +27,7 @@ Typical usage in an ipython session involves importing the main facade, and then
 ## Contributions: Questions, bugs, issues and new features 
 
 + For any issue bugs or question related to the code, please raise an issue in the 
-[nilabel issue page](https://github.com/SebastianoF/nilabel/issues).
+[nilabels issue page](https://github.com/SebastianoF/nilabels/issues).
 
 + Propose here as well improvements suggestions and new features.
 
