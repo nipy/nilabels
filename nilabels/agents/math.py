@@ -1,4 +1,3 @@
-import numpy as np
 import nibabel as nib
 
 from nilabels.tools.aux_methods.utils_path import get_pfi_in_pfi_out, connect_path_tail_head
