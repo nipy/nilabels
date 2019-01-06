@@ -24,7 +24,7 @@ class Math(object):
         if not im1.shape == im2.shape:
             raise IOError('Input images must have the same dimensions.')
 
-        im_result = set_new_data(im1, new_data=im1.data + im2.data)
+        im_result = set_new_data(im1, new_data=im1.get_data() + im2.get_data())
 
         nib.save(im_result, pfi_result)
         print('Image sum of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
@@ -40,7 +40,7 @@ class Math(object):
         if not im1.shape == im2.shape:
             raise IOError('Input images must have the same dimensions.')
 
-        im_result = set_new_data(im1, new_data=im1.data - im2.data)
+        im_result = set_new_data(im1, new_data=im1.get_data() - im2.get_data())
 
         nib.save(im_result, pfi_result)
         print('Image difference of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
@@ -56,7 +56,7 @@ class Math(object):
         if not im1.shape == im2.shape:
             raise IOError('Input images must have the same dimensions.')
 
-        im_result = set_new_data(im1, new_data=im1.data * im2.data)
+        im_result = set_new_data(im1, new_data=im1.get_data() * im2.get_data())
 
         nib.save(im_result, pfi_result)
         print('Image difference of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
