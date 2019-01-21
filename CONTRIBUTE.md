@@ -42,7 +42,7 @@ before this.
 ## To update the coverage badge
 
 + `pip install coverage-badge`
-+ `coverage-badge` in the root folder
++ `coverage-badge > coverage.svg` in the root folder
 
 ## Styleguides
 
