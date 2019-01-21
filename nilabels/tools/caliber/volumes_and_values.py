@@ -84,24 +84,36 @@ def get_values_below_labels_list(im_segm, im_anat, labels_list):
 def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, verbose=0):
     """
     Get a separate volume for each label in a data-frame
-    :param im_segm:
-    :param labels:
-    :param labels_names: index of labels in the final dataframes.
-    :param tot_volume_prior:
-    :param verbose:
+    :param im_segm: nibabel segmentation
+    :param labels: labels you want to measure, or 'all' if you want them all or 'tot' to have the total of the non zero
+                   labels.
+    :param labels_names: list with the indexes of labels in the final dataframes, corresponding to labels list.
+    :param tot_volume_prior: factor the volumes will be divided with.
+    :param verbose: > 0 will provide the intermediate stepsp
     :return:
     """
     num_non_zero_voxels = get_total_num_nonzero_voxels(im_segm)
     vol_non_zero_voxels_mm3 = num_non_zero_voxels * one_voxel_volume(im_segm)
     if tot_volume_prior is None:
         tot_volume_prior = vol_non_zero_voxels_mm3
-    if labels_names == 'tot':
+    if labels_names not in [None, 'all', 'tot']:
+        if len(labels) != len(labels_names):
+            raise IOError('Inconsistent labels - labels_names input.')
 
-        data_frame = pa.DataFrame({'Labels': pa.Series(labels, index=[labels_names]),
-                                   'Num voxels': pa.Series(num_non_zero_voxels, index=[labels_names]),
-                                   'Volume': pa.Series(vol_non_zero_voxels_mm3, index=[labels_names]),
-                                   'Vol over Tot': pa.Series(vol_non_zero_voxels_mm3 / tot_volume_prior,
-                                                             index=[labels_names])})
+    if labels_names == 'all':
+        labels_names = ['reg {}'.format(l) for l in labels]
+
+    if labels_names == 'tot':
+        labels_names = ['tot']
+
+        non_zero_voxels = np.count_nonzero(im_segm.get_data())
+        volumes = non_zero_voxels * one_voxel_volume(im_segm)
+        vol_over_tot = volumes / float(tot_volume_prior)
+
+        data_frame = pa.DataFrame({'Num voxels': pa.Series([non_zero_voxels], index=labels_names),
+                                   'Volume': pa.Series([volumes], index=labels_names),
+                                   'Vol over Tot': pa.Series([vol_over_tot], index=labels_names)})
+        return data_frame
 
     else:
         non_zero_voxels_list = []
@@ -116,7 +128,7 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
                 for label_k_j in label_k:
                     all_places += im_segm.get_data() == label_k_j
 
-            flat_volume_voxel = np.nan_to_num((all_places.astype(np.float64)).flatten() )
+            flat_volume_voxel = np.nan_to_num((all_places.astype(np.float64)).flatten())
 
             non_zero_voxels = np.count_nonzero(flat_volume_voxel)
             volumes = non_zero_voxels * one_voxel_volume(im_segm)
@@ -127,15 +139,15 @@ def get_volumes_per_label(im_segm, labels, labels_names, tot_volume_prior=None, 
             volumes_list.append(volumes)
             vol_over_tot_list.append(vol_over_tot)
 
-        data_frame = pa.DataFrame({'Labels'       : pa.Series(labels,               index=labels_names),
+        data_frame = pa.DataFrame({'Label'        : pa.Series(labels,               index=labels_names),
                                    'Num voxels'   : pa.Series(non_zero_voxels_list, index=labels_names),
                                    'Volume'       : pa.Series(volumes_list,         index=labels_names),
                                    'Vol over Tot' : pa.Series(vol_over_tot_list,    index=labels_names)})
 
-    data_frame = data_frame.rename_axis('Regions')
-    data_frame = data_frame.reset_index()
+        data_frame = data_frame.rename_axis('Region')
+        data_frame = data_frame.reset_index()
 
-    if verbose > 0:
-        print(data_frame)
+        if verbose > 0:
+            print(data_frame)
 
-    return data_frame
+        return data_frame

@@ -61,7 +61,7 @@ without reinstalling.
     `pip install -r requirements.txt`
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
-+ For advanced method `symmetrise_wit_registration`, extra examples and quick arrays visualisation with ITK-snap you must
++ For advanced method `symmetrise_wit_registration`, extra examples and quick arrays visualisation with ITK-snap you can
     + Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)
     + Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
     + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)

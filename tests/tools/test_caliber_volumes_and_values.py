@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 
 from nilabels.tools.caliber.volumes_and_values import get_total_num_nonzero_voxels, get_num_voxels_from_labels_list, \
-    get_values_below_labels_list
+    get_values_below_labels_list, get_volumes_per_label
 
 
 def cube_shape(omega, center, side_length, background_intensity=0, foreground_intensity=100, dtype=np.uint8):
@@ -180,9 +180,112 @@ def test_get_values_below_labels_list_wrong_input():
         get_values_below_labels_list(im_segm, im_anat, [1, [2, 3], '3', '4'])
 
 
-def test_get_volumes_per_label():
-    # TODO
-    pass
+def test_get_volumes_per_label_ok_and_with_prior():
+    omega = [10, 10, 3]
+    data_test = np.zeros(omega)
+
+    data_test[:2, :2, :2] = 2
+    data_test[-3:, -3:, -2:] = 3
+    im_test = nib.Nifti1Image(data_test, affine=np.eye(4))
+
+    df_vol = get_volumes_per_label(im_test, [0, 2, 3, 4], labels_names=['bkg', 'wm', 'gm', 'nada'])
+
+    np.testing.assert_equal(df_vol.loc[0]['Region'], 'bkg')
+    np.testing.assert_equal(df_vol.loc[0]['Label'], 0)
+    np.testing.assert_equal(df_vol.loc[0]['Num voxels'], 274)
+    np.testing.assert_equal(df_vol.loc[0]['Volume'], 274)
+    np.testing.assert_almost_equal(df_vol.loc[0]['Vol over Tot'], 274 / float(18 + 8))
+
+    np.testing.assert_equal(df_vol.loc[1]['Region'], 'wm')
+    np.testing.assert_equal(df_vol.loc[1]['Label'], 2)
+    np.testing.assert_equal(df_vol.loc[1]['Num voxels'], 8)
+    np.testing.assert_equal(df_vol.loc[1]['Volume'], 8)
+    np.testing.assert_almost_equal(df_vol.loc[1]['Vol over Tot'], 8 / float(18 + 8))
+
+    np.testing.assert_equal(df_vol.loc[2]['Region'], 'gm')
+    np.testing.assert_equal(df_vol.loc[2]['Label'], 3)
+    np.testing.assert_equal(df_vol.loc[2]['Num voxels'], 18)
+    np.testing.assert_equal(df_vol.loc[2]['Volume'], 18)
+    np.testing.assert_almost_equal(df_vol.loc[2]['Vol over Tot'], 18 / float(18 + 8))
+
+    np.testing.assert_equal(df_vol.loc[3]['Region'], 'nada')
+    np.testing.assert_equal(df_vol.loc[3]['Label'], 4)
+    np.testing.assert_equal(df_vol.loc[3]['Num voxels'], 0)
+    np.testing.assert_equal(df_vol.loc[3]['Volume'], 0)
+    np.testing.assert_almost_equal(df_vol.loc[3]['Vol over Tot'], 0)
+
+    df_vol_prior = get_volumes_per_label(im_test, [0, 2, 3, 4], labels_names=['bkg', 'wm', 'gm', 'nada'],
+                                         tot_volume_prior=10)
+
+    np.testing.assert_almost_equal(df_vol_prior.loc[0]['Vol over Tot'], 27.4)
+    np.testing.assert_almost_equal(df_vol_prior.loc[1]['Vol over Tot'], 0.8)
+    np.testing.assert_almost_equal(df_vol_prior.loc[2]['Vol over Tot'], 1.8)
+    np.testing.assert_almost_equal(df_vol_prior.loc[3]['Vol over Tot'], 0)
+
+
+def test_get_volumes_per_label_tot_labels():
+    omega = [10, 10, 3]
+    data_test = np.zeros(omega)
+
+    data_test[:2, :2, :2] = 2
+    data_test[-3:, -3:, -2:] = 3
+    im_test = nib.Nifti1Image(data_test, affine=np.eye(4))
+
+    df_vol_all = get_volumes_per_label(im_test, [0, 2, 3, 4], labels_names='all')
+
+    np.testing.assert_equal(df_vol_all.loc[0]['Region'], 'reg 0')
+    np.testing.assert_equal(df_vol_all.loc[0]['Label'], 0)
+    np.testing.assert_equal(df_vol_all.loc[0]['Num voxels'], 274)
+    np.testing.assert_equal(df_vol_all.loc[0]['Volume'], 274)
+    np.testing.assert_almost_equal(df_vol_all.loc[0]['Vol over Tot'], 274 / float(18 + 8))
+
+    df_vol_tot = get_volumes_per_label(im_test, [0, 2, 3, 4], labels_names='tot')
+
+    np.testing.assert_equal(df_vol_tot.loc['tot']['Num voxels'], 26)
+    np.testing.assert_equal(df_vol_tot.loc['tot']['Volume'], 26)
+    np.testing.assert_almost_equal(df_vol_tot.loc['tot']['Vol over Tot'], 1.0)
+
+
+def test_get_volumes_per_label_inconsistent_labels_labels_names():
+    omega = [10, 10, 3]
+    data_test = np.zeros(omega)
+
+    data_test[:2, :2, :2] = 2
+    data_test[-3:, -3:, -2:] = 3
+    im_test = nib.Nifti1Image(data_test, affine=np.eye(4))
+
+    with np.testing.assert_raises(IOError):
+        get_volumes_per_label(im_test, [0, 2, 3, 4], labels_names=['a', 'b'])
+
+
+def test_get_volumes_per_label_sublabels():
+    omega = [10, 10, 3]
+    data_test = np.zeros(omega)
+
+    data_test[:2, :2, :2] = 2
+    data_test[-3:, -3:, -2:] = 3
+    im_test = nib.Nifti1Image(data_test, affine=np.eye(4))
+
+    df_vol = get_volumes_per_label(im_test, [0, [2, 3], 4],
+                                   labels_names=['bkg', 'gm and wm', 'nada'])
+
+    np.testing.assert_equal(df_vol.loc[0]['Region'], 'bkg')
+    np.testing.assert_equal(df_vol.loc[0]['Label'], 0)
+    np.testing.assert_equal(df_vol.loc[0]['Num voxels'], 274)
+    np.testing.assert_equal(df_vol.loc[0]['Volume'], 274)
+    np.testing.assert_almost_equal(df_vol.loc[0]['Vol over Tot'], 274 / float(18 + 8))
+
+    np.testing.assert_equal(df_vol.loc[1]['Region'], 'gm and wm')
+    np.testing.assert_array_equal(df_vol.loc[1]['Label'], [2, 3])
+    np.testing.assert_equal(df_vol.loc[1]['Num voxels'], 26)
+    np.testing.assert_equal(df_vol.loc[1]['Volume'], 26)
+    np.testing.assert_almost_equal(df_vol.loc[1]['Vol over Tot'], 1.0)
+
+    np.testing.assert_equal(df_vol.loc[2]['Region'], 'nada')
+    np.testing.assert_equal(df_vol.loc[2]['Label'], 4)
+    np.testing.assert_equal(df_vol.loc[2]['Num voxels'], 0)
+    np.testing.assert_equal(df_vol.loc[2]['Volume'], 0)
+    np.testing.assert_almost_equal(df_vol.loc[2]['Vol over Tot'], 0)
 
 
 if __name__ == '__main__':
@@ -196,3 +299,9 @@ if __name__ == '__main__':
     test_get_num_voxels_from_labels_list_unexisting_labels()
     test_get_values_below_labels_list()
     test_get_values_below_labels_list_wrong_input()
+
+    test_get_volumes_per_label_ok_and_with_prior()
+    test_get_volumes_per_label_tot_labels()
+    test_get_volumes_per_label_inconsistent_labels_labels_names()
+    test_get_volumes_per_label_sublabels()
+

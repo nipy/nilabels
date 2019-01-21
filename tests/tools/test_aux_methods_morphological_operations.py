@@ -118,7 +118,7 @@ def test_get_shell_for_given_radius():
 def get_circle_shell_for_given_radius_2d():
     expected_ans = [(-2, 0), (-1, -1), (-1, 1), (0, -2), (0, 2), (1, -1), (1, 1), (2, 0)]
     computed_ans = get_circle_shell_for_given_radius(2, dimension=2)
-    assert cmp(expected_ans, computed_ans) == 0
+    np.testing.assert_equal(cmp(expected_ans, computed_ans), 0)
 
 
 def get_circle_shell_for_given_radius_3_2d():
