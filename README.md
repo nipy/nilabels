@@ -21,7 +21,8 @@ segmentations in nifti format.
     + permute or change the segmentation numbering, erase or merge labels 
     + compute Dice's score, covariance distance, Hausdorff distance and normalised symmetric contour distance between segmentations 
     + get the array of values at the voxel below a given label 
-    + symmetrise a segmentation 
+    + symmetrise a segmentation
+    + erase small connected components and replace with closest label values
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
 + Facade design pattern (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
 
@@ -38,11 +39,11 @@ Given a segmentation `my_segm.nii.gz` imagine you want to change the labels valu
 and save the result in `my_new_segm.nii.gz`. Then:
 
 ```python
-import nilabels as nis
+import nilabels as nil
 
 
-nis_app = nis.App()
-nis_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
+nil_app = nil.App()
+nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 
 ```
 
@@ -66,7 +67,6 @@ without reinstalling.
 in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 + For advanced method `symmetrise_wit_registration`, extra examples and quick arrays visualisation with ITK-snap you can
-    + Install [NiftySeg](https://github.com/KCL-BMEIS/NiftySeg)
     + Install [NiftyReg](https://github.com/KCL-BMEIS/niftyreg)
     + Install [ITK-snap](http://www.itksnap.org/pmwiki/pmwiki.php?n=Downloads.SNAP3)
 

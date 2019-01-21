@@ -15,7 +15,6 @@ info = {
                       },
         "author": "Sebastiano Ferraris",
         "dependencies": {
-                         "NiftySeg": "Vers b1bf8f08b152a093860da8fb5d0ceadfed6f4a13",
                          # requirements.txt automatically generated using pipreqs
                          "python requirements" : "{0}/requirements.txt".format(root_dir)
                          }

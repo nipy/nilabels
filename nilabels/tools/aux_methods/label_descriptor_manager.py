@@ -27,6 +27,8 @@ as the one in the descriptor below:
     8   255  50    50        1  1  1    "label eight"
     ...
 
+An instance of a label descriptor manager is contains the path to a file with
+a label descriptor in itk-snap convention or fsl convention and a parameter specifying the convetion.
 """
 import collections
 import os

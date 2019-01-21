@@ -10,6 +10,7 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
     """
     :param im_segm: nibabel image of a segmentation.
     :param labels_descriptor: instance of LabelsDescriptorManager
+    :param pfi_where_log: path to file where to save a log of the output.
     :return: correspondences between labels in the segmentation and labels in the label descriptors,
     number of voxels, volume and number of connected components per label, all in a log file.
     """
@@ -40,8 +41,9 @@ def check_missing_labels(im_segm, labels_descriptor, pfi_where_log=None):
 
             len_non_zero_places = len(all_places[np.where(all_places > 1e-6)])
             if len_non_zero_places == 0:
-                msg_l = '\nLabel {0} present in label descriptor and not delineated in the given segmentation.'.format(label_k)
-                msg +=  msg_l
+                msg_l = '\nLabel {0} present in label descriptor and not delineated in the ' \
+                        'given segmentation.'.format(label_k)
+                msg += msg_l
                 print(msg_l)
             num_voxels_per_label.append(len_non_zero_places)
 
