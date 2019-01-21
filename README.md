@@ -1,4 +1,8 @@
-# NiLabels 
+<p align="center">
+<img src="https://github.com/SebastianoF/nilabels/blob/master/logo_low.png" width="350">
+</p>
+
+# NiLabels
 
 (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
 
