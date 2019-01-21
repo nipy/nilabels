@@ -52,29 +52,29 @@ def contour_from_segmentation(im_segm, omit_axis=None, verbose=0):
     return set_new_data(im_segm, output_arr.astype(np.bool) * im_segm.get_data(), new_dtype=im_segm.get_data_dtype())
 
 
-def get_xyz_borders_of_a_label(segm_data, label):
+def get_xyz_borders_of_a_label(segm_arr, label):
     """
-    :param segm_data:
-    :param label:
-    :return:
+    :param segm_arr: array representing a segmentation
+    :param label: a single integer label
+    :return: box coordinates containing the given label in the segmentation, None if the label is not present.
     """
-    assert segm_data.ndim == 3
+    assert segm_arr.ndim == 3
 
-    if label not in segm_data:
+    if label not in segm_arr:
         return None
 
-    X, Y, Z = np.where(segm_data == label)
+    X, Y, Z = np.where(segm_arr == label)
     return [np.min(X), np.max(X), np.min(Y), np.max(Y), np.min(Z), np.max(Z)]
 
 
-def get_internal_contour_with_erosion_at_label(im_arr, lab, thickness=1):
+def get_internal_contour_with_erosion_at_label(segm_arr, lab, thickness=1):
     """
     Get the internal contour for a given thickness.
-    :param im_arr: input segmentation where to extract the contour
+    :param segm_arr: input segmentation where to extract the contour
     :param lab: label to extract the contour
     :param thickness: final thickness of the segmentation
     :return: image with only the contour of the given input image.
     """
-    im_lab = im_arr == lab
-    return (im_lab ^ nd.morphology.binary_erosion(im_lab, iterations=thickness).astype(np.bool)).astype(im_arr.dtype) * lab
+    im_lab = segm_arr == lab
+    return (im_lab ^ nd.morphology.binary_erosion(im_lab, iterations=thickness).astype(np.bool)).astype(segm_arr.dtype) * lab
 

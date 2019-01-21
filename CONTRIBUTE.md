@@ -38,7 +38,12 @@ encountered a similar problem.
 you can do a [git pull request](https://yangsu.github.io/pull-request-tutorial/). Please **check tests are all passed** 
 before this.
 
-  
+
+## To update the coverage badge
+
++ `pip install coverage-badge`
++ `coverage-badge` in the root folder
+
 ## Styleguides
 
 + The code follows the [PEP-8](https://www.python.org/dev/peps/pep-0008/) style convention. 

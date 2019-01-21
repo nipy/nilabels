@@ -26,7 +26,7 @@ class Math(object):
         im_result = set_new_data(im1, new_data=im1.get_data() + im2.get_data())
 
         nib.save(im_result, pfi_result)
-        print('Image sum of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
+        print('Image sum of {0} {1} saved under {2}.'.format(pfi_im1, pfi_im2, pfi_result))
         return pfi_result
 
     def sub(self, path_first_image, path_second_image, path_resulting_image):
@@ -42,7 +42,7 @@ class Math(object):
         im_result = set_new_data(im1, new_data=im1.get_data() - im2.get_data())
 
         nib.save(im_result, pfi_result)
-        print('Image difference of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
+        print('Image difference of {0} {1} saved under {2}.'.format(pfi_im1, pfi_im2, pfi_result))
         return pfi_result
 
     def prod(self, path_first_image, path_second_image, path_resulting_image):
@@ -58,5 +58,16 @@ class Math(object):
         im_result = set_new_data(im1, new_data=im1.get_data() * im2.get_data())
 
         nib.save(im_result, pfi_result)
-        print('Image difference of {0} {1} saved in {2}.'.format(pfi_im1, pfi_im2, pfi_result))
+        print('Image product of {0} {1} saved under {2}.'.format(pfi_im1, pfi_im2, pfi_result))
+        return pfi_result
+
+    def scalar_prod(self, scalar, path_image, path_resulting_image):
+        pfi_image = connect_path_tail_head(self.pfo_in, path_image)
+        pfi_result = connect_path_tail_head(self.pfo_out, path_resulting_image)
+        im = nib.load(pfi_image)
+
+        im_result = set_new_data(im, new_data=scalar * im.get_data())
+
+        nib.save(im_result, pfi_result)
+        print('Image {0} times {1} saved under {2}.'.format(pfi_image, scalar, pfi_result))
         return pfi_result
