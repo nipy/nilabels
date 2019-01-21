@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/SebastianoF/nilabels/blob/master/logo_low.png" width="350">
+<img src="https://github.com/SebastianoF/nilabels/blob/master/logo_low.png" width="300">
 </p>
 
 # NiLabels
