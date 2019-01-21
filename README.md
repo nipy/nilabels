@@ -1,4 +1,7 @@
 
+[![coverage](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/)
+
+
 <p align="center">
 <img src="https://github.com/SebastianoF/nilabels/blob/master/logo_low.png" width="300">
 </p>
