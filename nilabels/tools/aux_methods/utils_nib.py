@@ -83,7 +83,7 @@ def compare_two_nib(im1, im2):
         images_are_equal = False
         if np.array_equal(np.nan_to_num(im1.get_data()), np.nan_to_num(im2.get_data())):
             msg += '(data are different only up to nans)'
-    if not np.array_equal(im1.affine, im2.get_affine()):
+    if not np.array_equal(im1.affine, im2.affine):
         msg += 'Affine transformations are different. \n'
         images_are_equal = False
 
@@ -157,10 +157,10 @@ def modify_affine_transformation(im_input, new_aff, q_form=True, s_form=True, ve
 
     # create output image on the input
     if im_input.header['sizeof_hdr'] == 348:
-        new_image = nib.Nifti1Image(im_input.get_data(), new_transf, header=im_input.get_header())
+        new_image = nib.Nifti1Image(im_input.get_data(), new_transf, header=im_input.header)
     # if nifty2
     elif im_input.header['sizeof_hdr'] == 540:
-        new_image = nib.Nifti2Image(im_input.get_data(), new_transf, header=im_input.get_header())
+        new_image = nib.Nifti2Image(im_input.get_data(), new_transf, header=im_input.header)
     else:
         raise IOError('Input image header problems in sizeof_hdr.')
 

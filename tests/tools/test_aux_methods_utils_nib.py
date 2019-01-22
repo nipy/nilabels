@@ -20,7 +20,7 @@ def test_set_new_data_simple_modifications():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff)
     im_0_header = im_0.header
     # default intent_code
-    assert cmp(im_0_header['intent_code'], 0) == 0
+    assert im_0_header['intent_code'] == 0
     # change intento code
     im_0_header['intent_code'] = 5
 
@@ -29,7 +29,7 @@ def test_set_new_data_simple_modifications():
     im_1_header = im_1.header
     # see if the infos are the same as in the modified header
     assert_array_equal(im_1.get_data()[:], np.ones([3, 3, 3]))
-    assert cmp(im_1_header['intent_code'], 5) == 0
+    assert im_1_header['intent_code'] == 5
     assert_array_equal(im_1.affine, aff)
 
 
@@ -82,31 +82,31 @@ def test_set_new_data_for_buggy_image_header():
 def test_compare_two_nib_equals():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    assert cmp(compare_two_nib(im_0, im_1), True) == 0
+    assert compare_two_nib(im_0, im_1) == True
 
 
 def test_compare_two_nib_different_nifti_version():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti2Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    assert cmp(compare_two_nib(im_0, im_1), False) == 0
+    assert compare_two_nib(im_0, im_1) == False
 
 
 def test_compare_two_nib_different_nifti_version2():
     im_0 = nib.Nifti2Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
-    assert cmp(compare_two_nib(im_0, im_1), False) == 0
+    assert compare_two_nib(im_0, im_1) == False
 
 
 def test_compare_two_nib_different_data_dtype():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3], dtype=np.uint8), affine=np.eye(4))
     im_1 = nib.Nifti2Image(np.zeros([3, 3, 3], dtype=np.float64), affine=np.eye(4))
-    assert cmp(compare_two_nib(im_0, im_1), False) == 0
+    assert compare_two_nib(im_0, im_1) == False
 
 
 def test_compare_two_nib_different_data():
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti2Image(np.ones([3, 3, 3]), affine=np.eye(4))
-    assert cmp(compare_two_nib(im_0, im_1), False) == 0
+    assert compare_two_nib(im_0, im_1) == False
 
 
 def test_compare_two_nib_different_affine():
@@ -114,7 +114,7 @@ def test_compare_two_nib_different_affine():
     aff_1[3, 3] = 5
     im_0 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=np.eye(4))
     im_1 = nib.Nifti1Image(np.zeros([3, 3, 3]), affine=aff_1)
-    assert cmp(compare_two_nib(im_0, im_1), False) == 0
+    assert compare_two_nib(im_0, im_1) == False
 
 
 # TEST one voxel volumes

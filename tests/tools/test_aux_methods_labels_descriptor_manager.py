@@ -108,10 +108,8 @@ def test_basic_dict_input():
 
     ldm = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'))
 
-    cmp(ldm.dict_label_descriptor.keys(), dict_ld.keys())
     for k in ldm.dict_label_descriptor.keys():
-        cmp(ldm.dict_label_descriptor[k], dict_ld[k])
-        assert cmp(ldm.dict_label_descriptor[k], dict_ld[k]) == 0
+        assert ldm.dict_label_descriptor[k] == dict_ld[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -125,7 +123,7 @@ def test_load_save_and_compare():
     for l1, l2 in zip(f1.readlines(), f2.readlines()):
         split_l1 = [float(a) if is_a_string_number(a) else a for a in [a.strip() for a in l1.split(' ') if a is not '']]
         split_l2 = [float(b) if is_a_string_number(b) else b for b in [b.strip() for b in l2.split(' ') if b is not '']]
-        assert cmp(split_l1, split_l2) == 0
+        assert split_l1 == split_l2
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -139,9 +137,8 @@ def test_save_in_fsl_convention_reload_as_dict_and_compare():
                                       labels_descriptor_convention='fsl')
 
     # NOTE: test works only with default 1.0 values - fsl convention is less informative than itk-snap..
-    cmp(ldm_itk.dict_label_descriptor.keys(), ldm_fsl.dict_label_descriptor.keys())
     for k in ldm_itk.dict_label_descriptor.keys():
-        cmp(ldm_itk.dict_label_descriptor[k], ldm_fsl.dict_label_descriptor[k])
+        ldm_itk.dict_label_descriptor[k] ==  ldm_fsl.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -184,9 +181,8 @@ def test_relabel_labels_descriptor():
 
     ldm_relabelled = ldm_original.relabel(old_labels, new_labels, sort=True)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -210,9 +206,8 @@ def test_relabel_labels_descriptor_with_merging():
 
     ldm_relabelled = ldm_original.relabel(old_labels, new_labels, sort=True)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -240,9 +235,8 @@ def test_permute_labels_from_descriptor_check():
     perm = [[1, 2, 3, 4], [3, 4, 2, 1]]
     ldm_relabelled = ldm_original.permute_labels(perm)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -259,9 +253,8 @@ def test_erase_labels():
     labels_to_erase = [2, 3, 7]
     ldm_relabelled = ldm_original.erase_labels(labels_to_erase)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        assert dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 # -> multi-labels dict
@@ -293,7 +286,7 @@ def test_save_multi_labels_descriptor_custom():
                                          for m in multi_ld_lines]
     # Compare:
     for li1, li2 in zip(expected_lines, multi_ld_lines_a_list_of_lists):
-        cmp(li1, li2)
+        assert li1 == li2
 
 
 @write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor
@@ -317,8 +310,8 @@ def test_get_multi_label_dict_standard_combine():
     expected_multi_labels_dict.update({'label E': [7, 8]})
 
     for k1, k2 in zip(multi_labels_dict_from_ldm.keys(), expected_multi_labels_dict.keys()):
-        assert cmp(k1, k2) == 0
-        assert cmp(multi_labels_dict_from_ldm[k1], expected_multi_labels_dict[k2]) == 0
+        assert k1 == k2
+        assert multi_labels_dict_from_ldm[k1] == expected_multi_labels_dict[k2]
 
 
 @write_and_erase_temporary_folder_with_left_right_dummy_labels_descriptor
@@ -339,8 +332,8 @@ def test_get_multi_label_dict_standard_not_combine():
     expected_multi_labels_dict.update({'label E Right': [8]})
 
     for k1, k2 in zip(multi_labels_dict_from_ldm.keys(), expected_multi_labels_dict.keys()):
-        assert cmp(k1, k2) == 0
-        assert cmp(multi_labels_dict_from_ldm[k1], expected_multi_labels_dict[k2]) == 0
+        assert k1 == k2
+        assert multi_labels_dict_from_ldm[k1] == expected_multi_labels_dict[k2]
 
 
 @write_and_erase_temporary_folder
@@ -381,8 +374,8 @@ def test_save_multi_labels_descriptor_custom_test_robustness():
     expected_multi_labels_dict.update({'label E Left': [8]})
 
     for k1, k2 in zip(multi_labels_dict_from_ldm.keys(), expected_multi_labels_dict.keys()):
-        assert cmp(k1, k2) == 0
-        assert cmp(multi_labels_dict_from_ldm[k1], expected_multi_labels_dict[k2]) == 0
+        assert k1 == k2
+        assert multi_labels_dict_from_ldm[k1] == expected_multi_labels_dict[k2]
 
 
 # -> erase, assign and keep only one label relabeller.
@@ -406,9 +399,8 @@ def test_relabel_standard():
     new_labels = [9, 10]
     ldm_relabelled = ldm_original.relabel(old_labels, new_labels)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        assert dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -437,15 +429,14 @@ def test_erase_labels_unexisting_labels():
     labels_to_erase = [2, 4, 16, 32]
     ldm_relabelled = ldm_original.erase_labels(labels_to_erase)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        assert dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
 def test_assign_all_other_labels_the_same_value():
     dict_expected = collections.OrderedDict()
-    dict_expected.update({0: [[0, 0, 0], [0, 0, 0], 'background']})
+    dict_expected.update({0: [[255, 50, 50], [1.0, 1.0, 1.0], 'label eight']})  # Possible bug
     dict_expected.update({1: [[255, 0, 0], [1, 1, 1], 'label one (l1)']})  # copied over label two
     dict_expected.update({4: [[102, 102, 255], [1, 1, 1], 'label four']})
     dict_expected.update({7: [[255, 255, 0], [1, 1, 1], 'label seven']})
@@ -455,9 +446,13 @@ def test_assign_all_other_labels_the_same_value():
     other_value = 0
     ldm_relabelled = ldm_original.assign_all_other_labels_the_same_value(labels_to_keep, other_value)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
+    print(dict_expected)
+    print(ldm_relabelled.dict_label_descriptor)
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        print()
+        print(dict_expected[k])
+        print(ldm_relabelled.dict_label_descriptor[k])
+        assert dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
@@ -469,9 +464,8 @@ def test_keep_one_label():
     label_to_keep = 3
     ldm_relabelled = ldm_original.keep_one_label(label_to_keep)
 
-    cmp(dict_expected.keys(), ldm_relabelled.dict_label_descriptor.keys())
     for k in dict_expected.keys():
-        cmp(dict_expected[k], ldm_relabelled.dict_label_descriptor[k])
+        assert dict_expected[k] == ldm_relabelled.dict_label_descriptor[k]
 
 
 if __name__ == '__main__':

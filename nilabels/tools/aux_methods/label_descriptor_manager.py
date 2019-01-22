@@ -180,7 +180,7 @@ class LabelsDescriptorManager(object):
         for k_label_id in self.dict_label_descriptor.keys():
             mld_tmp.update({self.dict_label_descriptor[k_label_id][2].replace('"', '').strip(): [int(k_label_id)]})
 
-        mld_tmp_keys = mld_tmp.keys()
+        mld_tmp_keys = list(mld_tmp.keys())
         while len(mld_tmp_keys) > 0:
             if 'Right' in mld_tmp_keys[0]:
                 right_key = mld_tmp_keys[0]

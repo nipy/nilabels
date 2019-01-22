@@ -86,7 +86,7 @@ def test_get_roto_translation_matrix_too_small_rotation_axis():
 
 def test_get_roto_translation_matrix_get_check_shape_and_translation():
     rt = get_roto_translation_matrix(np.pi/8, rotation_axis=np.array([1, 0, 0]), translation=np.array([1, 2, 3]))
-    assert cmp(rt.shape, (4, 4)) == 0
+    assert rt.shape == (4, 4)
     assert_array_equal(rt[3, :], np.array([0, 0, 0, 1]))
     assert_array_equal(rt[:, 3], np.array([1, 2, 3, 1]))
 

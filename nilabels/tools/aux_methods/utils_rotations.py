@@ -262,7 +262,7 @@ def matrix_vector_field_product(j_input, v_input):
     """
     if not len(j_input.shape) == len(v_input.shape):
         raise IOError
-    if not cmp(j_input.shape[:-1], v_input.shape[:-1]) == 0:
+    if not j_input.shape[:-1] == v_input.shape[:-1]:
         raise IOError
 
     d = v_input.shape[-1]

@@ -61,7 +61,7 @@ def is_valid_permutation(in_perm, for_labels=True):
         return False
     if not len(in_perm[0]) == len(in_perm[1]) == len(set(in_perm[0])) == len(set(in_perm[1])):
         return False
-    if not cmp(sorted(set(in_perm[0])), sorted(set(in_perm[1]))) == 0:
+    if not (sorted(set(in_perm[0])) > sorted(set(in_perm[1])))-(sorted(set(in_perm[0])) < sorted(set(in_perm[1]))) == 0:
         return False
     if for_labels:
         # as dealing with labels, all the elements must be int

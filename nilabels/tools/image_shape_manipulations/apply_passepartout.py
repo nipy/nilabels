@@ -32,5 +32,5 @@ def crop_with_passepartout_based_on_label_segmentation(im_input_to_crop, im_segm
     x_min, x_max = v[0] - margins[0], v[1] + margins[0] + 1
     y_min, y_max = v[2] - margins[1], v[3] + margins[1] + 1
     z_min, z_max = v[4] - margins[2], v[5] + margins[2] + 1
-    print [x_min, x_max, y_min, y_max, z_min, z_max]
+    print([x_min, x_max, y_min, y_max, z_min, z_max])
     return crop_with_passepartout(im_input_to_crop, [x_min, -x_max, y_min, -y_max, z_min, -z_max])

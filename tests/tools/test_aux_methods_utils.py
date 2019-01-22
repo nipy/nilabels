@@ -37,7 +37,7 @@ def test_print_and_run_create_file():
     cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
     output_msg = print_and_run(cmd)
     assert os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
-    assert cmp(output_msg, 'touch tmp.txt') == 0
+    assert output_msg == 'touch tmp.txt'
 
 
 @create_and_erase_temporary_folder
@@ -45,7 +45,7 @@ def test_print_and_run_create_file_safety_on():
     cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
     output_msg = print_and_run(cmd, safety_on=True)
     assert not os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
-    assert cmp(output_msg, 'touch tmp.txt') == 0
+    assert output_msg == 'touch tmp.txt'
 
 
 @create_and_erase_temporary_folder
@@ -53,7 +53,7 @@ def test_print_and_run_create_file_safety_off():
     cmd = 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
     output_msg = print_and_run(cmd, safety_on=False, short_path_output=False)
     assert os.path.exists(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
-    assert cmp(output_msg, 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))) == 0
+    assert output_msg == 'touch {}'.format(jph(test_dir, 'z_tmp_test', 'tmp.txt'))
 
 
 def test_labels_query_int_input():

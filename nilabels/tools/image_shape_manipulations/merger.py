@@ -71,7 +71,7 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
 
     patch_inverted = np.invert(patch_region)
     new_data = im_hosting.get_data() * patch_inverted + im_patch.get_data() * patch_region
-    
+
     return set_new_data(im_hosting, new_data)
 
 

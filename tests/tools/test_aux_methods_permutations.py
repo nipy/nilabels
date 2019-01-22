@@ -29,9 +29,6 @@ def test_from_permutation_to_disjoints_cycles_single_cycle():
     cycles_perm = permutation_from_cauchy_to_disjoints_cycles(cauchy_perm)
     expected_ans = [[1, 3, 5, 2, 4], [6, 7]]
 
-    print expected_ans
-    print cycles_perm
-
     for c1, c2 in zip(expected_ans, cycles_perm):
         assert_array_equal(c1, c2)
 

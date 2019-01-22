@@ -10,11 +10,11 @@ from nilabels.tools.aux_methods.utils_path import connect_path_tail_head, get_pf
 
 def test_connect_tail_head_path():
     # Case 1:
-    assert cmp(connect_path_tail_head('as/df/gh', 'lm.txt'), 'as/df/gh/lm.txt') == 0
+    assert connect_path_tail_head('as/df/gh', 'lm.txt') == 'as/df/gh/lm.txt'
     # Case 2:
-    assert cmp(connect_path_tail_head('as/df/gh', 'as/df/gh/lm/nb.txt'), 'as/df/gh/lm/nb.txt') == 0
+    assert connect_path_tail_head('as/df/gh', 'as/df/gh/lm/nb.txt') == 'as/df/gh/lm/nb.txt'
     # Case 3:
-    assert cmp(connect_path_tail_head('as/df/gh', 'lm/nb.txt'), 'as/df/gh/lm/nb.txt') == 0
+    assert connect_path_tail_head('as/df/gh', 'lm/nb.txt') == 'as/df/gh/lm/nb.txt'
 
 
 def test_get_pfi_in_pfi_out():
