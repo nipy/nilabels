@@ -101,22 +101,25 @@ def keep_only_one_label(in_data, label_to_keep):
 
 def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, axis, plane_intercept):
     """
-    :param in_data:
-    :param label_old:
-    :param label_new:
-    :param side_to_modify:
-    :param axis:
-    :param plane_intercept:
+    :param in_data: input data array (must be 3d)
+    :param label_old: single label to be replaced
+    :param label_new: single label to replace with
+    :param side_to_modify: can be the string 'above' or 'below'
+    :param axis: can be 'x', 'y', 'z'
+    :param plane_intercept: voxel along the selected direction plane where to consider the symmetry.
     :return:
     """
-    msg = 'Input array must be 3-dimensional.'
-    assert in_data.ndim == 3, msg
+    if not in_data.ndim == 3:
+        msg = 'Input array must be 3-dimensional.'
+        raise IOError(msg)
 
-    msg = 'side_to_copy must be one of the two {}.'.format(['below', 'above'])
-    assert side_to_modify in ['below', 'above'], msg
+    if side_to_modify not in ['below', 'above']:
+        msg = 'side_to_copy must be one of the two {}.'.format(['below', 'above'])
+        raise IOError(msg)
 
-    msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-    assert axis in ['x', 'y', 'z'], msg
+    if axis not in ['x', 'y', 'z']:
+        msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
+        raise IOError(msg)
 
     positions = in_data == label_old
     halfed_positions = np.zeros_like(positions)
@@ -129,7 +132,7 @@ def relabel_half_side_one_label(in_data, label_old, label_new, side_to_modify, a
         if side_to_modify == 'above':
             halfed_positions[:, plane_intercept:, :] = positions[:, plane_intercept:, :]
         if side_to_modify == 'below':
-            halfed_positions[:, plane_intercept, :, :] = positions[:, plane_intercept, :]
+            halfed_positions[:, plane_intercept, :] = positions[:, plane_intercept, :]
     if axis == 'z':
         if side_to_modify == 'above':
             halfed_positions[:, :, plane_intercept:] = positions[ :, :, plane_intercept:]
