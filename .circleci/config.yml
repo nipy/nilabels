@@ -8,6 +8,7 @@ jobs:
         - checkout
         - run: sudo pip install virtualenv
         - run: virtualenv venv
+        - run: ls; pwd
         - run: source vevn/bin/activate
         - run: pip install -r requirements.txt
         - run: pip install pytest
@@ -21,6 +22,7 @@ jobs:
 workflows:
   version: 2
   build:
+    working_directory: ~/repo
     jobs:
       - Python_2.7
       - Python_3.6
