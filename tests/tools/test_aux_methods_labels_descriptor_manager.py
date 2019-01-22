@@ -436,14 +436,14 @@ def test_erase_labels_unexisting_labels():
 @write_and_erase_temporary_folder_with_dummy_labels_descriptor
 def test_assign_all_other_labels_the_same_value():
     dict_expected = collections.OrderedDict()
-    dict_expected.update({0: [[255, 50, 50], [1.0, 1.0, 1.0], 'label eight']})  # Possible bug
+    dict_expected.update({0: [[0, 0, 0], [0, 0, 0], 'background']})  # Possible bug
     dict_expected.update({1: [[255, 0, 0], [1, 1, 1], 'label one (l1)']})  # copied over label two
     dict_expected.update({4: [[102, 102, 255], [1, 1, 1], 'label four']})
     dict_expected.update({7: [[255, 255, 0], [1, 1, 1], 'label seven']})
 
     ldm_original = LabelsDescriptorManager(jph(pfo_tmp_test, 'labels_descriptor.txt'))
     labels_to_keep = [0, 1, 4, 7]
-    other_value = 0
+    other_value = 12
     ldm_relabelled = ldm_original.assign_all_other_labels_the_same_value(labels_to_keep, other_value)
 
     print(dict_expected)

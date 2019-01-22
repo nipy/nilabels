@@ -13,6 +13,7 @@ todo_list.txt
 z_*
 a_experiments
 .coverage
+.coverage.sie*
 paper
 .pytest_cache
 htmlcov

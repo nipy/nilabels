@@ -152,11 +152,17 @@ def test_modify_image_type_simple():
     assert im.get_data_dtype() == 'float64'
 
 
+# Possible bug in NiBabel
 def test_modify_image_type_update_description_header():
     im = nib.Nifti1Image(np.ones([5, 5, 5], dtype=np.float64), affine=np.eye(4))
     im_new = modify_image_data_type(im, np.uint8, update_descrip_field_header='spam')
     hd = im_new.header
-    assert hd['descrip'] == 'spam'
+    if isinstance(hd['descrip'], str):
+        assert hd['descrip'] == 'spam'
+    elif isinstance(hd['descrip'], np.ndarray):
+        assert hd['descrip'].item() == b'spam'
+    else:
+        assert False
     assert im_new.get_data_dtype() == 'uint8'
     assert im.get_data_dtype() == 'float64'
 
