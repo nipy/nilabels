@@ -10,8 +10,8 @@
 
 (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
 
-NiLabels is a set of tools to automatise simple manipulations and measurements of medical image 
-segmentations in nifti format.
+NiLabels is a cacophony of tools to automatise simple manipulations and measurements of medical image
+segmentations in nifti format. It is heavily based on and influenced by the library [NiBabel](http://nipy.org/nibabel/)
 
 ### Features
 
@@ -100,6 +100,6 @@ it is available as free open-source software under
 
 ### Acknowledgements
 
-+ This repository is developed within the [GIFT-surg research project](http://www.gift-surg.ac.uk).
++ This repository had begun within the [GIFT-surg research project](http://www.gift-surg.ac.uk).
 + This work was supported by Wellcome / Engineering and Physical Sciences Research Council (EPSRC) [WT101957; NS/A000027/1; 203145Z/16/Z]. 
 Sebastiano Ferraris is supported by the EPSRC-funded UCL Centre for Doctoral Training in Medical Imaging (EP/L016478/1) and Doctoral Training Grant (EP/M506448/1). 

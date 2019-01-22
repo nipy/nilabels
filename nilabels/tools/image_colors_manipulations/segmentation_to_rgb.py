@@ -9,11 +9,13 @@ def get_rgb_image_from_segmentation_and_label_descriptor(im_segm, ldm, invert_bl
     :param im_segm: nibabel segmentation whose labels corresponds to the input labels descriptor.
     :param ldm: instance of class label descriptor manager.
     :param dtype_output: data type of the output image.
+    :param invert_black_white: to swap black with white (improving background visualisation).
     :return: a 4d image, where at each voxel there is the [r, g, b] vector in the fourth dimension.
     """
     labels_in_image = list(np.sort(list(set(im_segm.get_data().flatten()))))
 
-    assert len(im_segm.shape) == 3
+    if not len(im_segm.shape) == 3:
+        raise IOError('input segmentation must be 3D.')
 
     rgb_image_arr = np.ones(list(im_segm.shape) + [3])
 

@@ -156,34 +156,24 @@ def test_relabel_half_side_one_label_wrong_input_simple():
 
 
 if __name__ == '__main__':
-    # test_relabeller_basic()
-    # test_relabeller_one_element()
-    # test_relabeller_one_element_not_in_array()
-    # test_relabeller_wrong_input()
-    #
-    # test_permute_labels_invalid_permutation()
-    # test_permute_labels_valid_permutation()
-    #
-    # test_erase_label_simple()
-    #
-    # test_assign_all_other_labels_the_same_values_simple()
-    # test_assign_all_other_labels_the_same_values_single_value()
-    #
-    # test_keep_only_one_label_label_simple()
-    # test_keep_only_one_label_label_not_present()
-    #
-    # test_relabel_half_side_one_label_wrong_input_shape()
-    # test_relabel_half_side_one_label_wrong_input_side()
-    # test_relabel_half_side_one_label_wrong_input_axis()
-    #
+    test_relabeller_basic()
+    test_relabeller_one_element()
+    test_relabeller_one_element_not_in_array()
+    test_relabeller_wrong_input()
+
+    test_permute_labels_invalid_permutation()
+    test_permute_labels_valid_permutation()
+
+    test_erase_label_simple()
+
+    test_assign_all_other_labels_the_same_values_simple()
+    test_assign_all_other_labels_the_same_values_single_value()
+
+    test_keep_only_one_label_label_simple()
+    test_keep_only_one_label_label_not_present()
+
+    test_relabel_half_side_one_label_wrong_input_shape()
+    test_relabel_half_side_one_label_wrong_input_side()
+    test_relabel_half_side_one_label_wrong_input_axis()
+
     test_relabel_half_side_one_label_wrong_input_simple()
-
-    data = np.array(range(3 ** 3)).reshape(3, 3, 3)
-    new_data = relabel_half_side_one_label(data, label_old=4, label_new=400, side_to_modify='below',
-                                           axis='x', plane_intercept=2)
-    expected_data = data[:]
-    expected_data[0, 1, 1] = 400
-
-    print(new_data)
-    print(expected_data)
-    # np.testing.assert_array_equal(new_data, expected_data)
