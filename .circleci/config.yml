@@ -22,7 +22,6 @@ jobs:
 workflows:
   version: 2
   build:
-    working_directory: ~/repo
     jobs:
       - Python_2.7
       - Python_3.6
