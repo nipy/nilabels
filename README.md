@@ -1,5 +1,5 @@
 
-[![coverage](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/)
+[![coverage](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)
 
 
 <p align="center">
@@ -83,11 +83,13 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 ### Code testing
 
 Code testing is a work in progress. We are aiming at reaching the 80% of coverage for the methods acting on numpy arrays and nibabel images, below the facade.
-To run the test, `pip install -U pytest` and `pip install coverage` followed by:
+To run the test, `pip install -U pytest` and `pip install coverage` and `pip install coverage-badge`
+followed by:
 ```bash
 pytest --cov --cov-report html
 coverage html
 open htmlcov/index.html
+coverage-badge -f -o coverage.svg  # optional to update the coverage badge
 ```
 
 ### Licencing and Copyright
