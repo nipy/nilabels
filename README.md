@@ -15,7 +15,7 @@ segmentations in nifti format. It is heavily based on and influenced by the libr
 
 ### Features
 
-+ Written in Python 2.7
++ Written in Python 3.6 back compatible with 2.7
 + Simplifies the access to a range of tools and algorithms for the manipulation of medical image segmentations (see more under [motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations))
 + After importing NiLabels, you can quickly: 
     + check if there are missing labels in a segmentation 
@@ -32,8 +32,8 @@ segmentations in nifti format. It is heavily based on and influenced by the libr
 
 ### Not-features (work in progress)
 
-+ Not yet Python 3, back compatible python 2.7
 + Not yet pip-installable
++ No Continuous integration yet
 + [... and more](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
 
 ### Introductory example
