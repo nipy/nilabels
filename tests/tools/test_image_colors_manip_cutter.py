@@ -1,6 +1,5 @@
 import numpy as np
 import nibabel as nib
-import pytest
 from numpy.testing import assert_array_equal
 
 from nilabels.tools.image_colors_manipulations.cutter import cut_4d_volume_with_a_1_slice_mask, \
