@@ -30,11 +30,7 @@ segmentations in nifti format. It is heavily based on and influenced by the libr
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
 + Facade design pattern (see the [docs](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
 
-### Not-features (work in progress)
-
-+ Not yet pip-installable
-+ No Continuous integration yet
-+ [... and more](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
++ See [Work in progress](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
 
 ### Introductory example
 
