@@ -11,8 +11,9 @@ def merge_labels_from_4d(in_data, keep_original_values=True):
     :param keep_original_values: merge the labels with their values, otherwise it uses the values of the slice numbering (including zero label!).
     :return:
     """
-    msg = 'Input array must be 4-dimensional.'
-    assert in_data.ndim == 4, msg
+    if not in_data.ndim == 4:
+        msg = 'Input array must be 4-dimensional.'
+        raise IOError(msg)
 
     in_data_shape = in_data.shape
     out_data = np.zeros(in_data_shape[:3], dtype=in_data.dtype)
@@ -67,15 +68,10 @@ def grafting(im_hosting, im_patch, im_patch_mask=None):
         np.testing.assert_array_equal(im_hosting.shape, im_patch_mask.shape)
 
         patch_region = im_patch_mask.get_data().astype(np.bool)
-    # new_data = np.copy(im_hosting.get_data())
-    # new_data[patch_region] = im_patch.get_data()[patch_region]
-    # np.place(new_data, patch_region, im_patch.get_data())
-    # np.putmask(new_data, patch_region, im_patch.get_data())
 
     patch_inverted = np.invert(patch_region)
     new_data = im_hosting.get_data() * patch_inverted + im_patch.get_data() * patch_region
-    # new_data = im_hosting.get_data() * patch_inverted / np.max(im_hosting.get_data()) + im_patch.get_data()
-
+    
     return set_new_data(im_hosting, new_data)
 
 
@@ -102,7 +98,6 @@ def substitute_volume_at_timepoint(im_input_4d, im_input_3d, timepoint):
     :return: im_input_4d whose at the timepoint-th time point the data of im_input_3d are stored.
     Handle base case: If the input 4d volume is actually a 3d and timepoint is 0, then just return the same volume.
     """
-    
     if len(im_input_4d.shape) == 3 and timepoint == 0:
         return im_input_3d
     elif len(im_input_4d.shape) == 4 and timepoint < im_input_4d.shape[-1]:
