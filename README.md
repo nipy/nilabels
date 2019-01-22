@@ -24,7 +24,7 @@ segmentations in nifti format.
     + apply rotations and translations to the image header
     + permute or change the segmentation numbering, erase or merge labels 
     + compute Dice's score, covariance distance, Hausdorff distance and normalised symmetric contour distance between segmentations 
-    + get the array of values at the voxel below a given label 
+    + get the array of values at the voxels below a given label
     + symmetrise a segmentation
     + erase small connected components and replace with closest label values
     + [...and more](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
@@ -33,7 +33,6 @@ segmentations in nifti format.
 ### Not-features (work in progress)
 
 + Not yet Python 3, back compatible python 2.7
-+ Not yet 80% coverage
 + Not yet pip-installable
 + [... and more](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
 
@@ -83,7 +82,7 @@ in a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 ### Code testing
 
 Code testing is a work in progress. We are aiming at reaching the 80% of coverage for the methods acting on numpy arrays and nibabel images, below the facade.
-To run the test, `pip install -U pytest` and `pip install coverage` and `pip install coverage-badge`
+To run the test, `pip install pytest-cov` and `pip install coverage` and `pip install coverage-badge`
 followed by:
 ```bash
 pytest --cov --cov-report html
