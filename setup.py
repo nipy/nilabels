@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 # from distutils.core import setup
 
 setup(name='nilabels',
-      version=__version__,
+      version='v0.0.6',
       description='Toolkit to manipulate and measure image segmentations in nifti format.',
       author='sebastiano ferraris',
       author_email='sebastiano.ferraris@gmail.com',
