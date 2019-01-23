@@ -13,10 +13,10 @@
 NiLabels is a cacophony of tools to automatise simple manipulations and measurements of medical image
 segmentations in nifti format. It is heavily based on and influenced by the library [NiBabel](http://nipy.org/nibabel/)
 
-+ Written in Python 3.6 back compatible with 2.7
-+ [Motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations))
++ Written in [Python 3.6](https://docs.python-guide.org/) back compatible with 2.7
++ [Motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations)
 + [Features](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
-+ [Design pattern](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern))
++ [Design pattern](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern)
 + [Work in progress](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
 
 ### Introductory example
@@ -35,10 +35,9 @@ nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2
 
 ### Instructions
 
-+ [Install](https://github.com/SebastianoF/nilabels/wiki/Instructions)
 + [Documentation](https://github.com/SebastianoF/nilabels/wiki)
-+ [Testing](https://github.com/SebastianoF/nilabels/wiki/Testing)
-+ [Documentation](https://github.com/SebastianoF/nilabels/wiki)
++ [How to install](https://github.com/SebastianoF/nilabels/wiki/Instructions)
++ [How to run the tests](https://github.com/SebastianoF/nilabels/wiki/Testing)
 
 
 ### Licencing and Copyright
