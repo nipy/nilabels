@@ -1,16 +1,26 @@
 #!/usr/bin/env python
 
-from nilabels.definitions import __version__
+import os
 from setuptools import setup, find_packages
-# from distutils.core import setup
+
+
+def requirements2list(pfi_txt='requirements.txt'):
+    here = os.path.dirname(os.path.realpath(__file__))
+    f = open(os.path.join(here, pfi_txt), 'r')
+    l = []
+    for line in f.readlines():
+        l.append(line.replace('\n', ''))
+    return l
+
 
 setup(name='nilabels',
-      version='v0.0.6',
+      version='v0.0.7',  # update also in definitions.py
       description='Toolkit to manipulate and measure image segmentations in nifti format.',
       author='sebastiano ferraris',
       author_email='sebastiano.ferraris@gmail.com',
       license='MIT',
       url='https://github.com/SebastianoF/nilabels',
       packages=find_packages(),
+      install_requires=requirements2list()
      )
 

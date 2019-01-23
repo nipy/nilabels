@@ -1,6 +1,6 @@
 import os
 
-__version__ = 'v0.0.6'
+__version__ = 'v0.0.7'  # update also in setup.py
 root_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 info = {
