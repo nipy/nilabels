@@ -1,6 +1,8 @@
 
 [![coverage](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)
 [![CircleCI](https://circleci.com/gh/SebastianoF/nilabels.svg?style=svg)](https://circleci.com/gh/SebastianoF/nilabels)
+[![PyPI version](https://badge.fury.io/py/nilabels.svg)](https://badge.fury.io/py/nilabels)
+
 
 <p align="center">
 <img src="https://github.com/SebastianoF/nilabels/blob/master/logo_low.png" width="300">
