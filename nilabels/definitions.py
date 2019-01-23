@@ -1,6 +1,6 @@
 import os
 
-__version__ = '0.0.4'
+__version__ = 'v0.0.51'
 root_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 info = {

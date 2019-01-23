@@ -34,7 +34,7 @@ nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2
 ### Instructions
 
 + [Documentation](https://github.com/SebastianoF/nilabels/wiki)
-+ [How to install](https://github.com/SebastianoF/nilabels/wiki/Instructions)
++ [How to install](https://github.com/SebastianoF/nilabels/wiki/Instructions) - not yet pip installable
 + [How to run the tests](https://github.com/SebastianoF/nilabels/wiki/Testing)
 
 
