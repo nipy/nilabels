@@ -8,8 +8,6 @@
 
 # NiLabels
 
-(ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
-
 NiLabels is a cacophony of tools to automatise simple manipulations and measurements of medical image
 segmentations in nifti format. It is heavily based on and influenced by the library [NiBabel](http://nipy.org/nibabel/)
 
@@ -42,8 +40,8 @@ nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2
 
 ### Licencing and Copyright
 
-Copyright (c) 2017, Sebastiano Ferraris. NiLabels  (ex. LABelsToolkit) is provided as it is and 
-it is available as free open-source software under 
+Copyright (c) 2017, Sebastiano Ferraris. NiLabels  (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
+is provided as it is and it is available as free open-source software under
 [MIT License](https://github.com/SebastianoF/nilabels/blob/master/LICENCE.txt)
 
 
