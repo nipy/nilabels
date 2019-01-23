@@ -21,7 +21,7 @@ segmentations in nifti format. It is strongly based on and influenced by the lib
 
 ### Introductory examples
 
-#### manipulate labels: relabel
+#### 1 Manipulate labels: relabel
 
 Given a segmentation, imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
 and save the result in `my_new_segm.nii.gz`. Then:
@@ -35,7 +35,7 @@ nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2
 
 ```
 
-#### manipulate labels: clean a segmentation
+#### 2 Manipulate labels: clean a segmentation
 
 Given a parcellation for which we expect a single connected component per label, we want to have it cleaned from all the
 extra components, merging them with the closest labels.
@@ -52,7 +52,7 @@ nil_app.check.number_connected_components_per_label('cleaned_segm.nii.gz', where
 
 ```
 <p align="center">
-<img src="https://github.com/SebastianoF/nilabels/blob/master/examples/cleaning_before_after.png" width="300">
+<img src="https://github.com/SebastianoF/nilabels/blob/master/examples/cleaning_before_after.png" width="600">
 </p>
 
 
@@ -85,6 +85,7 @@ Label 8 has 1 connected components
 Label 9 has 1 connected components
 ```
 
+More tools are introduced in the [documentation](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels).
 
 ### Instructions
 
