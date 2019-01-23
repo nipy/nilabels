@@ -8,6 +8,8 @@ import a_generate_phantoms_for_examples as gen
 from nilabels.agents.agents_controller import AgentsController as NiL
 from nilabels.definitions import root_dir
 
+import nilabels as nil
+
 # ---- GENERATE DATA ----
 
 
@@ -42,23 +44,13 @@ pfi_output_cleaned_segmentation   = jph(pfo_output_folder, 'ellipsoids_segm_clea
 log_file_after_cleaning           = jph(pfo_output_folder, 'log_after_cleaning.txt')
 pfi_differece_cleaned_non_cleaned = jph(pfo_output_folder, 'difference_half_cleaned_uncleaned.nii.gz')
 
-# ---- PRE-PROCESS ---- Malice for real manual segmentation input. Keep commented for the provided phantom examples.
-# Based on NiftySeg.
-
-cmd_ero  = 'seg_maths {} -ero 1 {}'.format(pfi_input_segmentation_noisy, pfi_input_segmentation_noisy)
-cmd_dil  = 'seg_maths {} -dil 1 {}'.format(pfi_input_segmentation_noisy, pfi_input_segmentation_noisy)
-cmd_smol = 'seg_maths {} -smol 1 {}'.format(pfi_input_segmentation_noisy, pfi_input_segmentation_noisy)
-
-# print_and_run(cmd_ero)
-# print_and_run(cmd_dil)
-# print_and_run(cmd_smol)
 
 # ---- PROCESS ----
 
-lt = NiL()
+nl = nil.App()
 
 # get the report before cleaning
-lt.check.number_connected_components_per_label(pfi_input_segmentation_noisy,
+nl.check.number_connected_components_per_label(pfi_input_segmentation_noisy,
                                                where_to_save_the_log_file=log_file_before_cleaning)
 
 print('Wanted final number of components per label:')
@@ -67,11 +59,11 @@ correspondences_labels_components = [[k, 1] for k in range(np.max(im_input_segme
 print(correspondences_labels_components)
 
 # get the cleaned segmentation
-lt.manipulate_labels.clean_segmentation(pfi_input_segmentation_noisy, pfi_output_cleaned_segmentation,
+nl.manipulate_labels.clean_segmentation(pfi_input_segmentation_noisy, pfi_output_cleaned_segmentation,
                                         labels_to_clean=correspondences_labels_components, force_overwriting=True)
 
 # get the report of the connected components afterwards
-lt.check.number_connected_components_per_label(pfi_output_cleaned_segmentation,
+nl.check.number_connected_components_per_label(pfi_output_cleaned_segmentation,
                                                where_to_save_the_log_file=log_file_after_cleaning)
 
 # ---- GET DIFFERENCE ----

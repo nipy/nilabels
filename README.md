@@ -19,9 +19,11 @@ segmentations in nifti format. It is strongly based on and influenced by the lib
 + [Design pattern](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern)
 + [Work in progress](https://github.com/SebastianoF/nilabels/wiki/Work-in-Progress)
 
-### Introductory example
+### Introductory examples
 
-Given a segmentation `my_segm.nii.gz` imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
+#### manipulate labels: relabel
+
+Given a segmentation, imagine you want to change the labels values from [1, 2, 3, 4, 5, 6] to [2, 12, 4, 7, 5, 6]
 and save the result in `my_new_segm.nii.gz`. Then:
 
 ```python
@@ -32,6 +34,57 @@ nil_app = nil.App()
 nil_app.manipulate_labels.relabel('my_segm.nii.gz', 'my_new_segm.nii.gz',  [1, 2, 3, 4, 5, 6], [2, 12, 4, 7, 5, 6])
 
 ```
+
+#### manipulate labels: clean a segmentation
+
+Given a parcellation for which we expect a single connected component per label, we want to have it cleaned from all the
+extra components, merging them with the closest labels.
+
+```python
+import nilabels as nil
+
+
+nil_app = nil.App()
+
+nil_app.check.number_connected_components_per_label('noisy_segm.nii.gz', where_to_save_the_log_file='before_cleaning.txt')
+nil_app.manipulate_labels.clean_segmentation('noisy_segm.nii.gz', 'cleaned_segm.nii.gz', force_overwriting=True)
+nil_app.check.number_connected_components_per_label('cleaned_segm.nii.gz', where_to_save_the_log_file='after_cleaning.txt')
+
+```
+<p align="center">
+<img src="https://github.com/SebastianoF/nilabels/blob/master/examples/cleaning_before_after.png" width="300">
+</p>
+
+
+Before cleaning `check.number_connected_components_per_label` would return:
+```
+
+Label 0 has 1 connected components
+Label 1 has 13761 connected components
+Label 2 has 14175 connected components
+Label 3 has 14373 connected components
+Label 4 has 1016 connected components
+Label 5 has 806 connected components
+Label 6 has 816 connected components
+Label 7 has 1281 connected components
+Label 8 has 977 connected components
+Label 9 has 746 connected components
+```
+
+The same command after cleaning:
+```
+Label 0 has 1 connected components
+Label 1 has 1 connected components
+Label 2 has 1 connected components
+Label 3 has 1 connected components
+Label 4 has 1 connected components
+Label 5 has 1 connected components
+Label 6 has 1 connected components
+Label 7 has 1 connected components
+Label 8 has 1 connected components
+Label 9 has 1 connected components
+```
+
 
 ### Instructions
 

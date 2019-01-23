@@ -87,7 +87,7 @@ def clean_semgentation(arr_segm, labels_to_clean=(), label_for_holes=-1, verbose
         labels_to_clean = sorted(list(set(arr_segm.flat)))
         labels_to_clean = [[z, 1] for z in labels_to_clean]
 
-    segm_with_holes = np.copy(arr_segm).astype(np.int64)
+    segm_with_holes = np.copy(arr_segm)
     for lab, num_components in labels_to_clean:
         if verbose:
             print('Cleaning label {}, keeping {} components'.format(lab, num_components))

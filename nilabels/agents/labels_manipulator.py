@@ -233,7 +233,7 @@ class LabelsManipulator(object):
         new_segm_data = clean_semgentation(im_segm.get_data(), labels_to_clean=labels_to_clean,
                                            label_for_holes=special_label)
 
-        im_segm_cleaned = set_new_data(im_segm, new_segm_data)
+        im_segm_cleaned = set_new_data(im_segm, new_segm_data.astype(im_segm.get_data_dtype()))
         nib.save(im_segm_cleaned, pfi_out)
         if verbose:
             print('Segmentation {} cleaned saved to {}'.format(pfi_in, pfi_out))
