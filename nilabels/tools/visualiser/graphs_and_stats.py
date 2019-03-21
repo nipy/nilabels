@@ -77,7 +77,7 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
                 ax.plot([theta_i, theta_i], [r[rs_id], r[rs_id+1]], colors_bound, lw=line_width)
             # Add centered nomenclatures if needed, with selected colour
             if add_nomenclatures:
-                if rs == 1 and rs_id ==0:
+                if rs == 1 and rs_id == 0:
                     cell_center = (0, 0)
                 else:
                     cell_center = ((theta_i + theta_i_plus_one) / 2., r[rs_id] + .5 * r[1] )
@@ -89,7 +89,7 @@ def bulls_eye(ax, data, cmap=None, norm=None, raidal_subdivisions=(2, 8, 8, 11),
                     sign, perc = nomenclature_white[0], int(nomenclature_white[1:]) / 100.
                     data_interval = np.max(data) - np.min(data)
                     if sign == '>':
-                        if data[cell_id] >  perc * data_interval + np.min(data):
+                        if data[cell_id] > perc * data_interval + np.min(data):
                             color_nomenclature = 'w'
                     if sign == '<':
                         if data[cell_id] < perc * data_interval + np.min(data):
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     data = np.array(range(29)) + 1
 
     # TEST bull-eye three-fold
-    if False:
+    if True:
 
         fig, ax = plt.subplots(figsize=(12, 8), nrows=1, ncols=3,
                                subplot_kw=dict(projection='polar'))
@@ -297,7 +297,7 @@ if __name__ == '__main__':
 
         plt.show(block=True)
 
-    if True :
+    if False :
         d = {'one': pd.Series([1., 2., 3.], index=['a', 'b', 'c']),
              'two': pd.Series([1.5, 2.5, 3.5, 4.5], index=['a', 'b', 'c', 'd'])}
         df = pd.DataFrame(d)
