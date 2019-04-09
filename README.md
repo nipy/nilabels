@@ -10,7 +10,7 @@
 
 # NiLabels
 
-NiLabels is a cacophony of tools to automatise simple manipulations and measurements of medical image
+NiLabels is a cacophony of tools to automate simple manipulations and measurements of medical image
 segmentations in nifti format. It is strongly based on and influenced by the library [NiBabel](http://nipy.org/nibabel/)
 
 + Written in [Python 3.6](https://docs.python-guide.org/) back compatible with 2.7
