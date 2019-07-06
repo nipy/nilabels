@@ -14,12 +14,12 @@ def requirements2list(pfi_txt='requirements.txt'):
 
 
 setup(name='nilabels',
-      version='v0.0.7',  # update also in definitions.py
+      version='v0.0.8',  # update also in definitions.py
       description='Toolkit to manipulate and measure image segmentations in nifti format.',
       author='sebastiano ferraris',
       author_email='sebastiano.ferraris@gmail.com',
       license='MIT',
-      url='https://github.com/SebastianoF/nilabels',
+      url='https://github.com/nipy/nilabels',
       packages=find_packages(),
       install_requires=requirements2list()
      )
