@@ -7,9 +7,10 @@ jobs:
     steps: &steps
       - checkout
       - run: sudo pip install -r requirements.txt
-      - run: sudo pip install pytest
+      - run: sudo pip install pytest ruff
       - run: python --version ; pip --version ; pwd ; ls
       - run: pytest
+      - run: ruff
   Python_3.10:
     docker:
       - image: circleci/python:3.10
