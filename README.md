@@ -99,6 +99,13 @@ More tools are introduced in the [documentation](https://github.com/SebastianoF/
 
 `nilabel` is a python package managed with [poetry](https://python-poetry.org/) and linted with [ruff](https://docs.astral.sh/ruff/), tested with [pytest](https://docs.pytest.org/en/8.0.x/)
 
+### TODO
+
+Other than the many TODOs around the code, there are two more things:
+
+- typechecking with mypy
+- migrate from cicleCI to github workflows
+
 ### Licencing and Copyright
 
 Copyright (c) 2017, Sebastiano Ferraris. NiLabels  (ex. [LABelsToolkit](https://github.com/SebastianoF/LABelsToolkit))
