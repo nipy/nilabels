@@ -2,6 +2,7 @@
 [![coverage](https://github.com/nipy/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)
 [![CircleCI](https://circleci.com/gh/nipy/nilabels.svg?style=svg)](https://circleci.com/gh/nipy/nilabels)
 [![PyPI version](https://badge.fury.io/py/nilabels.svg)](https://badge.fury.io/py/nilabels)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 
 <p align="center">
@@ -13,7 +14,7 @@
 NiLabels is a cacophony of tools to automate simple manipulations and measurements of medical image
 segmentations in nifti format. It is strongly based on and influenced by the library [NiBabel](http://nipy.org/nibabel/)
 
-+ Written in [Python 3.6](https://docs.python-guide.org/) back compatible with 2.7
++ Written in [Python 3](https://docs.python-guide.org/)
 + [Motivations](https://github.com/SebastianoF/nilabels/wiki/Motivations)
 + [Features](https://github.com/SebastianoF/nilabels/wiki/What-you-can-do-with-nilabels)
 + [Design pattern](https://github.com/SebastianoF/nilabels/wiki/Design-Pattern)
@@ -93,6 +94,10 @@ More tools are introduced in the [documentation](https://github.com/SebastianoF/
 + [How to install](https://github.com/SebastianoF/nilabels/wiki/Instructions)
 + [How to run the tests](https://github.com/SebastianoF/nilabels/wiki/Testing)
 
+
+### Development
+
+`nilabel` is a python package managed with [poetry](https://python-poetry.org/) and linted with [ruff](https://docs.astral.sh/ruff/), tested with [pytest](https://docs.pytest.org/en/8.0.x/)
 
 ### Licencing and Copyright
 

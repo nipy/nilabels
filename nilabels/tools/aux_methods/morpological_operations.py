@@ -3,24 +3,22 @@ from scipy import ndimage
 
 
 def get_morphological_patch(dimension, shape):
-    """
-    :param dimension: dimension of the image (NOT the shape).
+    """:param dimension: dimension of the image (NOT the shape).
     :param shape: circle or square.
     :return: morphological patch as ndimage
     """
-    if shape == 'circle':
+    if shape == "circle":
         morpho_patch = ndimage.generate_binary_structure(dimension, 1)
-    elif shape == 'square':
+    elif shape == "square":
         morpho_patch = ndimage.generate_binary_structure(dimension, 3)
     else:
-        raise IOError
+        raise OSError
 
     return morpho_patch
 
 
-def get_morphological_mask(point, omega, radius=5, shape='circle', morpho_patch=None):
-    """
-    Helper to obtain a morphological mask based on get_morphological_patch
+def get_morphological_mask(point, omega, radius=5, shape="circle", morpho_patch=None):
+    """Helper to obtain a morphological mask based on get_morphological_patch
     :param point: centre of the mask
     :param omega: grid dimension of the image domain. E.g. [256, 256, 128].
     :param radius: radius of the mask if morpho_patch not given.
@@ -32,16 +30,15 @@ def get_morphological_mask(point, omega, radius=5, shape='circle', morpho_patch=
         d = len(omega)
         morpho_patch = get_morphological_patch(d, shape=shape)
 
-    array_mask = np.zeros(omega, dtype=np.bool)
+    array_mask = np.zeros(omega, dtype=bool)
     array_mask.itemset(tuple(point), 1)
     for _ in range(radius):
         array_mask = ndimage.binary_dilation(array_mask, structure=morpho_patch).astype(array_mask.dtype)
     return array_mask
 
 
-def get_values_below_patch(point, target_image, radius=5, shape='circle', morpho_mask=None):
-    """
-    To obtain the list of the values below a maks.
+def get_values_below_patch(point, target_image, radius=5, shape="circle", morpho_mask=None):
+    """To obtain the list of the values below a maks.
     :param point: central point of the patch
     :param target_image: array image whose values we are interested into.
     :param radius: patch radius if morpho_patch is not given.
@@ -57,8 +54,7 @@ def get_values_below_patch(point, target_image, radius=5, shape='circle', morpho
 
 
 def get_circle_shell_for_given_radius(radius, dimension=3):
-    """
-    :param radius: radius of the circle.
+    """:param radius: radius of the circle.
     :param dimension: must be 2 or 3.
     :return: matrix coordinate values for a circle of given input radius and dimension centered at the origin.
     E.G.
@@ -81,5 +77,5 @@ def get_circle_shell_for_given_radius(radius, dimension=3):
                 if (radius - 1) ** 2 < xi ** 2 + yi ** 2 <= radius ** 2:
                     circle.append((xi, yi))
     else:
-        raise IOError('Dimensions allowed are 2 or 3.')
+        raise OSError("Dimensions allowed are 2 or 3.")
     return circle

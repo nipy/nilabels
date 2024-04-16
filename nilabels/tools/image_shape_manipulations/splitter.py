@@ -2,8 +2,7 @@ import numpy as np
 
 
 def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
-    """
-    Split labels of a 3d segmentation in a 4d segmentation,
+    """Split labels of a 3d segmentation in a 4d segmentation,
     one label for each slice in ascending order.
     Labels can be relabelled in consecutive order or can keep the
     original labels value.
@@ -13,7 +12,7 @@ def split_labels_to_4d(in_data, list_labels=(), keep_original_values=True):
     value for all the
     :return:
     """
-    msg = 'Input array must be 3-dimensional.'
+    msg = "Input array must be 3-dimensional."
     assert in_data.ndim == 3, msg
 
     out_data = np.zeros(list(in_data.shape) + [len(list_labels)], dtype=in_data.dtype)

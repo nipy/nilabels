@@ -1,0 +1,81 @@
+[tool.poetry]
+name = "nilabels"
+version = "0.1.0"
+description = ""
+authors = ["SebastianoF <sebastiano.ferraris@gmail.com>"]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+matplotlib = "^3.8.4"
+nibabel = ">=2.3.3"
+numpy = ">=1.16.0"
+pandas = ">=0.23.4"
+scipy = ">=1.2.0"
+setuptools = ">=40.6.3"
+scikit-image = ">=0.14.2"
+sympy = ">=1.3"
+tabulate = ">=0.8.2"
+scikit-learn = ">=0.20.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+ruff = "^0.3.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+extend-select = ["ALL"]
+ignore = [
+    "FIX002",  # TODOs related
+    "TD002",
+    "TD003",
+    "TD004",
+    "TD005",
+    "D103",    # docstring missing. Not all functions require doctsings
+    "D100",    # docstring missing. Not all modules require doctsings
+    "D107",    # missing docstrings
+    "D",       # TODO
+    "ANN",     # TODO
+    "NPY",
+    "PTH",
+    "FBT",
+    "S101",    # we don't dislike assert statements
+    "PLR0913", # too many arguments allowed
+    "PLR2004", # magic values allowed
+    "N806",    # uppercase variable name
+    "ERA001",  # commented out code
+    "EM101",
+    "EM103",
+    "RUF005",
+    "PLR0915",
+    "TCH002",  # false positives
+    "E741",
+    "TRY003",
+    "T201",    # some print statements
+    "N",
+    "SIM115",  # TODO
+    "PD901",
+    "ISC001",
+    "B008",
+    "RET504",
+    "PLR0912",
+    "SIM118",
+    "PLR0912",
+    "C901",
+    "SIM108",
+    "S602",
+    "PERF401",
+    "UP030",
+    "E501",
+    "S605",
+    "S605",
+
+]

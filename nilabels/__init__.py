@@ -1,1 +1,1 @@
-from .agents.agents_controller import AgentsController as App
+from .agents.agents_controller import AgentsController as App  # noqa: F401

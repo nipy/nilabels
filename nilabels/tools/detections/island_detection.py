@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from scipy import ndimage
 
@@ -5,8 +7,7 @@ from nilabels.tools.image_colors_manipulations.relabeller import relabeller
 
 
 def island_for_label(array_segm, label, m=0, special_label=-1):
-    """
-    As ndimage.label, with output ordered by the size of the connected component.
+    """As ndimage.label, with output ordered by the size of the connected component.
     :param array_segm:
     :param label:
     :param m: integer. If m = 0 the n connected components will be numbered from 1 (biggest) to n (smallest).
@@ -20,9 +21,9 @@ def island_for_label(array_segm, label, m=0, special_label=-1):
     If m = 0 it returns the components labelled from 1 to 4, where 1 is the biggest.
     if m = 2 the first two largest components are numbered 1 and 2, and the remaining 2 are labelled with special_label.
     """
-
     if label not in array_segm:
-        print('Label {} not in the provided array.'.format(label))
+        msg = f"Label {label} not in the provided array."
+        logging.info(msg)
         return array_segm
 
     binary_segm_comp, num_comp = ndimage.label(array_segm == label)
