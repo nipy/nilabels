@@ -1,7 +1,6 @@
 
 [![coverage](https://github.com/nipy/nilabels/blob/master/coverage.svg)](https://github.com/SebastianoF/nilabels/blob/master/coverage.svg)
-[![CircleCI](https://circleci.com/gh/nipy/nilabels.svg?style=svg)](https://circleci.com/gh/nipy/nilabels)
-[![github workflow](https://github.com/nipy/nilabels/actions/workflows/python-package.yml/badge.svg?style=svg)](https://github.com/nipy/nilabels/actions/workflows/python-package.yml/badge.svg)
+[![example workflow](https://github.com/nipy/nilabels/actions/workflows/python-package.yml/badge.svg?style=svg)](https://github.com/nipy/nilabels/actions/workflows/python-package.yml/badge.svg)
 [![PyPI version](https://badge.fury.io/py/nilabels.svg)](https://badge.fury.io/py/nilabels)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
