@@ -2,23 +2,24 @@ import os
 from os.path import join as jph
 
 import a_generate_phantoms_for_examples as gen
+
 from nilabels.agents.agents_controller import AgentsController as NiL
 from nilabels.definitions import root_dir
 
 # ---- GENERATE DATA ----
 
 
-if not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids.nii.gz')):
+if not os.path.exists(jph(root_dir, "data_examples", "ellipsoids.nii.gz")):
 
-    creation_list = {'Examples folder'    : False,
-                      'Punt e mes'        : False,
-                      'C'                 : False,
-                      'Planetaruim'       : False,
-                      'Buckle ellipsoids' : True,
-                      'Ellipsoids family' : False,
-                      'Cubes in the sky'  : False,
-                      'Sandwich'          : False,
-                      'Four-folds'        : False}
+    creation_list = {"Examples folder"    : False,
+                      "Punt e mes"        : False,
+                      "C"                 : False,
+                      "Planetaruim"       : False,
+                      "Buckle ellipsoids" : True,
+                      "Ellipsoids family" : False,
+                      "Cubes in the sky"  : False,
+                      "Sandwich"          : False,
+                      "Four-folds"        : False}
 
     gen.generate_figures(creation_list)
 
@@ -27,16 +28,16 @@ if not os.path.exists(jph(root_dir, 'data_examples', 'ellipsoids.nii.gz')):
 
 
 # input
-pfi_input_anatomy      = jph(root_dir, 'data_examples', 'ellipsoids.nii.gz')
-pfi_input_segmentation = jph(root_dir, 'data_examples', 'ellipsoids_seg_half.nii.gz')
-pfo_output_folder      = jph(root_dir, 'data_output')
+pfi_input_anatomy      = jph(root_dir, "data_examples", "ellipsoids.nii.gz")
+pfi_input_segmentation = jph(root_dir, "data_examples", "ellipsoids_seg_half.nii.gz")
+pfo_output_folder      = jph(root_dir, "data_output")
 
 assert os.path.exists(pfi_input_anatomy), pfi_input_anatomy
 assert os.path.exists(pfi_input_segmentation), pfi_input_segmentation
 assert os.path.exists(pfo_output_folder), pfo_output_folder
 
 # output
-pfi_output_segmentation = jph(root_dir, 'data_examples', 'ellipsoids_seg_symmetrised.nii.gz')
+pfi_output_segmentation = jph(root_dir, "data_examples", "ellipsoids_seg_symmetrised.nii.gz")
 
 
 # ---- LABELS LIST ----
@@ -60,13 +61,13 @@ lt.symmetrize.symmetrise_with_registration(pfi_input_anatomy,
                                            pfi_output_segmentation,
                                            results_folder_path=pfo_output_folder,
                                            list_labels_transformed=labels_sym_right,
-                                           coord='z',
+                                           coord="z",
                                            reuse_registration=False)
 
 # --- SEE RESULTS ----
 
-opener1 = 'itksnap -g {} -s {}'.format(pfi_input_anatomy, pfi_input_segmentation)
-opener2 = 'itksnap -g {} -s {}'.format(pfi_input_anatomy, pfi_output_segmentation)
+opener1 = f"itksnap -g {pfi_input_anatomy} -s {pfi_input_segmentation}"
+opener2 = f"itksnap -g {pfi_input_anatomy} -s {pfi_output_segmentation}"
 
 os.system(opener1)
 os.system(opener2)

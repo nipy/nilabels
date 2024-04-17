@@ -1,8 +1,9 @@
 from numpy.testing import assert_array_equal, assert_raises
 
-from nilabels.tools.aux_methods.utils import permutation_from_cauchy_to_disjoints_cycles, \
-    permutation_from_disjoint_cycles_to_cauchy
-
+from nilabels.tools.aux_methods.utils import (
+    permutation_from_cauchy_to_disjoints_cycles,
+    permutation_from_disjoint_cycles_to_cauchy,
+)
 
 # Test permutations:
 
@@ -49,7 +50,7 @@ def test_from_disjoint_cycles_to_permutation_single_cycle():
         assert_array_equal(c1, c2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_from_permutation_to_disjoints_cycles()
     test_from_permutation_to_disjoints_cycles_single_cycle_no_valid_permutation()
     test_from_disjoint_cycles_to_permutation()

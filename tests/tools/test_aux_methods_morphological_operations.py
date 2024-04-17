@@ -1,31 +1,34 @@
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises
 
-from nilabels.tools.aux_methods.morpological_operations import get_morphological_patch, get_morphological_mask, \
-    get_values_below_patch, get_circle_shell_for_given_radius
-
+from nilabels.tools.aux_methods.morpological_operations import (
+    get_circle_shell_for_given_radius,
+    get_morphological_mask,
+    get_morphological_patch,
+    get_values_below_patch,
+)
 
 # TEST aux_methods.morphological.py
 
 
 def test_get_morpological_patch():
-    expected = np.ones([3, 3]).astype(np.bool)
+    expected = np.ones([3, 3]).astype(bool)
     expected[0, 0] = False
     expected[0, 2] = False
     expected[2, 0] = False
     expected[2, 2] = False
-    assert_array_equal(get_morphological_patch(2, 'circle'), expected)
-    assert_array_equal(get_morphological_patch(2, 'square'), np.ones([3, 3]).astype(np.bool))
+    assert_array_equal(get_morphological_patch(2, "circle"), expected)
+    assert_array_equal(get_morphological_patch(2, "square"), np.ones([3, 3]).astype(bool))
 
 
 def test_get_morpological_patch_not_allowed_input():
     with assert_raises(IOError):
-        get_morphological_patch(2, 'spam')
+        get_morphological_patch(2, "spam")
 
 
 def test_get_morphological_mask_not_allowed_input():
     with assert_raises(IOError):
-        get_morphological_mask((5, 5), (11, 11), radius=2, shape='spam')
+        get_morphological_mask((5, 5), (11, 11), radius=2, shape="spam")
 
 
 def test_get_morphological_mask_with_morpho_patch():
@@ -41,7 +44,7 @@ def test_get_morphological_mask_with_morpho_patch():
                               [True,  True,  True],
                               [False,  True, False]]])
 
-    arr_mask = get_morphological_mask((2, 2, 2), (4, 4, 4), radius=1, shape='unused', morpho_patch=morpho_patch)
+    arr_mask = get_morphological_mask((2, 2, 2), (4, 4, 4), radius=1, shape="unused", morpho_patch=morpho_patch)
 
     expected_arr_mask = np.array([[[False, False,  False, False],
                                    [False, False,  False, False],
@@ -67,16 +70,16 @@ def test_get_morphological_mask_with_morpho_patch():
 
 
 def test_get_morphological_mask_with_zero_radius():
-    arr_mask = get_morphological_mask((2, 2, 2), (5, 5, 5), radius=0, shape='circle')
+    arr_mask = get_morphological_mask((2, 2, 2), (5, 5, 5), radius=0, shape="circle")
 
-    expected_arr_mask = np.zeros((5, 5, 5), dtype=np.bool)
+    expected_arr_mask = np.zeros((5, 5, 5), dtype=bool)
     expected_arr_mask[2, 2, 2] = 1
 
     assert_array_equal(arr_mask, expected_arr_mask)
 
 
 def test_get_morphological_mask_without_morpho_patch():
-    arr_mask = get_morphological_mask((2, 2), (5, 5), radius=2, shape='circle')
+    arr_mask = get_morphological_mask((2, 2), (5, 5), radius=2, shape="circle")
     expected_arr_mask = np.array([[False, False,  True, False, False],
                                   [False,  True,  True,  True, False],
                                   [True,  True,  True,  True,  True],
@@ -88,7 +91,7 @@ def test_get_morphological_mask_without_morpho_patch():
 def test_get_patch_values_simple():
     # toy mask on a simple image:
     image = np.random.randint(0, 10, (7, 7))
-    patch = np.zeros_like(image).astype(np.bool)
+    patch = np.zeros_like(image).astype(bool)
     patch[2, 2] = True
     patch[2, 3] = True
     patch[3, 2] = True
@@ -100,9 +103,9 @@ def test_get_patch_values_simple():
 
 def test_get_values_below_patch_no_morpho_mask():
     image = np.ones((7, 7))
-    vals = get_values_below_patch([3, 3], image, radius=1, shape='square')
+    vals = get_values_below_patch([3, 3], image, radius=1, shape="square")
 
-    assert_array_equal([1.0, ] * 9, vals)
+    assert_array_equal([1.0 ] * 9, vals)
 
 
 def test_get_shell_for_given_radius():
@@ -135,7 +138,7 @@ def get_circle_shell_for_given_radius_wrong_input_nd():
         get_circle_shell_for_given_radius(2, dimension=1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_get_morpological_patch()
     test_get_morpological_patch_not_allowed_input()
     test_get_morphological_mask_not_allowed_input()

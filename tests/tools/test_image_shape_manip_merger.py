@@ -1,20 +1,23 @@
-import numpy as np
 import nibabel as nib
+import numpy as np
 
-from nilabels.tools.image_shape_manipulations.merger import reproduce_slice_fourth_dimension, \
-    grafting, substitute_volume_at_timepoint,  stack_images, merge_labels_from_4d, \
-    from_segmentations_stack_to_probabilistic_segmentation
+from nilabels.tools.image_shape_manipulations.merger import (
+    from_segmentations_stack_to_probabilistic_segmentation,
+    grafting,
+    merge_labels_from_4d,
+    reproduce_slice_fourth_dimension,
+    stack_images,
+    substitute_volume_at_timepoint,
+)
 
 
-def test_merge_labels_from_4d_fake_input():
-
+def test_merge_labels_from_4d_fake_input() -> None:
     data = np.zeros([3, 3, 3])
     with np.testing.assert_raises(IOError):
         merge_labels_from_4d(data)
 
 
-def test_merge_labels_from_4d_shape_output():
-
+def test_merge_labels_from_4d_shape_output() -> None:
     data000 = np.zeros([3, 3, 3])
     data111 = np.zeros([3, 3, 3])
     data222 = np.zeros([3, 3, 3])
@@ -30,10 +33,9 @@ def test_merge_labels_from_4d_shape_output():
     np.testing.assert_array_equal([out[0, 0, 0], out[1, 1, 1], out[2, 2, 2]], [1, 2, 3])
 
 
-def test_stack_images_cascade():
-
+def test_stack_images_cascade() -> None:
     d = 2
-    im1 = nib.Nifti1Image(np.zeros([d, d]), affine=np.eye(4))
+    im1 = nib.Nifti1Image(np.zeros([d, d]), affine=np.eye(4), dtype=np.int64)
     np.testing.assert_array_equal(im1.shape, (d, d))
 
     list_images1 = [im1] * d
@@ -49,26 +51,29 @@ def test_stack_images_cascade():
     np.testing.assert_array_equal(im4.shape, (d, d, d, d, d))
 
 
-def test_reproduce_slice_fourth_dimension_wrong_input():
-    im_test = nib.Nifti1Image(np.zeros([5, 5, 5, 5]), affine=np.eye(4))
+def test_reproduce_slice_fourth_dimension_wrong_input() -> None:
+    im_test = nib.Nifti1Image(np.zeros([5, 5, 5, 5]), affine=np.eye(4), dtype=np.int64)
     with np.testing.assert_raises(IOError):
         reproduce_slice_fourth_dimension(im_test)
 
 
-def test_reproduce_slice_fourth_dimension_simple():
+def test_reproduce_slice_fourth_dimension_simple() -> None:
     data_test = np.arange(16).reshape(4, 4)
     num_slices = 4
     repetition_axis = 2
 
-    im_reproduced = reproduce_slice_fourth_dimension(nib.Nifti1Image(data_test, affine=np.eye(4)),
-                                                     num_slices=4, repetition_axis=repetition_axis)
+    im_reproduced = reproduce_slice_fourth_dimension(
+        nib.Nifti1Image(data_test, affine=np.eye(4), dtype=np.int64),
+        num_slices=4,
+        repetition_axis=repetition_axis,
+    )
 
-    data_expected = np.stack([data_test, ] * num_slices, axis=repetition_axis)
+    data_expected = np.stack([data_test] * num_slices, axis=repetition_axis)
 
-    np.testing.assert_array_equal(im_reproduced.get_data(), data_expected)
+    np.testing.assert_array_equal(im_reproduced.get_fdata(), data_expected)
 
 
-def test_grafting_simple():
+def test_grafting_simple() -> None:
     data_hosting = 3 * np.ones([5, 5, 5])
     data_patch = np.zeros([5, 5, 5])
     data_patch[2:4, 2:4, 2:4] = 7
@@ -81,11 +86,10 @@ def test_grafting_simple():
 
     im_grafted = grafting(im_hosting, im_patch)
 
-    np.testing.assert_array_equal(im_grafted.get_data(), data_expected)
+    np.testing.assert_array_equal(im_grafted.get_fdata(), data_expected)
 
 
-def test_from_segmentations_stack_to_probabilistic_segmentation_simple():
-
+def test_from_segmentations_stack_to_probabilistic_segmentation_simple() -> None:
     # Generate initial 1D segmentations:
     #     1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9
     a1 = [0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4]
@@ -106,27 +110,28 @@ def test_from_segmentations_stack_to_probabilistic_segmentation_simple():
     k3 = [0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 5, 6, 5, 5, 3, 3, 2, 1, 0]
     k4 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 4, 5, 6]
 
-    k0 = 1 / 6. * np.array(k0)
-    k1 = 1 / 6. * np.array(k1)
-    k2 = 1 / 6. * np.array(k2)
-    k3 = 1 / 6. * np.array(k3)
-    k4 = 1 / 6. * np.array(k4)
+    k0 = 1 / 6.0 * np.array(k0)
+    k1 = 1 / 6.0 * np.array(k1)
+    k2 = 1 / 6.0 * np.array(k2)
+    k3 = 1 / 6.0 * np.array(k3)
+    k4 = 1 / 6.0 * np.array(k4)
 
     prob_expected = np.stack([k0, k1, k2, k3, k4], axis=0)
     np.testing.assert_array_equal(prob, prob_expected)
 
 
-def test_from_segmentations_stack_to_probabilistic_segmentation_random_sum_rows_to_get_one():
-    J = 12
-    N = 120
-    K = 7
-    stack = np.stack([np.random.choice(range(K), N) for _ in range(J)])
+def test_from_segmentations_stack_to_probabilistic_segmentation_random_sum_rows_to_get_one() -> None:
+    j = 12
+    n = 120
+    k = 7
+    rng = np.random.default_rng(2021)
+    stack = np.stack([rng.choice(range(k), n) for _ in range(j)])
     prob = from_segmentations_stack_to_probabilistic_segmentation(stack)
     s = np.sum(prob, axis=0)
-    np.testing.assert_array_almost_equal(s, np.ones(N))
+    np.testing.assert_array_almost_equal(s, np.ones(n))
 
 
-def test_substitute_volume_at_timepoint_wrong_input():
+def test_substitute_volume_at_timepoint_wrong_input() -> None:
     im_4d = nib.Nifti1Image(np.zeros([5, 5, 5, 3]), affine=np.eye(4))
     im_3d = nib.Nifti1Image(np.ones([5, 5, 5]), affine=np.eye(4))
     tp = 7
@@ -134,18 +139,20 @@ def test_substitute_volume_at_timepoint_wrong_input():
         substitute_volume_at_timepoint(im_4d, im_3d, tp)
 
 
-def test_substitute_volume_at_timepoint_simple():
+def test_substitute_volume_at_timepoint_simple() -> None:
     im_4d = nib.Nifti1Image(np.zeros([5, 5, 5, 4]), affine=np.eye(4))
     im_3d = nib.Nifti1Image(np.ones([5, 5, 5]), affine=np.eye(4))
     tp = 2
-    expected_data = np.stack([np.zeros([5, 5, 5]), np.zeros([5, 5, 5]), np.ones([5, 5, 5]), np.zeros([5, 5, 5])],
-                             axis=3)
+    expected_data = np.stack(
+        [np.zeros([5, 5, 5]), np.zeros([5, 5, 5]), np.ones([5, 5, 5]), np.zeros([5, 5, 5])],
+        axis=3,
+    )
     im_subs = substitute_volume_at_timepoint(im_4d, im_3d, tp)
 
-    np.testing.assert_array_equal(im_subs.get_data(), expected_data)
+    np.testing.assert_array_equal(im_subs.get_fdata(), expected_data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_merge_labels_from_4d_fake_input()
     test_merge_labels_from_4d_shape_output()
 

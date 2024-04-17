@@ -1,31 +1,27 @@
 import numpy as np
 
 
-def get_small_orthogonal_rotation(theta, principal_axis='pitch'):
-    if principal_axis == 'yaw':
-        rot = np.array([[np.cos(theta), -np.sin(theta), 0, 0],
-                        [np.sin(theta), np.cos(theta),  0, 0],
-                        [0,             0,              1, 0],
-                        [0,             0,              0, 1]])
-    elif principal_axis == 'pitch':
-        rot = np.array([[1,            0,           0,       0],
-                        [0,  np.cos(theta),  -np.sin(theta), 0],
-                        [0,  np.sin(theta), np.cos(theta),   0],
-                        [0,             0,          0,       1]])
-    elif principal_axis == 'roll':
-        rot = np.array([[np.cos(theta), 0, np.sin(theta),  0],
-                        [0,             1,      0,         0],
-                        [-np.sin(theta), 0, np.cos(theta), 0],
-                        [0,             0,      0,         1]])
+def get_small_orthogonal_rotation(theta, principal_axis="pitch"):
+    if principal_axis == "yaw":
+        rot = np.array(
+            [[np.cos(theta), -np.sin(theta), 0, 0], [np.sin(theta), np.cos(theta), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+        )
+    elif principal_axis == "pitch":
+        rot = np.array(
+            [[1, 0, 0, 0], [0, np.cos(theta), -np.sin(theta), 0], [0, np.sin(theta), np.cos(theta), 0], [0, 0, 0, 1]],
+        )
+    elif principal_axis == "roll":
+        rot = np.array(
+            [[np.cos(theta), 0, np.sin(theta), 0], [0, 1, 0, 0], [-np.sin(theta), 0, np.cos(theta), 0], [0, 0, 0, 1]],
+        )
     else:
-        raise IOError('principal_axis parameter can be pitch, roll or yaw')
+        raise OSError("principal_axis parameter can be pitch, roll or yaw")
 
     return rot  # to be multiplied on the right side as im_input.affine.dot(rot)
 
 
-def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  translation=np.array([0, 0, 0])):
-    """
-    Exploit the fact that every rotation is uniquely defined by an angle and a rotation direction.
+def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]), translation=np.array([0, 0, 0])):
+    """Exploit the fact that every rotation is uniquely defined by an angle and a rotation direction.
     :param theta: rotation parameter
     :param rotation_axis: rotation axis (3d vector)
     :param translation: tranlsational part.
@@ -33,13 +29,13 @@ def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  trans
     """
     n = np.linalg.norm(rotation_axis)
     if np.abs(n) < 0.001:
-        raise IOError('Input rotation axis too close to zero.')
+        raise OSError("Input rotation axis too close to zero.")
     rot_versor = rotation_axis / n
 
     # Rodriguez magic formula for rotation part:
-    skew_rot_versor = np.array([[0, -rot_versor[2], rot_versor[1]],
-                                [rot_versor[2], 0, -rot_versor[0]],
-                                [-rot_versor[1], rot_versor[0], 0]])
+    skew_rot_versor = np.array(
+        [[0, -rot_versor[2], rot_versor[1]], [rot_versor[2], 0, -rot_versor[0]], [-rot_versor[1], rot_versor[0], 0]],
+    )
     rot_part = np.eye(3) + np.sin(theta) * skew_rot_versor + (1 - np.cos(theta)) * skew_rot_versor.dot(skew_rot_versor)
 
     # transformations parameters
@@ -51,11 +47,11 @@ def get_roto_translation_matrix(theta, rotation_axis=np.array([1, 0, 0]),  trans
 
 
 def basic_90_rot_ax(m, ax=0):
-    """
-    Basic rotations of a 3d matrix. Ingredient of the method axial_rotations.
+    """Basic rotations of a 3d matrix. Ingredient of the method axial_rotations.
     ----------
-    Example:
 
+    Example:
+    -------
     cube = array([[[0, 1],
                    [2, 3]],
 
@@ -73,6 +69,7 @@ def basic_90_rot_ax(m, ax=0):
     :param m: 3d matrix
     :param ax: axis of rotation
     :return: rotate the cube around axis ax, perpendicular to the face [[0,1],[2,3]]
+
     """
     ax %= 3
 
@@ -80,20 +77,17 @@ def basic_90_rot_ax(m, ax=0):
         return np.rot90(m[:, ::-1, :].swapaxes(0, 1)[::-1, :, :].swapaxes(0, 2), 3)
     if ax == 1:
         return m.swapaxes(0, 2)[::-1, :, :]
-    if ax == 2:
-        return np.rot90(m, 1)
+    return np.rot90(m, 1)
 
 
 def axial_90_rotations(m, rot=1, ax=2):
-    """
-    :param m: 3d matrix
+    """:param m: 3d matrix
     :param rot: number of rotations
     :param ax: axis of rotation
     :return: m rotate rot times around axis ax, according to convention.
     """
-
-    if m.ndim is not 3:
-        raise IOError('Input matrix must be a 3d volume.')
+    if m.ndim != 3:
+        raise OSError("Input matrix must be a 3d volume.")
 
     rot %= 4
 
@@ -106,34 +100,37 @@ def axial_90_rotations(m, rot=1, ax=2):
     return m
 
 
-def flip_data(in_data, axis_direction='x'):
-    """
-    Flip an array along one dimension and respect to one orthogonal axis
+def flip_data(in_data, axis_direction="x"):
+    """Flip an array along one dimension and respect to one orthogonal axis
     :param in_data: input array
     :param axis_direction: axis for the flipping
     :return: in_data flipped respect to the axis_direction.
     """
-    if not in_data.ndim == 3:
-        msg = 'Input array must be 3-dimensional.'
-        raise IOError(msg)
+    if in_data.ndim != 3:
+        msg = "Input array must be 3-dimensional."
+        raise OSError(msg)
 
-    if axis_direction == 'x':
+    if axis_direction == "x":
         out_data = in_data[:, ::-1, :]
-    elif axis_direction == 'y':
+    elif axis_direction == "y":
         out_data = in_data[:, :, ::-1]
-    elif axis_direction == 'z':
+    elif axis_direction == "z":
         out_data = in_data[::-1, :, :]
     else:
-        msg = 'axis variable must be one of the following: {}.'.format(['x', 'y', 'z'])
-        raise IOError(msg)
+        msg = "axis variable must be one of the following: {}.".format(["x", "y", "z"])
+        raise OSError(msg)
 
     return out_data
 
 
-def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_copy='below',
-                    keep_in_data_dimensions_boundaries=True):
-    """
-    Symmetrise the input_array according to the axial plane
+def symmetrise_data(
+    in_data,
+    axis_direction="x",
+    plane_intercept=10,
+    side_to_copy="below",
+    keep_in_data_dimensions_boundaries=True,
+):
+    """Symmetrise the input_array according to the axial plane
       axis = plane_intercept
     the copied part can be 'below' or 'above' the axes, following the ordering.
 
@@ -144,17 +141,16 @@ def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_cop
     :param keep_in_data_dimensions_boundaries:
     :return:
     """
-
     # Sanity check:
 
     if not in_data.ndim == 3:
-        raise IOError('Input array must be 3-dimensional.')
+        raise OSError("Input array must be 3-dimensional.")
 
-    if side_to_copy not in ['below', 'above']:
-        raise IOError('side_to_copy must be one of the two {}.'.format(['below', 'above']))
+    if side_to_copy not in ["below", "above"]:
+        raise OSError("side_to_copy must be one of the two {}.".format(["below", "above"]))
 
-    if axis_direction not in ['x', 'y', 'z']:
-        raise IOError('axis variable must be one of the following: {}.'.format(['x', 'y', 'z']))
+    if axis_direction not in ["x", "y", "z"]:
+        raise OSError("axis variable must be one of the following: {}.".format(["x", "y", "z"]))
 
     # step 1: find the block to symmetrise.
     # step 2: create the symmetric and glue it to the block.
@@ -162,68 +158,64 @@ def symmetrise_data(in_data, axis_direction='x', plane_intercept=10, side_to_cop
 
     out_data = None
 
-    if axis_direction == 'x':
-
-        if side_to_copy == 'below':
+    if axis_direction == "x":
+        if side_to_copy == "below":
             s_block = in_data[:, :plane_intercept, :]
             s_block_symmetric = s_block[:, ::-1, :]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=1)
 
-        if side_to_copy == 'above':
+        if side_to_copy == "above":
             s_block = in_data[:, plane_intercept:, :]
             s_block_symmetric = s_block[:, ::-1, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=1)
 
-    if axis_direction == 'y':
-
-        if side_to_copy == 'below':
+    if axis_direction == "y":
+        if side_to_copy == "below":
             s_block = in_data[:, :, :plane_intercept]
             s_block_symmetric = s_block[:, :, ::-1]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=2)
 
-        if side_to_copy == 'above':
+        if side_to_copy == "above":
             s_block = in_data[:, :, plane_intercept:]
             s_block_symmetric = s_block[:, :, ::-1]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=2)
 
-    if axis_direction == 'z':
-
-        if side_to_copy == 'below':
+    if axis_direction == "z":
+        if side_to_copy == "below":
             s_block = in_data[:plane_intercept, :, :]
             s_block_symmetric = s_block[::-1, :, :]
             out_data = np.concatenate((s_block, s_block_symmetric), axis=0)
 
-        if side_to_copy == 'above':
+        if side_to_copy == "above":
             s_block = in_data[plane_intercept:, :, :]
             s_block_symmetric = s_block[::-1, :, :]
             out_data = np.concatenate((s_block_symmetric, s_block), axis=0)
 
     if keep_in_data_dimensions_boundaries:
+        if side_to_copy == "below":
+            out_data = out_data[: in_data.shape[0], : in_data.shape[1], : in_data.shape[2]]
 
-        if side_to_copy == 'below':
-            out_data = out_data[:in_data.shape[0], :in_data.shape[1], :in_data.shape[2]]
-
-        if side_to_copy == 'above':
-            out_data = out_data[out_data.shape[0] - in_data.shape[0]:,
-                                out_data.shape[1] - in_data.shape[1]:,
-                                out_data.shape[2] - in_data.shape[2]:]
+        if side_to_copy == "above":
+            out_data = out_data[
+                out_data.shape[0] - in_data.shape[0] :,
+                out_data.shape[1] - in_data.shape[1] :,
+                out_data.shape[2] - in_data.shape[2] :,
+            ]
 
     return out_data
 
 
 def reorient_b_vect(bvect_array, transform):
-    """
-    Reorient b-vectors of a DWI scan.
+    """Reorient b-vectors of a DWI scan.
     :param bvect_array: array of b-vectors column convention n x 3.
     :param transform: transformation to be applied to each b-vector.
     :return:
     """
-    return np.einsum('...kl,...l->...k', bvect_array, transform).T
+    return np.einsum("...kl,...l->...k", bvect_array, transform).T
 
 
-def reorient_b_vect_from_files(pfi_input, pfi_output, transform, fmt='%.14f'):
-    """
-    Reorient b-vectors of a DWI scan from textfiles.
+def reorient_b_vect_from_files(pfi_input, pfi_output, transform, fmt="%.14f"):
+    """Reorient b-vectors of a DWI scan from textfiles.
     :param pfi_input: input to txt data with b-vectors column convention 'x y z \\'.
     :param pfi_output: output b-vectors after transformation in a new .txt file.
     :param transform: transformation to be applied to each b-vector.
@@ -236,8 +228,7 @@ def reorient_b_vect_from_files(pfi_input, pfi_output, transform, fmt='%.14f'):
 
 
 def matrix_vector_field_product(j_input, v_input):
-    """
-    :param j_input: matrix m x n x (4 or 9) as for example a jacobian column major
+    r""":param j_input: matrix m x n x (4 or 9) as for example a jacobian column major
     :param v_input: matrix m x n x (2 or 3) to be multiplied by the matrix point-wise.
     :return: m x n  x (2 or 3) whose each element is the result of the product of the
      matrix (i,j,:) multiplied by the corresponding element in the vector v (i,j,:).
@@ -261,13 +252,13 @@ def matrix_vector_field_product(j_input, v_input):
 
     """
     if not len(j_input.shape) == len(v_input.shape):
-        raise IOError
+        raise OSError
     if not j_input.shape[:-1] == v_input.shape[:-1]:
-        raise IOError
+        raise OSError
 
     d = v_input.shape[-1]
     vol = list(v_input.shape[:d])
     extra_ones = len(v_input.shape) - (len(vol) + 1)
 
     temp = j_input.reshape(vol + [1] * extra_ones + [d, d])  # transform in squared block with additional ones
-    return np.einsum('...kl,...l->...k', temp, v_input)
+    return np.einsum("...kl,...l->...k", temp, v_input)

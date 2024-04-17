@@ -1,6 +1,6 @@
 import os
 
-__version__ = 'v0.0.8'  # update also in setup.py
+__version__ = "v0.0.8"  # update also in setup.py
 root_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 info = {
@@ -9,13 +9,13 @@ info = {
         "description": "",
         "repository": {
                        "type": "git",
-                       "url": ""
+                       "url": "",
                       },
         "author": "Sebastiano Ferraris",
         "dependencies": {
                          # requirements.txt automatically generated using pipreqs
-                         "python requirements" : "{0}/requirements.txt".format(root_dir)
-                         }
+                         "python requirements" : f"{root_dir}/requirements.txt",
+                         },
         }
 
 

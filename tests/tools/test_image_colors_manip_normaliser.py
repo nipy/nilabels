@@ -1,9 +1,11 @@
-import numpy as np
 import nibabel as nib
-from numpy.testing import assert_array_equal
+import numpy as np
 
-from nilabels.tools.image_colors_manipulations.normaliser import normalise_below_labels, \
-    intensities_normalisation_linear, mahalanobis_distance_map
+from nilabels.tools.image_colors_manipulations.normaliser import (
+    intensities_normalisation_linear,
+    mahalanobis_distance_map,
+    normalise_below_labels,
+)
 
 
 def test_normalise_below_labels():
@@ -22,7 +24,7 @@ def test_normalise_below_labels():
 
     im_normalised_below = normalise_below_labels(im_data, im_segm)
 
-    np.testing.assert_array_almost_equal(im_normalised_below.get_data(), expected_array_normalised)
+    np.testing.assert_array_almost_equal(im_normalised_below.get_fdata(), expected_array_normalised)
 
 
 def test_normalise_below_labels_specified_list():
@@ -45,20 +47,20 @@ def test_normalise_below_labels_specified_list():
     # No labels indicated:
     expected_array_normalised = arr_data / factor_1_2
     im_normalised_below = normalise_below_labels(im_data, im_segm, labels_list=None, exclude_first_label=False)
-    np.testing.assert_array_almost_equal(im_normalised_below.get_data(), expected_array_normalised)
+    np.testing.assert_array_almost_equal(im_normalised_below.get_fdata(), expected_array_normalised)
 
     # asking only for label 2
     expected_array_normalised = arr_data / factor_2
     im_normalised_below = normalise_below_labels(im_data, im_segm, labels_list=[2], exclude_first_label=False)
-    np.testing.assert_array_almost_equal(im_normalised_below.get_data(), expected_array_normalised)
+    np.testing.assert_array_almost_equal(im_normalised_below.get_fdata(), expected_array_normalised)
 
     # asking only for label 1
     expected_array_normalised = arr_data / factor_1
     im_normalised_below = normalise_below_labels(im_data, im_segm, labels_list=[1], exclude_first_label=False)
-    np.testing.assert_array_almost_equal(im_normalised_below.get_data(), expected_array_normalised)
+    np.testing.assert_array_almost_equal(im_normalised_below.get_fdata(), expected_array_normalised)
 
 
-def test_normalise_below_labels_specified_list_exclude_first():
+def test_normalise_below_labels_specified_list_exclude_first() -> None:
     arr_data = np.ones([20, 21, 22])
     arr_segm = np.zeros([20, 21, 22])
 
@@ -75,17 +77,17 @@ def test_normalise_below_labels_specified_list_exclude_first():
 
     expected_array_normalised = arr_data / factor_2
     im_normalised_below = normalise_below_labels(im_data, im_segm, labels_list=[1, 2], exclude_first_label=True)
-    np.testing.assert_array_almost_equal(im_normalised_below.get_data(), expected_array_normalised)
+    np.testing.assert_array_almost_equal(im_normalised_below.get_fdata(), expected_array_normalised)
 
 
 def test_intensities_normalisation():
     arr_data = np.zeros([20, 20, 20])
     arr_segm = np.zeros([20, 20, 20])
 
-    arr_data[:5, :5, :5]          = 2
-    arr_data[5:10, 5:10, 5:10]    = 4
+    arr_data[:5, :5, :5] = 2
+    arr_data[5:10, 5:10, 5:10] = 4
     arr_data[10:15, 10:15, 10:15] = 6
-    arr_data[15:, 15:, 15:]       = 8
+    arr_data[15:, 15:, 15:] = 8
 
     arr_segm[arr_data > 1] = 1
 
@@ -93,24 +95,24 @@ def test_intensities_normalisation():
     im_segm = nib.Nifti1Image(arr_segm, affine=np.eye(4))
 
     im_normalised = intensities_normalisation_linear(im_data, im_segm, im_mask_foreground=im_segm)
-    np.testing.assert_almost_equal(np.min(im_normalised.get_data()), 0.0)
-    np.testing.assert_almost_equal(np.max(im_normalised.get_data()), 10.0)
+    np.testing.assert_almost_equal(np.min(im_normalised.get_fdata()), 0.0)
+    np.testing.assert_almost_equal(np.max(im_normalised.get_fdata()), 10.0)
 
     im_normalised = intensities_normalisation_linear(im_data, im_segm)
-    np.testing.assert_almost_equal(np.min(im_normalised.get_data()), -3.2)
-    np.testing.assert_almost_equal(np.max(im_normalised.get_data()), 10.0)
+    np.testing.assert_almost_equal(np.min(im_normalised.get_fdata()), -3.2)
+    np.testing.assert_almost_equal(np.max(im_normalised.get_fdata()), 10.0)
 
 
 def test_mahalanobis_distance_map():
     data = np.zeros([10, 10, 10])
     im = nib.Nifti1Image(data, affine=np.eye(4))
     md_im = mahalanobis_distance_map(im)
-    np.testing.assert_array_equal(md_im.get_data(), np.zeros_like(md_im.get_data()))
+    np.testing.assert_array_equal(md_im.get_fdata(), np.zeros_like(md_im.get_fdata()))
 
     data = np.ones([10, 10, 10])
     im = nib.Nifti1Image(data, affine=np.eye(4))
     md_im = mahalanobis_distance_map(im)
-    np.testing.assert_array_equal(md_im.get_data(), np.zeros_like(md_im.get_data()))
+    np.testing.assert_array_equal(md_im.get_fdata(), np.zeros_like(md_im.get_fdata()))
 
 
 def test_mahalanobis_distance_map_with_mask():
@@ -126,14 +128,14 @@ def test_mahalanobis_distance_map_with_mask():
     im_mask = nib.Nifti1Image(mask, affine=np.eye(4))
 
     md_im = mahalanobis_distance_map(im, im_mask)
-    np.testing.assert_array_equal(md_im.get_data(), mn_data)
+    np.testing.assert_array_equal(md_im.get_fdata(), mn_data)
 
-    mn_data_trimmed = mn_data * mask.astype(np.bool)
+    mn_data_trimmed = mn_data * mask.astype(bool)
     md_im = mahalanobis_distance_map(im, im_mask, trim=True)
-    np.testing.assert_array_equal(md_im.get_data(), mn_data_trimmed)
+    np.testing.assert_array_equal(md_im.get_fdata(), mn_data_trimmed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_normalise_below_labels()
     test_normalise_below_labels_specified_list()
     test_normalise_below_labels_specified_list_exclude_first()
