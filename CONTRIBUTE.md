@@ -3,41 +3,41 @@
 Thank you your help!
 
 NiLabels (ex LABelsToolkit) started as a python package containing a range of heterogeneous imaging tools to perform
-quick manipulations and measurement on segmentations from ipython or jupyter notebook. 
-Initially planned to support several projects undertook by the initial author, after some development and refactoring 
+quick manipulations and measurement on segmentations from ipython or jupyter notebook.
+Initially planned to support several projects undertook by the initial author, after some development and refactoring
  it is now intended to be part of the Nipy ecosystem, to provide the neuroimaging developer community with another tool.
 
 ## Code of Conduct
 
-This project adopts the [Covenant Code of Conduct](https://contributor-covenant.org/). 
-By participating, you are expected to uphold this code. 
- 
-## Before starting 
+This project adopts the [Covenant Code of Conduct](https://contributor-covenant.org/).
+By participating, you are expected to uphold this code.
+
+## Before starting
 
 Please familiarise with the design pattern and the nomenclature employed.
- + **tools:** core methods are all there, divivded by final intended aim. A tool acts on the numpy arrays or on 
- instances of nibabel images.
- + **agents** are facades collecting all the tools, and make them act directly on the paths to the nifti images.  
- + **main:** is facade of the facades under agents folder package. This collects all the methods under 
+
++ **tools:** core methods are all there, divivded by final intended aim. A tool acts on the numpy arrays or on
+instances of nibabel images.
++ **agents** are facades collecting all the tools, and make them act directly on the paths to the nifti images.  
++ **main:** is facade of the facades under agents folder package. This collects all the methods under
      the agents facades, therefore accessing to all the tools.
-     
+
 Typical usage in an ipython session involves importing the main facade, and then some tab completition to browse
  the provided methods.
- 
-## Contributions: Questions, bugs, issues and new features 
 
-+ For any issue bugs or question related to the code, please raise an issue in the 
+## Contributions: Questions, bugs, issues and new features
+
++ For any issue bugs or question related to the code, please raise an issue in the
 [nilabels issue page](https://github.com/SebastianoF/nilabels/issues).
 
 + Propose here as well improvements suggestions and new features.
 
-+ **Please use a new issue for each thread:** make your issue re-usable and reachable by other users that may have 
++ **Please use a new issue for each thread:** make your issue re-usable and reachable by other users that may have
 encountered a similar problem.
 
-+ If you forked the repository and made some contributions that you would like to integrate in the git master branch, 
-you can do a [git pull request](https://yangsu.github.io/pull-request-tutorial/). Please **check tests are all passed** 
++ If you forked the repository and made some contributions that you would like to integrate in the git master branch,
+you can do a [git pull request](https://yangsu.github.io/pull-request-tutorial/). Please **check tests are all passed**
 before this.
-
 
 ## To update the coverage badge
 
